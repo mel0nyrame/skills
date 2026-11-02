@@ -1,0 +1,6 @@
+interface:
+  display_name: "Git Operations"
+  short_description: "Review changes, split commits, and push within authorization"
+  default_prompt: "Use $git-ops to review current changes and perform only the commits or pushes I explicitly request."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Clarify"
+  short_description: "Clarify the real goal before answering"
+  default_prompt: "Use $clarify to clarify my real goal before answering this question."

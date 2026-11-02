@@ -1,0 +1,6 @@
+interface:
+  display_name: "Recap"
+  short_description: "Turn session knowledge into readable, sourced topics"
+  default_prompt: "Use $recap to preserve the useful knowledge from this conversation."
+policy:
+  allow_implicit_invocation: false

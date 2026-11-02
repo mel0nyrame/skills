@@ -1,0 +1,4 @@
+interface:
+  display_name: "Karpathy Guidelines"
+  short_description: "Complete tasks with focused work and understandable results"
+  default_prompt: "Use $karpathy-guidelines to complete this task, verify the outcome, and explain the result clearly."
