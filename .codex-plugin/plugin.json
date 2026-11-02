@@ -1,0 +1,25 @@
+{
+  "name": "skills",
+  "version": "0.1.0",
+  "description": "Skills for engineering, clarification, research, and knowledge capture.",
+  "author": {
+    "name": "mel0nyrame",
+    "url": "https://github.com/mel0nyrame"
+  },
+  "homepage": "https://github.com/mel0nyrame/skills",
+  "repository": "https://github.com/mel0nyrame/skills",
+  "license": "MIT",
+  "keywords": ["skills", "engineering", "research", "knowledge"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "mel0nyrame Skills",
+    "shortDescription": "Engineering, research, clarification, and knowledge capture",
+    "developerName": "mel0nyrame",
+    "category": "Developer Tools",
+    "defaultPrompt": [
+      "Review the project and implement this change.",
+      "Clarify the goal before answering my question.",
+      "Capture reusable knowledge from this conversation."
+    ]
+  }
+}

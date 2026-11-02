@@ -1,0 +1,17 @@
+{
+  "name": "mel0nyrame-skills",
+  "owner": {
+    "name": "mel0nyrame"
+  },
+  "metadata": {
+    "description": "Personal skills for engineering, thinking, research, and knowledge capture."
+  },
+  "plugins": [
+    {
+      "name": "skills",
+      "source": "./",
+      "description": "Skills for engineering, clarification, research, and knowledge capture.",
+      "category": "development"
+    }
+  ]
+}
