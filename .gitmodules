@@ -1,0 +1,8 @@
+[submodule "pr"]
+	path = skills/engineering/pr
+	url = https://github.com/mattpocock/skills.git
+	update = none
+[submodule "context7-mcp"]
+	path = skills/research/context7-mcp
+	url = https://github.com/upstash/context7.git
+	update = none

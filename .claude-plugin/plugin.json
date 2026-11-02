@@ -1,0 +1,19 @@
+{
+  "name": "skills",
+  "version": "0.1.0",
+  "description": "Skills for engineering, clarification, research, and knowledge capture.",
+  "author": {
+    "name": "mel0nyrame",
+    "url": "https://github.com/mel0nyrame"
+  },
+  "homepage": "https://github.com/mel0nyrame/skills",
+  "repository": "https://github.com/mel0nyrame/skills",
+  "license": "MIT",
+  "keywords": ["skills", "engineering", "research", "knowledge"],
+  "skills": [
+    "./skills/engineering/",
+    "./skills/thinking/",
+    "./skills/research/",
+    "./skills/knowledge/"
+  ]
+}

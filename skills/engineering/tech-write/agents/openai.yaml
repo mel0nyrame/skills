@@ -1,0 +1,6 @@
+interface:
+  display_name: "Technical Writing"
+  short_description: "Verify facts, ownership, and complete technical contracts"
+  default_prompt: "Use $tech-write to review the specified technical prose for ownership, current facts, complete contracts, and hidden context."
+policy:
+  allow_implicit_invocation: true

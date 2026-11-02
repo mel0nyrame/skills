@@ -1,0 +1,15 @@
+interface:
+  display_name: "TinyFish MCP"
+  short_description: "Search, fetch, research, and automate the live web"
+  default_prompt: "Use $tinyfish-mcp to search, fetch, research, or interact with the live web using the lightest appropriate TinyFish MCP tool."
+
+policy:
+  allow_implicit_invocation: true
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "tinyfish"
+      description: "TinyFish MCP server for live web search, content fetching, and browser automation"
+      transport: "streamable_http"
+      url: "https://agent.tinyfish.ai/mcp"
