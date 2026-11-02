@@ -1,0 +1,133 @@
+# Recap for knowledge you can read and retrieve later
+
+English | [简体中文](recap.zh.md) · [All guides](../README.md)
+
+`recap` turns a selected conversation into topic documents preserving explanations, reasons, procedures, and sources. It also queries existing topics and maintains selected knowledge. Use it for material you will need to understand again, such as debugging methods, engineering decisions, and repeatable procedures.
+
+A long conversation may cover two independent questions and later correct one conclusion. The resulting knowledge should explain each topic, identify the correction, and show what supports the current account. A chat date or a few conclusions alone cannot do that.
+
+File descriptions below follow the [execution instructions](../../skills/knowledge/recap/SKILL.md), [document contract](../../skills/knowledge/recap/references/formats.md), and [helper implementation](../../skills/knowledge/recap/scripts/knowledge.py). Reading this guide does not initialize a library.
+
+## Choose a knowledge-library location
+
+Root selection uses an explicit root first, then `RECAP_KNOWLEDGE_ROOT`, then `~/.agents/knowledge`. This is a separate knowledge directory; working on a project does not automatically select that project as the destination.
+
+The helpers need Python 3 and Git. Full-text search normally uses SQLite FTS5 provided through Python. An explicit text-search fallback is available when FTS5 is absent. The assistant reads the library's own `AGENTS.md` before accessing its contents.
+
+**Initialization creates a Git repository and its first commit.** Candidate inspection and formal publication can create further commits. If you require no Git commits, request an uncommitted draft before starting these workflows.
+
+## Request a capture with explicit boundaries
+
+Replace the example directory with your chosen location.
+
+```text
+$skills:recap
+Turn this conversation's debugging methods and decision reasons into topics.
+Use /path/to/my-knowledge and check its existing rules first. Preserve context,
+evidence, failed attempts, applicability, and source locations. Show proposed
+new or updated topics and actual destinations before running steps that create
+Git commits. Wait for my confirmation for those steps. Leave this project's Git
+state untouched.
+```
+
+This uses the collection's Codex plugin. Use `$recap` standalone or `/skills:recap` in Claude Code. Invocation is explicit; ordinary conversation does not automatically trigger capture.
+
+## Follow capture into publication
+
+The assistant establishes the selected conversation, branch, and inspected coverage, then searches related topics. Existing explanations should absorb appropriate findings instead of producing similar copies for every chat. Guesses, executed checks, and user corrections need distinct treatment.
+
+It prepares topic bodies and necessary source records. Coverage gaps and unread attachments remain visible. Locators support traceability, but deleting the original chat leaves only retained excerpts independently inspectable; full replay is not guaranteed.
+
+Formal updates use a candidate worktree and checks. Concurrent changes to the same content require independent review. The inspected version is then published, saved prose and important retrieval are checked, and this successful operation's temporary worktree is cleaned. Failed or pending work remains available.
+
+## Know the resulting files
+
+This illustrative layout shows items that may appear after initialization, capture, and search. Topic names should describe a reader's question, normally in the user's language.
+
+```text
+my-knowledge/
+├── AGENTS.md
+├── index.md
+├── CHANGELOG.md
+├── topics/
+│   └── a-specific-topic.md
+├── sources/
+│   └── host-session-id.md
+├── drafts/
+├── .git/
+├── .state/
+│   ├── library.json
+│   ├── index.sqlite
+│   ├── cursors/
+│   └── published/
+└── .worktree/
+```
+
+| Location | Contents and creation condition |
+| --- | --- |
+| `topics/**/*.md` | Formal explanations, examples, applicability, and source links |
+| `sources/<host>-<session-id>.md` | Source identity, inspected coverage, gaps, and necessary supporting excerpts |
+| `index.md` | Topic-summary reading routes, preserving existing prose outside the managed section |
+| `CHANGELOG.md` | What knowledge changed and why |
+| `drafts/` | Unpublished material, including drafts with unresolved coverage gaps |
+| `.state/library.json` | Library format, branch, and related machine state |
+| `.state/index.sqlite` | Cache created or updated by FTS5 search, not formal topic prose |
+| `.state/cursors/` | Incremental-conversation checkpoints when needed, published with the knowledge they represent |
+| `.state/published/` | Publication-operation records |
+| `.worktree/` | Candidate worktrees; successful cleanup can remove the operation's directory |
+
+Initialization also creates `.gitignore` and internal directories such as `.history/`. These locations do not need manual filler. Machine state, candidates, and search caches cannot replace readable `topics/` content.
+
+## What a topic should look like when opened
+
+A capture of this collection's packaging discussion could begin with this excerpt. It is a teaching example, not a file already saved in your library. Actual publication generates the document metadata.
+
+```markdown
+# Checkout policy for external skill submodules
+
+This topic explains why the collection leaves the external PR and Context7
+repositories unchecked out. It applies to the current packaging layout where
+nine bundled skills share categorized directories.
+
+## Rule and reason
+The external references are Git submodules with update = none in .gitmodules.
+Complete upstream repositories contain other skills that can affect recursive
+discovery when checked out.
+
+## Verification
+Confirm both references remain gitlinks and normal initialization skips checkout.
+Then verify that installer discovery still returns nine bundled skills.
+
+## Source
+Consult the [conversation record](../sources/host-session-id.md), retaining actual
+message coverage and necessary excerpts.
+```
+
+The topic should explain the reason and when verification matters again. A single sentence saying not to initialize submodules would omit applicability and checks.
+
+## Retrieve the knowledge later
+
+Ask a specific question. Default search covers formal topics rather than mixing drafts and raw source records into ordinary results.
+
+```text
+$skills:recap
+Find knowledge about export permission checks. Explain why they belong at the
+shared service entry point, and identify the relevant topic and source.
+Do not add or modify formal knowledge in this query.
+```
+
+Queries can update caches and lock files. Query-only use does not imply zero disk writes. State a strict read-only requirement first if that is necessary, so the assistant can establish a suitable access method.
+
+From this collection's root, this capability check does not create the library. Replace the example root.
+
+```sh
+python3 -B skills/knowledge/recap/scripts/knowledge.py --root /path/to/my-knowledge doctor
+```
+
+An existing populated directory needs migration review rather than empty-library initialization. See [publication, migration, and recovery](../../skills/knowledge/recap/references/operations.md).
+
+## Decide whether useful knowledge was preserved
+
+Open a topic independently. Its question, applicability, and supporting evidence should make sense without the chat. Search for it using different wording and check that it can be found.
+
+A publication commit, index entry, or success message alone is insufficient. A short summary that omits reasons and operating conditions still needs rewriting. A local library is not itself an off-device backup.
