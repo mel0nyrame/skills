@@ -1,0 +1,6 @@
+interface:
+  display_name: "Project ADR"
+  short_description: "Maintain decision facts, rationale, and replacement links"
+  default_prompt: "Use $project-adr to maintain affected engineering decisions under project rules, reuse same-topic owners, check replacement relationships, and validate format, states, and links."
+policy:
+  allow_implicit_invocation: true

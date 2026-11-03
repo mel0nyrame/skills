@@ -1,0 +1,6 @@
+interface:
+  display_name: "Project Git"
+  short_description: "Review changes, split commits, and push within authorization"
+  default_prompt: "Use $project-git to review current changes and perform only the commits or pushes I explicitly request."
+policy:
+  allow_implicit_invocation: true

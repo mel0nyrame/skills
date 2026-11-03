@@ -13,10 +13,12 @@
 | Skill | 用途 |
 | --- | --- |
 | [project-engineering](docs/engineering/project-engineering.zh.md) | 实现项目改动，保存工程知识，同步受影响的决策。 |
-| [decisions](docs/engineering/decisions.zh.md) | 维护长期工程理由、备选方案、生命周期和替代关系。 |
-| [git-ops](docs/engineering/git-ops.zh.md) | 审查工作树、拆分提交，并按用户授权推送。 |
-| [tech-write](docs/engineering/tech-write.zh.md) | 编写和审查自足的技术文字，保留完整契约。 |
+| [project-adr](docs/engineering/project-adr.zh.md) | 维护长期工程理由、备选方案、生命周期和替代关系。 |
+| [project-git](docs/engineering/project-git.zh.md) | 审查工作树、拆分提交，并按用户授权推送。 |
+| [project-prose](docs/engineering/project-prose.zh.md) | 编写和审查自足的技术文字，保留完整契约。 |
 | [pr ↗](https://github.com/mattpocock/skills/tree/main/skills/engineering/pr) | 外部推荐，指向 Matt Pocock 的上游 PR Skill。[使用指南](docs/engineering/pr.zh.md) · [子模块](skills/engineering/pr)。 |
+
+四个 `project-*` Skill 组成一套项目工程工具，分别负责实现与知识维护、长期决策、Git 交付和技术文字。每个 Skill 也可以单独使用。
 
 ### 思考与澄清
 
@@ -109,9 +111,9 @@ codex plugin add skills@mel0nyrame-skills
 
 - `clarify` 提出一个关键问题后暂停，收到回复后再回答。
 - `recap` 仅由用户显式调用。保留 `disable-model-invocation: true` 和 Codex 禁止隐式调用的设置。
-- `git-ops` 分别检查 commit、push 和 PR/MR 操作的授权。先检查项目规则和稳定的结构化提交历史，再决定是否使用中文默认说明。用户对本次任务的明确要求优先。
-- `decisions` 优先遵守目标项目约定。默认检查器接受完整的英文或中文结构，并保留归档排除规则。
-- `project-engineering` 和 `git-ops` 的 PR/MR 正文编写依赖单独安装的上游 `pr`。依赖缺失时报告缺口，不静默安装。
+- `project-git` 分别检查 commit、push 和 PR/MR 操作的授权。先检查项目规则和稳定的结构化提交历史，再决定是否使用中文默认说明。用户对本次任务的明确要求优先。
+- `project-adr` 优先遵守目标项目约定。默认检查器接受完整的英文或中文结构，并保留归档排除规则。
+- `project-engineering` 和 `project-git` 的 PR/MR 正文编写依赖单独安装的上游 `pr`。依赖缺失时报告缺口，不静默安装。
 - Firecrawl 和 TinyFish Skill 需要分别配置对应 MCP 服务。项目仅提供 Skill 和依赖元数据，不包含服务配置或凭据。
 
 ## 维护
@@ -142,7 +144,7 @@ Skill 指令使用英文。同步维护本文件与 [README.md](README.md)。每
 
 ```sh
 python3 -B -m unittest discover -s tests -v
-python3 -B skills/engineering/decisions/scripts/check_adr.py docs/agents/adr
+python3 -B skills/engineering/project-adr/scripts/check_adr.py docs/agents/adr
 npx skills@latest add . --list
 claude plugin validate .claude-plugin/plugin.json --strict
 claude plugin validate .claude-plugin/marketplace.json --strict

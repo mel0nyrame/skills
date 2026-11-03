@@ -1,9 +1,9 @@
 ---
-name: git-ops
+name: project-git
 description: Use when reviewing a Git working tree, splitting or creating commits, pushing branches, or recording Git delivery. Check changes and validation against repository rules, and execute only the authorized delivery stage. Use the external pr skill for PR/MR titles, descriptions, and publication.
 ---
 
-# Git Operations
+# Project Git
 
 Handle the working tree, commits, and pushes within the user's authorization. A commit request does not authorize a push. A push request does not authorize creating or updating a PR/MR or changing an external tracker. Route PR/MR requests to the external [pr skill](https://github.com/mattpocock/skills/tree/main/skills/engineering/pr). If it is unavailable, report that dependency rather than treating a push as a completed PR/MR.
 
@@ -12,7 +12,7 @@ Handle the working tree, commits, and pushes within the user's authorization. A 
 - Read repository and subtree instructions, contribution rules, and Git rules for the current stage. Before drafting commit titles, resolve the project's format and language using [the convention selection rules](references/CONVENTIONS.md#select-conventions).
 - Inspect `git status --short --branch`, unstaged changes, and staged changes. Separate this task's changes from other work. Check remotes, upstream tracking, and outgoing commits when a push is requested.
 - Identify required validation and existing results. Reuse checks from the current task that still cover the same changes. Run focused checks when evidence is missing or invalidated by later edits. Report only commands actually run and their results.
-- For changes to technical prose, confirm that facts and references make sense from the current repository. For lasting engineering decisions, check affected records and their reasons. Use `tech-write` or `decisions` for deeper review when available. Required repository checks still apply when those skills are absent.
+- For changes to technical prose, confirm that facts and references make sense from the current repository. For lasting engineering decisions, check affected records and their reasons. Use `project-prose` or `project-adr` for deeper review when available. Required repository checks still apply when those skills are absent.
 
 ## Create commits
 

@@ -1,8 +1,8 @@
-# Technical Writing for documentation other people can use
+# Project Prose for documentation other people can use
 
-English | [简体中文](tech-write.zh.md) · [All guides](../README.md)
+English | [简体中文](project-prose.zh.md) · [All guides](../README.md)
 
-`tech-write` checks whether technical prose remains understandable without the author's private conversation. It verifies claims against implementation, preserves necessary conditions, checks accessible references, and improves wording. It applies to READMEs, engineering documents, comments, API descriptions, decisions, and agent instructions.
+`project-prose` checks whether technical prose remains understandable without the author's private conversation. It verifies claims against implementation, preserves necessary conditions, checks accessible references, and improves wording. It applies to READMEs, engineering documents, comments, API descriptions, decisions, and agent instructions.
 
 The direct output is usually the document or comment you named. Constraints, failure behavior, and responsibilities must survive the rewrite.
 
@@ -11,14 +11,14 @@ The direct output is usually the document or comment you named. Constraints, fai
 Start with a narrow request. The export feature and path below are teaching examples.
 
 ```text
-$skills:tech-write
+$skills:project-prose
 Review docs/export.md for a contributor new to the project. Check claims against
 implementation and edit that file directly. Preserve permission constraints,
 failure handling, and compatibility requirements. Flag missing evidence rather
 than inventing facts. Do not change behavior code or create a separate report.
 ```
 
-This uses the collection's Codex plugin. Use `$tech-write` standalone or `/skills:tech-write` in Claude Code. Verifying behavior requires relevant source access. With only a prose fragment, the assistant can review expression but must identify unverified facts.
+This uses the collection's Codex plugin. Use `$project-prose` standalone or `/skills:project-prose` in Claude Code. Verifying behavior requires relevant source access. With only a prose fragment, the assistant can review expression but must identify unverified facts.
 
 ## Follow a claim back to something inspectable
 
@@ -50,4 +50,4 @@ There is no default `review.md`, replacement README, or personal glossary. Addit
 
 Read the file alone, without the chat. It should identify the reader, prerequisites, real behavior, and failure handling. Links should lead to actual repository files or declared external sources. Inspect the diff for preserved obligations. A required permission check must not become an optional recommendation.
 
-Relevant, verifiable history and alternatives can remain. Removing every historical word or qualifier is not an accuracy test. The [execution instructions](../../skills/engineering/tech-write/SKILL.md) describe the review method; the [decisions guide](decisions.md) explains maintenance of lasting reasons.
+Relevant, verifiable history and alternatives can remain. Removing every historical word or qualifier is not an accuracy test. The [execution instructions](../../skills/engineering/project-prose/SKILL.md) describe the review method; the [project-adr guide](project-adr.md) explains maintenance of lasting reasons.

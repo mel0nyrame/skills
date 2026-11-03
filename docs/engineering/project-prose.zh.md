@@ -1,8 +1,8 @@
-# Technical Writing 怎样把技术说明写到别人能接着用
+# Project Prose 怎样把技术说明写到别人能接着用
 
-[English](tech-write.md) | 简体中文 · [全部指南](../README.zh.md)
+[English](project-prose.md) | 简体中文 · [全部指南](../README.zh.md)
 
-`tech-write` 用来检查技术文字能否脱离作者的聊天记录独立成立。它会对照实现核实事实，补清读者需要的条件，检查引用是否可访问，再整理表达。适用对象包括 README、工程文档、代码注释、API 说明、决策记录和 Agent 指令。
+`project-prose` 用来检查技术文字能否脱离作者的聊天记录独立成立。它会对照实现核实事实，补清读者需要的条件，检查引用是否可访问，再整理表达。适用对象包括 README、工程文档、代码注释、API 说明、决策记录和 Agent 指令。
 
 这项工作的直接产物通常就是你指定的那份文档或注释。读者需要知道的限制、失败行为和责任边界，改写后仍要保留。
 
@@ -11,14 +11,14 @@
 可以从一个范围很小的请求开始。下面的路径和导出功能用于教学示例。
 
 ```text
-$skills:tech-write
+$skills:project-prose
 审查 docs/export.md，读者是第一次接触项目的贡献者。
 对照相关实现核实说明，直接修改这份文件。
 保留权限限制、失败处理和兼容性要求。
 引用不明的地方先指出缺口，不要编造。不要改功能代码或创建新报告。
 ```
 
-示例使用本项目的 Codex 插件。单独安装时用 `$tech-write`，Claude Code 中用 `/skills:tech-write`。要核实行为，助手需要读取相关实现；只有文档片段时，它能检查表达，也应说明哪些事实尚未核实。
+示例使用本项目的 Codex 插件。单独安装时用 `$project-prose`，Claude Code 中用 `/skills:project-prose`。要核实行为，助手需要读取相关实现；只有文档片段时，它能检查表达，也应说明哪些事实尚未核实。
 
 ## 它会怎样检查
 
@@ -49,4 +49,4 @@ $skills:tech-write
 
 把文档单独打开，不对照聊天。检查它是否说清适用对象、操作条件、实际行为和失败后怎么办。顺着链接阅读，应能找到真实文件或声明的外部来源。修改 diff 也应当保留原有义务，不能把“必须检查权限”改成“建议检查权限”。
 
-历史和备选方案只要仍有用、能够核实，就可以保留。这个 Skill 不会靠删掉所有“以前”“可能”来证明文字准确。完整检查方法见[执行指令](../../skills/engineering/tech-write/SKILL.md)，决策理由的维护见[decisions 指南](decisions.zh.md)。
+历史和备选方案只要仍有用、能够核实，就可以保留。这个 Skill 不会靠删掉所有“以前”“可能”来证明文字准确。完整检查方法见[执行指令](../../skills/engineering/project-prose/SKILL.md)，决策理由的维护见[project-adr 指南](project-adr.zh.md)。

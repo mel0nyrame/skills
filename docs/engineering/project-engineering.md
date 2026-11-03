@@ -45,7 +45,7 @@ There is no fixed bundle generated on every invocation. The task determines impl
 
 In the teaching example, routing exports through a shared permission service could affect future export features and merit documentation. A function's current line number is directly discoverable and usually needs no separate record.
 
-When a target project has no decision convention, the `decisions` fallback is `docs/adr/`. This collection itself uses `docs/agents/adr/`. Those paths apply to different projects.
+When a target project has no decision convention, the `project-adr` fallback is `docs/adr/`. This collection itself uses `docs/agents/adr/`. Those paths apply to different projects.
 
 ## Check the actual result
 
@@ -53,4 +53,4 @@ Expect an inspectable diff, commands actually run with results, and locations of
 
 For the CSV example, verify the requested fields and permissions, relevant tests, and synchronized generated artifacts. Open any reported engineering document. It should explain useful constraints and evidence rather than repeat a directory listing.
 
-A read-only investigation leaves files unchanged and reports findings in chat. Commits, pushes, and PR publication require their own authorization. Continue with [decisions](decisions.md), [technical writing](tech-write.md), or [Git operations](git-ops.md) for those responsibilities.
+A read-only investigation leaves files unchanged and reports findings in chat. Commits, pushes, and PR publication require their own authorization. Continue with [project-adr](project-adr.md), [technical writing](project-prose.md), or [Git operations](project-git.md) for those responsibilities.

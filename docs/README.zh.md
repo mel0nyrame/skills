@@ -13,9 +13,9 @@
 | [clarify](thinking/clarify.zh.md) | 先明确真正要解决的问题 | 对话中的关键问题及后续方案，没有默认文件 |
 | [karpathy-guidelines](thinking/karpathy-guidelines.zh.md) | 控制工作范围，核实假设和结果 | 原任务的代码、文档或答案，没有固定产物目录 |
 | [project-engineering](engineering/project-engineering.zh.md) | 按项目规则实现功能、修复或迁移 | 相关源文件和测试，必要时更新工程知识及决策 |
-| [decisions](engineering/decisions.zh.md) | 保存重要工程选择的理由并维护旧记录 | 项目 ADR 目录中的 Markdown 记录和关联链接 |
-| [git-ops](engineering/git-ops.zh.md) | 审查改动、拆分提交、按授权推送 | 审查说明、本地提交哈希或推送结果，取决于授权 |
-| [tech-write](engineering/tech-write.zh.md) | 让技术说明脱离聊天也能读懂 | 指定文档或注释的更新，或只读审查意见 |
+| [project-adr](engineering/project-adr.zh.md) | 保存重要工程选择的理由并维护旧记录 | 项目 ADR 目录中的 Markdown 记录和关联链接 |
+| [project-git](engineering/project-git.zh.md) | 审查改动、拆分提交、按授权推送 | 审查说明、本地提交哈希或推送结果，取决于授权 |
+| [project-prose](engineering/project-prose.zh.md) | 让技术说明脱离聊天也能读懂 | 指定文档或注释的更新，或只读审查意见 |
 | [pr](engineering/pr.zh.md) | 根据真实 diff 和验证结果写 PR 正文 | 对话草稿，或你指定的 `PR.md` 等文件 |
 | [firecrawl-mcp](research/firecrawl-mcp.zh.md) | 读取和提取网页内容 | 有来源的答案、结构化结果，明确要求后再保存文件 |
 | [tinyfish-mcp](research/tinyfish-mcp.zh.md) | 读取网页，必要时执行筛选和点击 | 提取数据、任务状态，明确要求后再保存文件 |
@@ -50,9 +50,9 @@ $skills:project-engineering
 
 以导出功能这个教学示例来说，`project-engineering` 先确认项目规则和实现入口，再修改功能及测试。有值得长期保留的发现时，它优先补进已有工程文档。目标项目没有合适负责人时，才考虑 `docs/engineering/ENGINEERING.md` 或 `DATA.md` 这些缺省位置。
 
-如果功能涉及新的长期选择，`decisions` 再负责理由和替代关系。目标项目没有约定时，默认记录放在 `docs/adr/`。本集合自己的记录使用 `docs/agents/adr/`，不会因此要求所有项目使用同一路径。
+如果功能涉及新的长期选择，`project-adr` 再负责理由和替代关系。目标项目没有约定时，默认记录放在 `docs/adr/`。本集合自己的记录使用 `docs/agents/adr/`，不会因此要求所有项目使用同一路径。
 
-代码和说明准备好以后，你可以让 `git-ops` 先审查，再明确决定是否 commit 或 push。需要评审正文时再调用外部 `pr`。一次小改动不需要把所有 Skill 依次运行一遍。
+代码和说明准备好以后，你可以让 `project-git` 先审查，再明确决定是否 commit 或 push。需要评审正文时再调用外部 `pr`。一次小改动不需要把所有 Skill 依次运行一遍。
 
 ## 外部服务和知识库有什么额外条件
 
