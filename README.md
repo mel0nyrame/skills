@@ -13,10 +13,12 @@ New to the collection? Start with the [usage guides](docs/README.md) for purpose
 | Skill | Purpose |
 | --- | --- |
 | [project-engineering](docs/engineering/project-engineering.md) | Implement changes, preserve engineering knowledge, and maintain affected decisions. |
-| [decisions](docs/engineering/decisions.md) | Maintain lasting engineering reasons, alternatives, lifecycle, and replacement links. |
-| [git-ops](docs/engineering/git-ops.md) | Review working trees, split commits, and push within user authorization. |
-| [tech-write](docs/engineering/tech-write.md) | Write and review self-contained technical prose with complete contracts. |
+| [project-adr](docs/engineering/project-adr.md) | Maintain lasting engineering reasons, alternatives, lifecycle, and replacement links. |
+| [project-git](docs/engineering/project-git.md) | Review working trees, split commits, and push within user authorization. |
+| [project-prose](docs/engineering/project-prose.md) | Write and review self-contained technical prose with complete contracts. |
 | [pr ↗](https://github.com/mattpocock/skills/tree/main/skills/engineering/pr) | External recommendation: Matt Pocock's upstream PR skill. [Usage guide](docs/engineering/pr.md) · [Submodule](skills/engineering/pr). |
+
+The four `project-*` skills form a project-engineering suite: implementation and knowledge maintenance, durable decisions, Git delivery, and technical prose. Each can also be used independently.
 
 ### Thinking
 
@@ -109,9 +111,9 @@ codex plugin add skills@mel0nyrame-skills
 
 - `clarify` pauses after one decisive question, then answers after your reply.
 - `recap` is explicitly invoked. It preserves both `disable-model-invocation: true` and the Codex implicit-invocation opt-out.
-- `git-ops` keeps separate authorization for commits, pushes, and PR/MR operations. It checks project rules and consistent structured commit history before falling back to Chinese commit descriptions. Explicit task instructions take precedence.
-- `decisions` follows project conventions first. Its default checker accepts complete English and Chinese schemas and preserves archive exclusions.
-- `project-engineering` and `git-ops` use the separately installed upstream `pr` skill for PR/MR descriptions. They report its absence rather than silently installing it.
+- `project-git` keeps separate authorization for commits, pushes, and PR/MR operations. It checks project rules and consistent structured commit history before falling back to Chinese commit descriptions. Explicit task instructions take precedence.
+- `project-adr` follows project conventions first. Its default checker accepts complete English and Chinese schemas and preserves archive exclusions.
+- `project-engineering` and `project-git` use the separately installed upstream `pr` skill for PR/MR descriptions. They report its absence rather than silently installing it.
 - Firecrawl and TinyFish guidance requires the corresponding MCP server to be configured separately. This package provides skills and dependency metadata; it does not bundle server configuration or credentials.
 
 ## Maintain
@@ -142,7 +144,7 @@ Run focused checks from the repository root:
 
 ```sh
 python3 -B -m unittest discover -s tests -v
-python3 -B skills/engineering/decisions/scripts/check_adr.py docs/agents/adr
+python3 -B skills/engineering/project-adr/scripts/check_adr.py docs/agents/adr
 npx skills@latest add . --list
 claude plugin validate .claude-plugin/plugin.json --strict
 claude plugin validate .claude-plugin/marketplace.json --strict

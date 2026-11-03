@@ -1,8 +1,8 @@
-# Git Operations for review, commits, and delivery
+# Project Git for review, commits, and delivery
 
-English | [简体中文](git-ops.zh.md) · [All guides](../README.md)
+English | [简体中文](project-git.zh.md) · [All guides](../README.md)
 
-`git-ops` handles changes already present in a project. It helps inspect the working tree, form coherent commits, and execute a commit or push only when requested.
+`project-git` handles changes already present in a project. It helps inspect the working tree, form coherent commits, and execute a commit or push only when requested.
 
 A commit saves a version in local Git history. A push sends commits to a remote repository. They are separate decisions. You can use the skill only to review changes without authorizing either action.
 
@@ -11,13 +11,13 @@ A commit saves a version in local Git history. A push sends commits to a remote 
 In this teaching example, the working tree contains report-export changes and unrelated login-message edits. Start by reviewing only the export work.
 
 ```text
-$skills:git-ops
+$skills:project-git
 Review report-export changes and tests. Identify problems and suggest commit
 boundaries. Login-message edits belong to other work. Leave them alone.
 For this round, do not edit files, stage, commit, or push.
 ```
 
-This uses the collection's Codex plugin. Use `$git-ops` standalone or `/skills:git-ops` in Claude Code. The assistant needs Git and access to applicable repository rules.
+This uses the collection's Codex plugin. Use `$project-git` standalone or `/skills:project-git` in Claude Code. The assistant needs Git and access to applicable repository rules.
 
 It should distinguish this task's changes from other staged and unstaged work. When a push is requested, it additionally checks remotes, the target branch, upstream tracking, and outgoing commits. Existing validation must still cover the current changes.
 
@@ -60,4 +60,4 @@ During review, check that unrelated edits were not absorbed into the proposed co
 
 Failed validation or hooks should result in an accurate explanation and recoverable state. Hooks are not bypassed to force completion. Force pushes, history rewrites, and remote deletion require explicit authorization matching the scope.
 
-The external [pr skill](pr.md) helps draft the PR body. Creating or updating a hosted PR is another operation. Consult the [naming conventions](../../skills/engineering/git-ops/references/CONVENTIONS.md), [delivery-record rules](../../skills/engineering/git-ops/references/TRACKER.md), and [execution instructions](../../skills/engineering/git-ops/SKILL.md) for details.
+The external [pr skill](pr.md) helps draft the PR body. Creating or updating a hosted PR is another operation. Consult the [naming conventions](../../skills/engineering/project-git/references/CONVENTIONS.md), [delivery-record rules](../../skills/engineering/project-git/references/TRACKER.md), and [execution instructions](../../skills/engineering/project-git/SKILL.md) for details.

@@ -52,4 +52,4 @@ For illustration, moving an export function from a page to a shared service can 
 
 Read the draft as someone absent from the chat. It should explain what changed, why, actual checks, and remaining risks. Filenames must match the diff, and evidence and links should be inspectable.
 
-[git-ops](git-ops.md) handles commits and pushes. See the [upstream instructions](https://github.com/mattpocock/skills/blob/main/skills/engineering/pr/SKILL.md) and [third-party notices](../../THIRD_PARTY_NOTICES.md) for original rules and attribution. This guide does not store a copy of the upstream instruction body.
+[project-git](project-git.md) handles commits and pushes. See the [upstream instructions](https://github.com/mattpocock/skills/blob/main/skills/engineering/pr/SKILL.md) and [third-party notices](../../THIRD_PARTY_NOTICES.md) for original rules and attribution. This guide does not store a copy of the upstream instruction body.

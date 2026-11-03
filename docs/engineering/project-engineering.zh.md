@@ -47,7 +47,7 @@ $skills:project-engineering
 
 例如，导出功能如果必须通过统一权限服务，这个约束以后还会影响其他导出入口，就值得保存。某个函数刚好在第几行，代码本身已经能查到，通常不需要再抄进工程文档。
 
-目标项目没有决策规则时，`decisions` 的默认目录是 `docs/adr/`。本集合自己的决策放在 `docs/agents/adr/`，这两个路径的适用对象不同。
+目标项目没有决策规则时，`project-adr` 的默认目录是 `docs/adr/`。本集合自己的决策放在 `docs/agents/adr/`，这两个路径的适用对象不同。
 
 ## 怎样判断这次工作完成了
 
@@ -55,4 +55,4 @@ $skills:project-engineering
 
 检查 CSV 导出示例时，你需要确认字段和权限符合请求，相关测试覆盖了改动，生成物与源文件一致。打开助手提到的工程文档，应能找到有用的限制和依据，而不是一份复制代码目录的清单。
 
-只要求只读调查时，结果应留在对话中，文件保持不变。commit、push 和发布 PR 需要各自的授权。需要专门处理理由、技术文字或提交时，可继续阅读[工程决策](decisions.zh.md)、[技术写作](tech-write.zh.md)和[Git 操作](git-ops.zh.md)。
+只要求只读调查时，结果应留在对话中，文件保持不变。commit、push 和发布 PR 需要各自的授权。需要专门处理理由、技术文字或提交时，可继续阅读[工程决策](project-adr.zh.md)、[技术写作](project-prose.zh.md)和[Git 操作](project-git.zh.md)。

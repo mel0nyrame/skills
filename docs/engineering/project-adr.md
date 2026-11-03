@@ -1,8 +1,8 @@
-# Decisions for engineering choices and their reasons
+# Project ADR for engineering choices and their reasons
 
-English | [简体中文](decisions.zh.md) · [All guides](../README.md)
+English | [简体中文](project-adr.zh.md) · [All guides](../README.md)
 
-`decisions` preserves why an engineering choice holds, which alternatives were considered, and when it should be reconsidered. The document is often called an architecture decision record, or ADR. The skill also covers lasting engineering choices outside architecture.
+`project-adr` preserves why an engineering choice holds, which alternatives were considered, and when it should be reconsidered. The document is often called an architecture decision record, or ADR. The skill also covers lasting engineering choices outside architecture.
 
 Code may reveal the chosen database without explaining why other options were rejected. A useful record lets a later reader understand the original problem and tradeoffs without recovering the chat.
 
@@ -17,14 +17,14 @@ This collection provides a real example. Its [first packaging decision](../agent
 Use this in the project whose records need work.
 
 ```text
-$skills:decisions
+$skills:project-adr
 Inspect existing decisions about uploaded-file storage. If the choice changed,
 record new reasons and real alternatives, and link old and new records. If only
 implementation paths changed, synchronize the existing record's facts. Show the
 proposed file changes first. Do not archive or delete other records.
 ```
 
-Use `$decisions` standalone or `/skills:decisions` in Claude Code. An undecided choice can be a `proposed` record; discussion alone does not make it implemented.
+Use `$project-adr` standalone or `/skills:project-adr` in Claude Code. An undecided choice can be a `proposed` record; discussion alone does not make it implemented.
 
 ## Understand the file output
 
@@ -60,7 +60,7 @@ Adding a category requires checking the installer paths and discovery results.
 
 Default states distinguish `proposed`, `implemented`, a still-useful `rejected` choice, fully `superseded` records, and frozen `archived` history. An existing project lifecycle takes precedence.
 
-The assistant reads [default-state definitions](../../skills/engineering/decisions/references/LIFECYCLE.md#default-states) when the project lacks a lifecycle convention. Before archiving or deleting records, it reads the separate [preservation and dependency checks](../../skills/engineering/decisions/references/LIFECYCLE.md#archive-or-delete).
+The assistant reads [default-state definitions](../../skills/engineering/project-adr/references/LIFECYCLE.md#default-states) when the project lacks a lifecycle convention. Before archiving or deleting records, it reads the separate [preservation and dependency checks](../../skills/engineering/project-adr/references/LIFECYCLE.md#archive-or-delete).
 
 ## Maintain facts without erasing earlier choices
 
@@ -73,7 +73,7 @@ Archiving and deletion follow task authorization. Archived bodies remain frozen.
 Read whether the record explains the choice before relying on a checker. The default script validates structure, state, and local link paths, not truthful rationale. From this collection's root, check its actual records with this command.
 
 ```sh
-python3 -B skills/engineering/decisions/scripts/check_adr.py docs/agents/adr
+python3 -B skills/engineering/project-adr/scripts/check_adr.py docs/agents/adr
 ```
 
-It reads files and reports results; it does not generate ADRs. Complete Chinese default templates are also accepted. Use project-specific checks for other valid formats rather than rewriting them to satisfy this script. See the [execution instructions](../../skills/engineering/decisions/SKILL.md) and [project integration](../../skills/engineering/decisions/references/PROJECT-INTEGRATION.md).
+It reads files and reports results; it does not generate ADRs. Complete Chinese default templates are also accepted. Use project-specific checks for other valid formats rather than rewriting them to satisfy this script. See the [execution instructions](../../skills/engineering/project-adr/SKILL.md) and [project integration](../../skills/engineering/project-adr/references/PROJECT-INTEGRATION.md).

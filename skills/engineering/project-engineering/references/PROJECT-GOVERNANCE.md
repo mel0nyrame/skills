@@ -8,7 +8,7 @@ Standing instructions own short rules that apply to every change in their scope 
 
 Give each explanation one owner where possible. Elsewhere, retain only the contract consumers need locally and stable links. Keep full rationale, directory inventories, and APIs with their owners.
 
-When establishing ongoing ADR maintenance, use the project-integration workflow in `decisions` for standing triggers, directory contracts, and check commands. Reuse project entry points. On the first decision, fill gaps in existing instructions' maintenance rules. Wire mechanical checks only within the authorized governance scope.
+When establishing ongoing ADR maintenance, use the project-integration workflow in `project-adr` for standing triggers, directory contracts, and check commands. Reuse project entry points. On the first decision, fill gaps in existing instructions' maintenance rules. Wire mechanical checks only within the authorized governance scope.
 
 When knowledge needs preserving and the project has neither a suitable owner nor a storage convention, use `docs/engineering/ENGINEERING.md` for relevant architecture, reusable assets, change entry points, validation, known constraints, observed conventions, or open questions. Use `docs/engineering/DATA.md` for persistent-data knowledge. Create only files and sections with actual content. These are fallback entry points, not mandatory filenames for every project.
 

@@ -1,8 +1,8 @@
-# Decisions 怎样保存工程选择及其理由
+# Project ADR 怎样保存工程选择及其理由
 
-[English](decisions.md) | 简体中文 · [全部指南](../README.zh.md)
+[English](project-adr.md) | 简体中文 · [全部指南](../README.zh.md)
 
-`decisions` 用来保存一项工程选择为什么成立，哪些方案已经比较过，以及什么条件变化后需要重新讨论。文件通常叫 ADR，即架构决策记录。这个 Skill 也处理架构之外的长期工程选择。
+`project-adr` 用来保存一项工程选择为什么成立，哪些方案已经比较过，以及什么条件变化后需要重新讨论。文件通常叫 ADR，即架构决策记录。这个 Skill 也处理架构之外的长期工程选择。
 
 代码可以说明项目用了哪种数据库，却未必能解释为什么放弃另外两种。几年后重读一份合格的记录，应当能看懂当时的问题和取舍，而不必重新找回原来的聊天。
 
@@ -17,14 +17,14 @@
 在需要处理的项目中发送下面的请求。示例使用本项目的 Codex 插件。
 
 ```text
-$skills:decisions
+$skills:project-adr
 检查本项目关于上传文件保存位置的现有决策。
 如果选择已经改变，写清新理由和真实备选方案，维护新旧记录的链接。
 如果只是代码路径改变，同步原记录的事实。
 先展示准备修改的文件，不归档或删除其他记录。
 ```
 
-单独安装时使用 `$decisions`。Claude Code 插件中使用 `/skills:decisions`。如果你尚未作出选择，也可以要求整理 `proposed` 状态的提案，不能将仍在讨论的方案写成已经实施。
+单独安装时使用 `$project-adr`。Claude Code 插件中使用 `/skills:project-adr`。如果你尚未作出选择，也可以要求整理 `proposed` 状态的提案，不能将仍在讨论的方案写成已经实施。
 
 ## 会生成什么文件
 
@@ -60,7 +60,7 @@ Adding a category requires checking the installer paths and discovery results.
 
 `proposed` 表示仍在考虑，`implemented` 表示已经实施，`rejected` 保存仍有预防价值的拒绝理由，`superseded` 表示被完全替代，`archived` 表示冻结的历史。项目已有状态体系时，继续遵守项目体系。
 
-项目没有生命周期约定时，助手才读取[默认状态定义](../../skills/engineering/decisions/references/LIFECYCLE.md#default-states)。归档或删除记录前，再读取单独的[内容保留和依赖检查](../../skills/engineering/decisions/references/LIFECYCLE.md#archive-or-delete)。
+项目没有生命周期约定时，助手才读取[默认状态定义](../../skills/engineering/project-adr/references/LIFECYCLE.md#default-states)。归档或删除记录前，再读取单独的[内容保留和依赖检查](../../skills/engineering/project-adr/references/LIFECYCLE.md#archive-or-delete)。
 
 ## 实现变化后怎样维护
 
@@ -75,7 +75,7 @@ Adding a category requires checking the installer paths and discovery results.
 在本集合根目录，可以执行下面的命令检查本集合的记录。
 
 ```sh
-python3 -B skills/engineering/decisions/scripts/check_adr.py docs/agents/adr
+python3 -B skills/engineering/project-adr/scripts/check_adr.py docs/agents/adr
 ```
 
-它会读文件并报告结果，不会替你生成 ADR。默认检查器也兼容完整的中文结构，但不能用它强行改造另一个项目的有效模板。详细约定见[执行指令](../../skills/engineering/decisions/SKILL.md)和[项目接入流程](../../skills/engineering/decisions/references/PROJECT-INTEGRATION.md)。
+它会读文件并报告结果，不会替你生成 ADR。默认检查器也兼容完整的中文结构，但不能用它强行改造另一个项目的有效模板。详细约定见[执行指令](../../skills/engineering/project-adr/SKILL.md)和[项目接入流程](../../skills/engineering/project-adr/references/PROJECT-INTEGRATION.md)。

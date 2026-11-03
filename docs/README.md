@@ -13,9 +13,9 @@ Start with the result you need. `clarify` provides a focused clarification round
 | [clarify](thinking/clarify.md) | Establish the problem that needs solving | A question and later solution in chat, without a default file |
 | [karpathy-guidelines](thinking/karpathy-guidelines.md) | Keep scope, assumptions, and verification under control | The original task's code, documents, or answer, with no fixed artifact directory |
 | [project-engineering](engineering/project-engineering.md) | Implement features, fixes, or migrations under project rules | Relevant source and tests, plus engineering knowledge and decision updates when needed |
-| [decisions](engineering/decisions.md) | Preserve important choices and maintain existing records | Markdown decisions and links in the project's ADR location |
-| [git-ops](engineering/git-ops.md) | Review changes, form commits, and push within authorization | Review findings, local commit hashes, or push results depending on permission |
-| [tech-write](engineering/tech-write.md) | Make technical prose understandable without the chat | Updated target prose or read-only review findings |
+| [project-adr](engineering/project-adr.md) | Preserve important choices and maintain existing records | Markdown decisions and links in the project's ADR location |
+| [project-git](engineering/project-git.md) | Review changes, form commits, and push within authorization | Review findings, local commit hashes, or push results depending on permission |
+| [project-prose](engineering/project-prose.md) | Make technical prose understandable without the chat | Updated target prose or read-only review findings |
 | [pr](engineering/pr.md) | Write a PR body from actual changes and evidence | A chat draft or an explicitly requested file such as `PR.md` |
 | [firecrawl-mcp](research/firecrawl-mcp.md) | Read and extract web information | Sourced answers or structured data, saved locally only when requested |
 | [tinyfish-mcp](research/tinyfish-mcp.md) | Read pages and interact with filters or controls when necessary | Extracted data and run status, with optional requested local saving |
@@ -49,9 +49,9 @@ This authorizes implementation and validation while retaining Git-delivery bound
 
 In the export teaching example, `project-engineering` establishes project rules and entry points before modifying functionality and tests. Useful findings go into existing engineering documents first. Only without an appropriate owner do fallback paths such as `docs/engineering/ENGINEERING.md` or `DATA.md` become relevant.
 
-A lasting new choice brings in `decisions` for rationale and replacement relationships. Without target-project conventions, its default directory is `docs/adr/`. This collection's own records use `docs/agents/adr/`; that does not impose the same path on every other project.
+A lasting new choice brings in `project-adr` for rationale and replacement relationships. Without target-project conventions, its default directory is `docs/adr/`. This collection's own records use `docs/agents/adr/`; that does not impose the same path on every other project.
 
-Once code and prose are ready, `git-ops` can review them before you separately authorize a commit or push. Use the external `pr` for a review description when needed. A small change does not require every skill in sequence.
+Once code and prose are ready, `project-git` can review them before you separately authorize a commit or push. Use the external `pr` for a review description when needed. A small change does not require every skill in sequence.
 
 ## Additional prerequisites for services and knowledge
 

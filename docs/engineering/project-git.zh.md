@@ -1,8 +1,8 @@
-# Git Operations 怎样审查改动并安全交付
+# Project Git 怎样审查改动并安全交付
 
-[English](git-ops.md) | 简体中文 · [全部指南](../README.zh.md)
+[English](project-git.md) | 简体中文 · [全部指南](../README.zh.md)
 
-`git-ops` 处理已经发生的项目改动。它帮助你看懂工作树、拆分合理的提交，并在你明确要求后执行 commit 或 push。
+`project-git` 处理已经发生的项目改动。它帮助你看懂工作树、拆分合理的提交，并在你明确要求后执行 commit 或 push。
 
 commit 把一个版本保存到本地 Git 历史，push 把提交发送到远程仓库。两步需要分别决定。只想看看代码改得怎样，完全可以只做审查。
 
@@ -11,13 +11,13 @@ commit 把一个版本保存到本地 Git 历史，push 把提交发送到远程
 下面是一个教学示例。工作树中同时有报表导出和登录提示的修改，你只想先检查导出部分。
 
 ```text
-$skills:git-ops
+$skills:project-git
 审查报表导出相关改动和测试，指出问题并建议提交分组。
 登录提示属于另一项工作，不要碰。
 本轮不要修改文件，不要暂存、commit 或 push。
 ```
 
-这个示例使用本项目的 Codex 插件。单独安装时用 `$git-ops`，Claude Code 中用 `/skills:git-ops`。助手需要能够运行 Git，并读取适用的仓库规则。
+这个示例使用本项目的 Codex 插件。单独安装时用 `$project-git`，Claude Code 中用 `/skills:project-git`。助手需要能够运行 Git，并读取适用的仓库规则。
 
 助手应先检查工作树和暂存区，区分本任务改动与其他工作。准备推送时才进一步核对远程地址、目标分支、上游分支和待推送提交。它还要确认验证结果是否真的覆盖当前改动。
 
@@ -59,4 +59,4 @@ $skills:git-ops
 
 验证失败或 hooks 阻止提交时，应报告原因，保留可恢复状态。不能为了交付绕过 hooks。强推、改写历史和删除远端引用需要与目标范围相匹配的明确授权。
 
-写 PR 正文可以交给外部 [pr](pr.zh.md)。创建或更新托管平台上的 PR 仍是另一项操作。默认命名和记录规则分别见[命名约定](../../skills/engineering/git-ops/references/CONVENTIONS.md)、[交付记录](../../skills/engineering/git-ops/references/TRACKER.md)和[执行指令](../../skills/engineering/git-ops/SKILL.md)。
+写 PR 正文可以交给外部 [pr](pr.zh.md)。创建或更新托管平台上的 PR 仍是另一项操作。默认命名和记录规则分别见[命名约定](../../skills/engineering/project-git/references/CONVENTIONS.md)、[交付记录](../../skills/engineering/project-git/references/TRACKER.md)和[执行指令](../../skills/engineering/project-git/SKILL.md)。

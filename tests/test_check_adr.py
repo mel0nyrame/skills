@@ -9,7 +9,7 @@ import unittest
 
 
 SCRIPT = (Path(__file__).resolve().parents[1] / "skills" / "engineering"
-          / "decisions" / "scripts" / "check_adr.py")
+          / "project-adr" / "scripts" / "check_adr.py")
 SPEC = importlib.util.spec_from_file_location("check_adr", SCRIPT)
 ADR = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(ADR)

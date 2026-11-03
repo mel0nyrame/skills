@@ -12,7 +12,7 @@ There is no build step. Run checks from the repository root:
 
 ```sh
 python3 -B -m unittest discover -s tests -v
-python3 -B skills/engineering/decisions/scripts/check_adr.py docs/agents/adr
+python3 -B skills/engineering/project-adr/scripts/check_adr.py docs/agents/adr
 npx skills@latest add . --list
 claude plugin validate .claude-plugin/plugin.json --strict
 claude plugin validate .claude-plugin/marketplace.json --strict
@@ -42,6 +42,6 @@ Keep external `pr` and `context7-mcp` submodules unchecked out under their `upda
 
 ## Commits and Pull Requests
 
-Use focused commits and follow the [Git naming defaults](skills/engineering/git-ops/references/CONVENTIONS.md) unless explicitly overridden.
+Use focused commits and follow the [Git naming defaults](skills/engineering/project-git/references/CONVENTIONS.md) unless explicitly overridden.
 
 Commit, push, and platform publication require explicit authorization. Preserve unrelated staged and unstaged work. PR descriptions should explain behavior, scope, validation actually performed, and remaining limitations. Include representative prompt examples for changed skill behavior and link relevant existing issues.

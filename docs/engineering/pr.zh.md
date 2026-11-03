@@ -52,4 +52,4 @@ $pr
 
 检查草稿能否让没参加聊天的人知道改了什么、为什么改、有哪些真实检查，以及还剩什么风险。正文里的文件名应与 diff 对应，链接和测试结果都应能查到。
 
-Git 提交和推送由 [git-ops](git-ops.zh.md)处理。上游完整指令和署名见[原文](https://github.com/mattpocock/skills/blob/main/skills/engineering/pr/SKILL.md)及[第三方通知](../../THIRD_PARTY_NOTICES.md)，本页不保存其指令副本。
+Git 提交和推送由 [project-git](project-git.zh.md)处理。上游完整指令和署名见[原文](https://github.com/mattpocock/skills/blob/main/skills/engineering/pr/SKILL.md)及[第三方通知](../../THIRD_PARTY_NOTICES.md)，本页不保存其指令副本。

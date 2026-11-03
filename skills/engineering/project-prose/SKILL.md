@@ -1,9 +1,9 @@
 ---
-name: tech-write
+name: project-prose
 description: Use when writing, editing, or reviewing technical documents, code comments/JSDoc, decision records, agent instructions, prompts, or diagnostics. Verify current facts, explanation ownership, and complete contracts. Remove reliance on private conversation, review, or draft context.
 ---
 
-# Self-Contained Technical Writing
+# Project Prose
 
 Ground technical prose in the project's current state. Preserve the facts, obligations, constraints, and sources maintainers need. Remove private author workflows, reasoning transcripts, and stale conversational framing. Apply semantic review rather than keyword-based deletion.
 

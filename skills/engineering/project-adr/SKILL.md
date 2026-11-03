@@ -1,9 +1,9 @@
 ---
-name: decisions
+name: project-adr
 description: Use when adding or changing lasting engineering decisions, implementation affects existing ADRs, or reviewing, superseding, archiving, deleting records, or establishing project decision maintenance.
 ---
 
-# Durable Engineering Decisions
+# Project ADR
 
 Maintain decision memory that prevents repeated mistakes or debates. The scope extends beyond architecture decision records (ADRs). Follow the target repository's formats, locations, lifecycle, and validation rules.
 
