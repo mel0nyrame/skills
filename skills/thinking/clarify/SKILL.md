@@ -1,6 +1,6 @@
 ---
 name: clarify
-description: Clarify the user's real goal before giving a final answer by surfacing hidden assumptions, decision-changing information gaps, and the most common mistake, then asking exactly one decisive question. Use when the user asks to think deeply first, clarify intent, avoid generic advice, stress-test a question, or explicitly invokes clarify for an open-ended plan, decision, recommendation, diagnosis, or creative task.
+description: Use when the user asks to clarify intent or stress-test an open-ended question before receiving an answer. Identify decision-changing gaps, ask one decisive question, and wait for the reply.
 ---
 
 # Clarify

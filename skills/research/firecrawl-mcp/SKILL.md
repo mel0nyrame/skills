@@ -22,8 +22,6 @@ Choose the lightest tool that completes the task. Read a known URL directly inst
 | Click, fill fields, navigate, or expose interactive content | `firecrawl_interact` | Escalate when reading alone is insufficient; close the session afterward |
 | Conduct multi-site structured research with unknown sources | `firecrawl_agent` | Use when ordinary search and selected page reads cannot reasonably complete the task |
 
-For programming evidence, papers, or US legal sources, read [Specialized Search](references/workflows.md#specialized-search). The same reference covers jobs, files, provider data, monitors, and account tools. Read only the section needed for the task.
-
 ## Search and Source Selection
 
 The current hosted `firecrawl_search` schema requires `query` and `objective`. State the user's underlying goal in one sentence in `objective`; reuse it across related calls without including credentials or unrelated private information.
@@ -87,6 +85,17 @@ Set `maxAge: 0` when the task needs a live fetch. Default requests may use recen
 - Distinguish model-context tokens from Firecrawl credits. Smaller output can require additional server-side model processing and does not establish lower service cost.
 - Use monitors, form submission, feedback, and paid provider execution only within the user's requested workflow and existing authorization. A research request alone does not authorize additional messages, acceptance of terms, or recurring jobs.
 
-## Conditional Reference
+## Read before conditional operations
 
-[references/workflows.md](references/workflows.md) covers crawling and research jobs, browser interaction, local files, specialized search, provider data and large results, monitors, and account tools. It also records primary sources and verification limits. When examples differ from the current MCP schema or actual responses, use the live contract.
+Read the matching section before invoking these operations; ordinary Search and URL Scrape do not require every reference section.
+
+| Before this operation | Required reference |
+| --- | --- |
+| Map a site, start Crawl or Agent, or recover a timed-out job | [Crawling and Research Jobs](references/workflows.md#crawling-and-research-jobs) |
+| Start or resume browser interaction | [Browser Interaction](references/workflows.md#browser-interaction) |
+| Upload or parse a local file | [Local File Parsing](references/workflows.md#local-file-parsing) |
+| Use programming, paper, or US legal search tools | [Specialized Search](references/workflows.md#specialized-search) |
+| Inspect or execute a provider, or read retained results | [Provider Data and Large Results](references/workflows.md#provider-data-and-large-results) |
+| Create/manage monitors, inspect account usage, or send feedback | [Monitors and Account Tools](references/workflows.md#monitors-and-account-tools) |
+
+For the recorded evidence scope, read [Primary Sources and Verification Limits](references/workflows.md#primary-sources-and-verification-limits). When examples differ from the current MCP schema or actual responses, use the live contract.

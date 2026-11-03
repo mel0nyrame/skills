@@ -1,6 +1,6 @@
 ---
 name: project-engineering
-description: Use when implementing features, fixing defects, refactoring or migrating a project, or organizing project engineering knowledge. Establish repository rules, reusable capabilities, change entry points, and validation. Persist knowledge that affects future changes and maintain related decision records with the implementation.
+description: Use when implementing features, fixing defects, refactoring or migrating a project, or organizing its engineering knowledge.
 ---
 
 # Project Engineering
@@ -71,24 +71,11 @@ Source code or its API owner owns API details.
 
 Distinguish the runtime **Source of Truth** from the development **Canonical Change Entry Point**. A production database may own runtime facts, while schema definitions and migrations own manual schema changes.
 
-For generated OpenAPI, Protobuf, ORM types, database structures, clients, documentation, compiled assets, configuration, or prompts:
-
-```text
-Locate owner → edit owner → regenerate → review derived diff
-```
-
-By default, change generated or derived artifacts through their owner rather than patching files that regeneration will overwrite.
+When the change touches generated or derived artifacts, read [generated artifacts](references/CHANGE-BOUNDARIES.md#generated-artifacts) before editing. Change their owner, regenerate through the supported process, and review the derived diff.
 
 ## 6. Govern persistent data
 
-When adding persistent data or changing its schema, flow, ownership, isolation, lifecycle, deletion, or rebuild strategy, confirm:
-
-- Owner, scope, namespace, and source of truth.
-- Schema, migration, and backward compatibility.
-- Lifecycle, retention, deletion, and audit.
-- Invalidation and rebuild of derived data, caches, and replicas, including propagation of source deletion.
-
-Apply the same checks to agent memory, embeddings, vector indexes, summaries, checkpoints, and context caches. Derived data, caches, and indexes must not become a business source of truth without explicit design, migration, and compatibility policies.
+When adding persistent data or changing its schema, flow, ownership, isolation, lifecycle, deletion, or rebuild strategy, read [persistent data](references/CHANGE-BOUNDARIES.md#persistent-data) before implementation. Apply that review to agent memory and derived stores as well as business data. Proceed when affected boundaries and the migration/rebuild approach are established; resolve material unknowns first.
 
 ## 7. Implement and persist project knowledge
 

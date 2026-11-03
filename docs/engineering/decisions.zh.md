@@ -60,6 +60,8 @@ Adding a category requires checking the installer paths and discovery results.
 
 `proposed` 表示仍在考虑，`implemented` 表示已经实施，`rejected` 保存仍有预防价值的拒绝理由，`superseded` 表示被完全替代，`archived` 表示冻结的历史。项目已有状态体系时，继续遵守项目体系。
 
+项目没有生命周期约定时，助手才读取[默认状态定义](../../skills/engineering/decisions/references/LIFECYCLE.md#default-states)。归档或删除记录前，再读取单独的[内容保留和依赖检查](../../skills/engineering/decisions/references/LIFECYCLE.md#archive-or-delete)。
+
 ## 实现变化后怎样维护
 
 文件移动、配置键改名，但选择没变，就更新原记录中的事实。选择变了，就保留旧记录所代表的决定，并建立新旧关系。部分替代时，两份记录还可能各自负责一部分理由，不能为了整齐把旧内容全部删掉。

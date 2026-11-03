@@ -60,6 +60,8 @@ Adding a category requires checking the installer paths and discovery results.
 
 Default states distinguish `proposed`, `implemented`, a still-useful `rejected` choice, fully `superseded` records, and frozen `archived` history. An existing project lifecycle takes precedence.
 
+The assistant reads [default-state definitions](../../skills/engineering/decisions/references/LIFECYCLE.md#default-states) when the project lacks a lifecycle convention. Before archiving or deleting records, it reads the separate [preservation and dependency checks](../../skills/engineering/decisions/references/LIFECYCLE.md#archive-or-delete).
+
 ## Maintain facts without erasing earlier choices
 
 A file move or configuration rename can require a factual update while the decision remains valid. A changed choice needs a clear relationship with the earlier decision. Partial replacement can leave unique reasons in both records; deleting the older record for tidiness would lose them.

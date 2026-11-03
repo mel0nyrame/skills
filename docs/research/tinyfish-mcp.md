@@ -2,7 +2,7 @@
 
 English | [简体中文](tinyfish-mcp.zh.md) · [All guides](../README.md)
 
-`tinyfish-mcp` guides web discovery, content reading, and browser tasks through TinyFish. Prefer lightweight reading when the page already exposes the content. Browser automation becomes useful when filters, clicks, or dynamic loading are necessary.
+`tinyfish-mcp` guides web discovery, content reading, and browser tasks assigned to the configured TinyFish MCP server. Select it when you want TinyFish; an explicit request for another service keeps that choice. Prefer lightweight reading when the page already exposes the content. Browser automation becomes useful when filters, clicks, or dynamic loading are necessary.
 
 A concrete task might filter a supplied course catalog to online courses and collect names, fees, and sources. The actions remain bounded by your request.
 
@@ -36,6 +36,8 @@ This uses the collection's Codex plugin. Use `$tinyfish-mcp` standalone or `/ski
 The assistant checks whether the URL can be read directly. Sufficient content needs no separate browser session. When interaction is necessary, the automation goal should specify it precisely.
 
 A long job may initially return a run ID, the service's identifier for that execution. Check the same run rather than starting another because it remains active. Use an available cancellation operation when cancellation is needed.
+
+The assistant reads the relevant [automation workflow](../../skills/research/tinyfish-mcp/references/automation.md) before starting interaction, an asynchronous run, batch jobs, or a raw browser session. Ordinary page reading uses the main tool-selection rules without loading every automation branch.
 
 Returned data still needs checking. Confirm that filters actually took effect, links match the courses, and fees came from pages. A successful click alone cannot prove the requested filter worked.
 
