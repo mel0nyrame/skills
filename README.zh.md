@@ -109,7 +109,7 @@ codex plugin add skills@mel0nyrame-skills
 
 - `clarify` 提出一个关键问题后暂停，收到回复后再回答。
 - `recap` 仅由用户显式调用。保留 `disable-model-invocation: true` 和 Codex 禁止隐式调用的设置。
-- `git-ops` 分别检查 commit、push 和 PR/MR 操作的授权。目标仓库未另行规定时，commit 说明使用中文。
+- `git-ops` 分别检查 commit、push 和 PR/MR 操作的授权。先检查项目规则和稳定的结构化提交历史，再决定是否使用中文默认说明。用户对本次任务的明确要求优先。
 - `decisions` 优先遵守目标项目约定。默认检查器接受完整的英文或中文结构，并保留归档排除规则。
 - `project-engineering` 和 `git-ops` 的 PR/MR 正文编写依赖单独安装的上游 `pr`。依赖缺失时报告缺口，不静默安装。
 - Firecrawl 和 TinyFish Skill 需要分别配置对应 MCP 服务。项目仅提供 Skill 和依赖元数据，不包含服务配置或凭据。

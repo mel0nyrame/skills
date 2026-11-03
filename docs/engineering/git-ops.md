@@ -33,7 +33,16 @@ Do not push.
 
 The assistant stages explicit paths or portions, reviews the staged diff, and commits. Tests, lockfiles, and required generated outputs belong with the implementation they support. Split when intentions are independently explainable and reversible, rather than by file count alone.
 
-Without repository naming rules, a branch can use `feat/report-export`. The default commit title is `<type>(<scope>): <Chinese description>`. Established target-project rules take precedence.
+Before drafting a commit title, the assistant checks applicable repository instructions, contribution guides, and commit-tool configuration for both format and description language. Where written rules are silent, it checks relevant recent non-merge commits for a consistent, structured convention. Explicit task instructions take precedence.
+
+| Available guidance | Commit-title choice |
+| --- | --- |
+| Project requires English Conventional Commits | `feat(export): add report export` |
+| No written rule, but recent commits consistently use English Conventional Commits | Follow that format and English descriptions |
+| Only loose titles such as `fix xxx`, `add xxx`, `修复了xxx`, or `加入xxx` | Use the default `feat(export): 增加报表导出` |
+| User explicitly requests English, with no project title format | Keep the default structure and write `feat(export): add report export` |
+
+Format and language are resolved separately; defaults fill only unspecified aspects. Without an established convention or explicit override, the title is `<type>(<scope>): <Chinese description>`, with optional scope. A branch can use `feat/report-export` when no branch naming rule exists. These are teaching examples, not commit results.
 
 ## Know what the operation produces
 

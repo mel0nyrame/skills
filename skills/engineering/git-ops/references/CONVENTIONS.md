@@ -1,6 +1,17 @@
 # Git Naming and Commit Splitting
 
-Follow explicit target repository conventions. These defaults apply when a project has none.
+Resolve the target project's conventions first. The defaults below apply only to aspects left unspecified.
+
+## Select conventions
+
+Before drafting commit titles:
+
+1. Apply explicit task instructions about naming format or description language.
+2. Read applicable repository and subtree instructions, contribution guides, and commit-tool configuration such as commitlint. Written project requirements take precedence over historical examples.
+3. Where written rules are silent, inspect relevant recent non-merge commits. Follow a consistent, structured naming pattern and its description language. Isolated examples or loose titles such as `fix xxx`, `add xxx`, `修复了xxx`, and `加入xxx` do not establish a naming convention.
+4. Resolve format and language separately. Keep each requirement found above; use the defaults below only for unspecified aspects.
+
+For example, a documented requirement or consistent history of `fix(auth): handle expired tokens` calls for English descriptions. An explicit English-only requirement with no title format keeps the default `<type>(<scope>):` structure and uses English descriptions. Unstructured history alone leaves the Chinese default in effect.
 
 ## Branches
 
@@ -22,13 +33,13 @@ Use a short, recognizable English kebab-case topic. Rename pushed or shared bran
 
 ## Commit titles
 
-Format:
+Default format:
 
 ```text
 <type>(<scope>): <Chinese description>
 ```
 
-The optional `scope` uses short English kebab-case. Use an ASCII colon followed by one space. Write the description in Chinese so that a reader unfamiliar with the conversation can understand what the commit delivers. This output-language convention applies even though the skill instructions are in English; explicit repository conventions take precedence.
+The optional `scope` uses short English kebab-case. Use an ASCII colon followed by one space. When convention selection leaves the description language unspecified, write it in Chinese. Make the title understandable without the conversation. The skill's English instruction language does not determine the commit language.
 
 Examples:
 

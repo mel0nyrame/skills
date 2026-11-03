@@ -109,7 +109,7 @@ codex plugin add skills@mel0nyrame-skills
 
 - `clarify` pauses after one decisive question, then answers after your reply.
 - `recap` is explicitly invoked. It preserves both `disable-model-invocation: true` and the Codex implicit-invocation opt-out.
-- `git-ops` keeps separate authorization for commits, pushes, and PR/MR operations. Its fallback commit convention uses Chinese descriptions unless target repository rules specify otherwise.
+- `git-ops` keeps separate authorization for commits, pushes, and PR/MR operations. It checks project rules and consistent structured commit history before falling back to Chinese commit descriptions. Explicit task instructions take precedence.
 - `decisions` follows project conventions first. Its default checker accepts complete English and Chinese schemas and preserves archive exclusions.
 - `project-engineering` and `git-ops` use the separately installed upstream `pr` skill for PR/MR descriptions. They report its absence rather than silently installing it.
 - Firecrawl and TinyFish guidance requires the corresponding MCP server to be configured separately. This package provides skills and dependency metadata; it does not bundle server configuration or credentials.
