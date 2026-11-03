@@ -2,7 +2,7 @@
 
 English | [简体中文](tinyfish-mcp.zh.md) · [All guides](../README.md)
 
-`tinyfish-mcp` guides web discovery, content reading, and browser tasks assigned to the configured TinyFish MCP server. Select it when you want TinyFish; an explicit request for another service keeps that choice. Prefer lightweight reading when the page already exposes the content. Browser automation becomes useful when filters, clicks, or dynamic loading are necessary.
+`tinyfish-mcp` guides web discovery, content reading, and browser tasks through TinyFish. Use it when you select TinyFish or the assistant chooses TinyFish MCP tools for the task. An explicit request for another service keeps that choice. Prefer lightweight reading when the page already exposes the content. Browser automation becomes useful when filters, clicks, or dynamic loading are necessary.
 
 A concrete task might filter a supplied course catalog to online courses and collect names, fees, and sources. The actions remain bounded by your request.
 

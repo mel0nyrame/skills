@@ -4,6 +4,8 @@ English | [简体中文](firecrawl-mcp.zh.md) · [All guides](../README.md)
 
 `firecrawl-mcp` guides use of connected Firecrawl tools for finding pages, reading known URLs, extracting fields, and, when necessary, interacting with dynamic pages or collecting a bounded section of a site.
 
+Use it when you select Firecrawl or the assistant chooses Firecrawl MCP tools for the task. An explicit request for another service keeps that choice. Before Map, Crawl, or Agent operations, the assistant reads the corresponding URL-discovery, multi-page, or research subsection.
+
 It helps turn material from several pages into a consistent result while retaining sources and checking content. Installing the skill adds instructions; the Firecrawl MCP service needs its own connection.
 
 ## Establish a working service connection

@@ -1,6 +1,6 @@
 ---
 name: firecrawl-mcp
-description: Use Firecrawl MCP for live web search, source verification, reading URLs, structured extraction, scoped site crawling, and browser interaction. Apply when the user selects Firecrawl or an online-source task can use the configured Firecrawl server. Respect an explicit choice of another service.
+description: Use when the user selects Firecrawl or the agent has chosen Firecrawl MCP tools for web search, source verification, page reading, structured extraction, site crawling, or browser interaction. Respect an explicit choice of another service.
 ---
 
 # Firecrawl MCP
@@ -91,7 +91,9 @@ Read the matching section before invoking these operations; ordinary Search and 
 
 | Before this operation | Required reference |
 | --- | --- |
-| Map a site, start Crawl or Agent, or recover a timed-out job | [Crawling and Research Jobs](references/workflows.md#crawling-and-research-jobs) |
+| Map a site's URLs | [Site URL Discovery](references/workflows.md#site-url-discovery) |
+| Start or check a Crawl job | [Multi-page Content](references/workflows.md#multi-page-content) |
+| Start, check, or continue Agent research | [Multi-site Research](references/workflows.md#multi-site-research) |
 | Start or resume browser interaction | [Browser Interaction](references/workflows.md#browser-interaction) |
 | Upload or parse a local file | [Local File Parsing](references/workflows.md#local-file-parsing) |
 | Use programming, paper, or US legal search tools | [Specialized Search](references/workflows.md#specialized-search) |

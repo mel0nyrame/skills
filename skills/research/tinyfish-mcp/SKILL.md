@@ -1,6 +1,6 @@
 ---
 name: tinyfish-mcp
-description: Use for web search, page reading, extraction, or browser automation when the user selects TinyFish or the task is routed to its configured MCP server. Respect an explicit choice of another service.
+description: Use when the user selects TinyFish or the agent has chosen TinyFish MCP tools for web search, page reading, extraction, or browser automation. Respect an explicit choice of another service.
 ---
 
 # TinyFish MCP
