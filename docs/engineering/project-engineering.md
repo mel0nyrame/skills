@@ -30,6 +30,8 @@ It then follows relevant calls to find the change entry point. An existing share
 
 Persistent-data changes require understanding ownership, retention, deletion, and rebuild behavior. A page-only button does not by itself justify new database-governance documents.
 
+For generated artifacts or persistent-data changes, the assistant reads the matching [change-boundary checklist](../../skills/engineering/project-engineering/references/CHANGE-BOUNDARIES.md) before editing. The main workflow retains the reading conditions and completion checks; detailed branch rules are loaded when applicable.
+
 After implementation, the assistant runs focused checks, inspects actual results, and synchronizes affected documentation and decision facts. A verification claim should identify the check and outcome.
 
 ## Files you may receive

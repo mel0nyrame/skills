@@ -1,6 +1,6 @@
 ---
 name: project-adr
-description: Use when adding or changing lasting engineering decisions, implementation changes affect existing ADRs, or reviewing, superseding, archiving, deleting records, or establishing project ADR maintenance. Synchronize active records with implementation, preserve lasting reasons and real alternatives, and check same-topic supersession.
+description: Use when adding or changing lasting engineering decisions, implementation affects existing ADRs, or reviewing, superseding, archiving, deleting records, or establishing project decision maintenance.
 ---
 
 # Project ADR
@@ -87,26 +87,11 @@ Code and configuration own current behavior. Tests own executable guarantees. Ge
 
 Follow existing project lifecycle rules or stable state conventions, including whether a state is mandatory, whether it lives in YAML or prose, and the vocabulary. Determine meaning from actual implementation and replacement links. A label such as `accepted` does not prove implementation. Preserve existing representation. If a project has no state field, verify the actual lifecycle and express required supersession relationships in its own format.
 
-When no state convention exists and the default structure is used, choose one value:
-
-- **implemented:** delivered and still guides future changes. Keep references accurate as facts change, preserving the original decision.
-- **proposed:** genuinely under consideration. After implementation, change it to `implemented` and describe delivered reality rather than a remaining plan.
-- **rejected:** retain only while the wrong approach remains tempting and the record prevents repeated debate. Deletion is allowed when the record is stale, misleading, replaced, or no longer preventive.
-- **superseded:** fully replaced, with an explicit replacement-record link. A partly replaced record keeps its still-valid state and identifies the replaced scope.
-- **archived:** a frozen historical snapshot. Preserve its wording, facts, and outbound links. It cannot establish current behavior.
-
-Completion and age do not automatically justify archive. Consider archive when only one-time implementation details, a closed local fix, or low-value history already obvious from current owners remain. When uncertain, preserve the record and state the judgment boundary. Avoid age, length, or count quotas.
+When the project has no state convention and the default structure is used, read [default states](references/LIFECYCLE.md#default-states) before assigning a state. Confirm the state matches implementation and replacement relationships.
 
 ## Archive or delete safely
 
-Follow the repository's complete protocol. Handle language variants, metadata, manifests, signatures, and hashes together. Before moving or deleting:
-
-1. Enumerate unique propositions and confirm an owner for everything that needs preserving.
-2. Search filenames, titles, symbols, configuration keys, and links to identify dependents.
-3. Repair inbound links from active content so the old path no longer acts as current authority.
-4. Use recoverable, reviewable changes permitted by the repository.
-
-An archive operation changes only the state, location, and mechanical metadata permitted by repository protocol. After archive, the body remains permanently frozen.
+Before archiving or deleting a record, read [the retirement protocol](references/LIFECYCLE.md#archive-or-delete). Complete its preservation and dependency checks within task authorization. Archived bodies remain frozen.
 
 ## Validate and report
 

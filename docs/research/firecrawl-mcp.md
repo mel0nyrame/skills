@@ -4,6 +4,8 @@ English | [简体中文](firecrawl-mcp.zh.md) · [All guides](../README.md)
 
 `firecrawl-mcp` guides use of connected Firecrawl tools for finding pages, reading known URLs, extracting fields, and, when necessary, interacting with dynamic pages or collecting a bounded section of a site.
 
+Use it when you select Firecrawl or the assistant chooses Firecrawl MCP tools for the task. An explicit request for another service keeps that choice. Before Map, Crawl, or Agent operations, the assistant reads the corresponding URL-discovery, multi-page, or research subsection.
+
 It helps turn material from several pages into a consistent result while retaining sources and checking content. Installing the skill adds instructions; the Firecrawl MCP service needs its own connection.
 
 ## Establish a working service connection
@@ -37,6 +39,8 @@ This uses the collection's Codex plugin. Use `$firecrawl-mcp` standalone or `/sk
 Known URLs should normally be read directly. Search is useful when sources must first be found. Inspect original pages when required fields are absent, and escalate to interaction only when clicks or dynamic loading require it.
 
 Site collection also needs paths, page limits, and depth. A long-running task can initially return a job identifier. The assistant should retain it and check status; an identifier alone is not a completed collection.
+
+Before browser interaction, local-file upload, provider execution, or another conditional operation, the assistant follows the [operation-specific reading routes](../../skills/research/firecrawl-mcp/SKILL.md#read-before-conditional-operations). Ordinary search and page reading do not require loading every workflow.
 
 Numbers need association with their actual plan, currency, and billing period. Generated summaries or answers require source checking before being presented as exact quotations.
 
