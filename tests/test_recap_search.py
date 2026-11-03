@@ -188,6 +188,75 @@ class SearchTests(unittest.TestCase):
                 self.assertEqual(self.paths(query, fallback), ["topics/plain.md"])
             self.assertEqual(self.paths("destinationmarker", fallback), [])
 
+    def test_reference_keys_are_excluded_but_labels_remain_searchable(self):
+        self.topic("references.md", "References",
+                   "[Visible label][ HiddenRefKey ] and [Collapsed label][]\n\n"
+                   "[hiddenrefkey]: ../sources/example.md\n"
+                   "[Collapsed label]: ../sources/example.md")
+        for fallback in (False, True):
+            with self.subTest(fallback=fallback):
+                self.assertEqual(self.paths("hiddenrefkey", fallback), [])
+                for query in ("Visible", "Collapsed"):
+                    self.assertEqual(self.paths(query, fallback), ["topics/references.md"])
+
+    def test_undefined_reference_syntax_remains_literal_text(self):
+        self.topic("literal.md", "Literal text", "[Visible label][undefinedkey]")
+        for fallback in (False, True):
+            self.assertEqual(self.paths("undefinedkey", fallback), ["topics/literal.md"])
+
+    def test_normalized_phrase_stays_visible_in_long_line_snippet(self):
+        for phrase in ("并发，安全", "并发  安全"):
+            path = self.topic("long.md", "Long example", "x " * 400 + phrase + "需要锁。")
+            for fallback in (False, True):
+                with self.subTest(phrase=phrase, fallback=fallback):
+                    hit = self.results("并发安全", fallback)[0]
+                    self.assertIn(phrase, hit["snippet"])
+                    self.assertLessEqual(len(hit["snippet"]), 350)
+                    self.assertIn(phrase, path.read_text().splitlines()[hit["line"] - 1])
+
+    def test_snippet_anchors_actual_identifier_after_a_similar_prefix(self):
+        self.topic("long.md", "Long example",
+                   "session.prompting " + "x " * 400 + "session.prompt sends input.")
+        for fallback in (False, True):
+            hit = self.results("session.prompt", fallback)[0]
+            self.assertIn("session.prompt sends input.", hit["snippet"])
+
+    def test_phrase_across_lines_keeps_original_start_line(self):
+        path = self.topic("multiline.md", "Multiple lines", "说明文字。\n\n并发\n安全需要锁。")
+        for fallback in (False, True):
+            hit = self.results("并发安全", fallback)[0]
+            self.assertIn("并发\n安全", hit["snippet"])
+            self.assertEqual(path.read_text().splitlines()[hit["line"] - 1], "并发")
+
+    def test_link_projection_keeps_long_snippet_source_offsets(self):
+        self.topic("long.md", "Long example",
+                   "[Visible](../sources/" + "destination" * 50 + ".md) "
+                   + "x " * 400 + "并发，安全需要锁。")
+        for fallback in (False, True):
+            hit = self.results("并发安全", fallback)[0]
+            self.assertIn("并发，安全", hit["snippet"])
+
+    def test_schema2_cache_rebuilds_changed_reference_projection(self):
+        if not knowledge.fts_available():
+            self.skipTest("SQLite FTS5 unavailable")
+        path = self.topic("references.md", "References",
+                          "[Visible label][hiddenrefkey]\n\n"
+                          "[hiddenrefkey]: ../sources/example.md")
+        original = path.read_bytes()
+        cache = self.root / ".state/index.sqlite"
+        with closing(sqlite3.connect(cache)) as conn, conn:
+            conn.execute("CREATE TABLE metadata (key TEXT PRIMARY KEY, value TEXT)")
+            conn.execute("INSERT INTO metadata VALUES ('schema','2')")
+            conn.execute("CREATE TABLE documents (path TEXT PRIMARY KEY, sha TEXT, title TEXT, body TEXT)")
+            conn.execute("CREATE VIRTUAL TABLE search USING fts5(path UNINDEXED,title,aliases,summary,body)")
+            conn.execute("INSERT INTO documents VALUES (?,?,?,?)",
+                         ("topics/references.md", knowledge.digest(original), "References", original.decode()))
+            conn.execute("INSERT INTO search VALUES (?,?,?,?,?)",
+                         ("topics/references.md", "", "", "", knowledge.normalize("Visible label hiddenrefkey")))
+        self.assertEqual(self.paths("hiddenrefkey"), [])
+        self.assertEqual(self.paths("Visible"), ["topics/references.md"])
+        self.assertEqual(path.read_bytes(), original)
+
     def test_public_search_and_read_keep_revision_checks(self):
         knowledge.initialize(self.root)
         path = self.topic("scope.md", "Current", "session.prompt sends input.")

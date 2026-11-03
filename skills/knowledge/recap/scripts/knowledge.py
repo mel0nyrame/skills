@@ -2,6 +2,7 @@
 """Capture/query knowledge through bounded reads and reviewed Git worktree publication."""
 from __future__ import annotations
 import argparse
+from bisect import bisect_right
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -45,20 +46,23 @@ CJK = r"\u3400-\u9fff\uf900-\ufaff\U00020000-\U0002ffff"
 IDENTIFIER = r"[A-Za-z0-9_]+(?:(?:\.|::)[A-Za-z0-9_]+)*"
 TOKEN = re.compile(rf"[{CJK}]|{IDENTIFIER}|[^\W_]+", re.UNICODE)
 QUERY_GROUP = re.compile(rf"[{CJK}]+|{IDENTIFIER}|[^\W_]+", re.UNICODE)
-INDEX_SCHEMA = "2"
+INDEX_SCHEMA = "3"
+
+
+def normalized_tokens(text):
+    for match in TOKEN.finditer(text):
+        token = match[0].casefold()
+        # Encode complete tokens so SQLite cannot split punctuation or fold accents.
+        yield "t" + token.encode("utf-8").hex(), match.start(), match.end()
+        if re.search(r"[_\.:]", token):
+            # Keep ordinary component queries useful without loosening full identifiers.
+            for part in re.finditer(r"[^_\.:]+", match[0]):
+                yield ("t" + part[0].casefold().encode("utf-8").hex(),
+                       match.start() + part.start(), match.start() + part.end())
 
 
 def normalize(text):
-    tokens = []
-    for token in TOKEN.findall(text):
-        token = token.casefold()
-        # Encode complete tokens so SQLite cannot split punctuation or fold accents.
-        tokens.append("t" + token.encode("utf-8").hex())
-        if re.search(r"[_\.:]", token):
-            # Keep ordinary component queries useful without loosening full identifiers.
-            tokens.extend("t" + part.encode("utf-8").hex()
-                          for part in re.split(r"[_\.:]+", token) if part)
-    return " ".join(tokens)
+    return " ".join(token for token, _, _ in normalized_tokens(text))
 
 
 def query_groups(query):
@@ -106,11 +110,28 @@ def topic_parts(text):
 
 
 def visible_text(text):
-    """Keep link labels, excluding destinations from the retrieval projection."""
-    text = re.sub(r"\]\(<?[^\s)>]+>?(?:\s+[^)]*)?\)", "]", text)
-    text = re.sub(r"(?m)^ {0,3}\[[^]\n]+\]:[^\n]*", "", text)
+    """Mask link metadata while preserving original character and line positions."""
+    def blank(value):
+        return re.sub(r"[^\r\n]", " ", value)
+
+    def keep_group(match, group):
+        start = match.start(group) - match.start()
+        end = match.end(group) - match.start()
+        return blank(match[0][:start]) + match[group] + blank(match[0][end:])
+
+    def reference_id(value):
+        return " ".join(value.split()).casefold()
+
+    definitions = r"(?m)^ {0,3}\[([^]\n]+)\]:[^\n]*"
+    references = {reference_id(match[1]) for match in re.finditer(definitions, text)}
+    text = re.sub(definitions, lambda match: blank(match[0]), text)
+    text = re.sub(r"\[([^]\n]+)\]\[([^]\n]*)\]",
+                  lambda match: keep_group(match, 1)
+                  if reference_id(match[2] or match[1]) in references else match[0], text)
+    text = re.sub(r"\]\(<?[^\s)>]+>?(?:\s+[^)]*)?\)",
+                  lambda match: "]" + blank(match[0][1:]), text)
     return re.sub(r"\[\[([^\]|\n]+)(?:\|([^]\n]+))?\]\]",
-                  lambda match: match[2] or match[1], text)
+                  lambda match: keep_group(match, 2 if match[2] is not None else 1), text)
 
 
 def search_fields(path, text):
@@ -123,31 +144,49 @@ def contains_group(normalized, group):
     return " " + group + " " in " " + normalized + " "
 
 
+def matching_spans(text, groups):
+    """Locate encoded query groups in the original character coordinates."""
+    tokens, bounds, cursor = [], {}, 1
+    for token, start, end in normalized_tokens(text):
+        bounds[cursor] = start
+        tokens.append(token)
+        cursor += len(token)
+        bounds[cursor] = end
+        cursor += 1
+    normalized = " " + " ".join(tokens) + " "
+    for group_id, group in enumerate(groups):
+        position = normalized.find(" " + group + " ")
+        while position >= 0:
+            yield group_id, bounds[position + 1], bounds[position + 1 + len(group)]
+            position = normalized.find(" " + group + " ", position + 1)
+
+
 def snippet_for(text, query):
     groups = query_groups(query)
     _, body, offset = topic_parts(text)
-    lines = body.splitlines()
-    candidates = []
-    for i, line in enumerate(lines):
-        projected = visible_text(line)
-        normalized = normalize(projected)
-        hits = sum(contains_group(normalized, group) for group in groups)
-        if hits:
-            explanation = not re.match(r"^\s*#{1,6}\s", projected)
-            candidates.append((hits, explanation, -i, i))
+    lines = body.splitlines(keepends=True)
+    projected = visible_text(body)
+    projected_lines = projected.splitlines(keepends=True)
+    starts, cursor = [], 0
+    for line in lines:
+        starts.append(cursor)
+        cursor += len(line)
+    candidates = {}
+    for group_id, start, end in matching_spans(projected, groups):
+        i = bisect_right(starts, start) - 1
+        candidates.setdefault(i, []).append((group_id, start, end))
     if candidates:
-        i = max(candidates)[3]
+        i = max(candidates, key=lambda i: (
+            len({match[0] for match in candidates[i]}),
+            not re.match(r"^\s*#{1,6}\s", projected_lines[i]), -i))
     else:
-        i = next((i for i, line in enumerate(lines) if visible_text(line).strip()), 0)
-    line = lines[i] if lines else ""
+        i = next((i for i, line in enumerate(projected_lines) if line.strip()), 0)
     start = 0
-    if len(line) > 350:
-        matches = [re.search(re.escape(term), line, re.IGNORECASE)
-                   for term in QUERY_GROUP.findall(query)]
-        positions = [match.start() for match in matches if match]
-        if positions:
-            start = max(0, min(positions) - 80)
-    snippet = "\n".join(lines[i:i + 3])
+    if candidates and len(lines[i]) > 350:
+        _, match_start, match_end = min(candidates[i], key=lambda match: match[1])
+        context = max(0, min(80, 350 - (match_end - match_start)))
+        start = max(0, match_start - starts[i] - context)
+    snippet = "".join(lines[i:i + 3]).rstrip("\r\n")
     return offset + i + 1, snippet[start:start + 350]
 
 

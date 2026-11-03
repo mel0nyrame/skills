@@ -8,9 +8,9 @@ Recap must retrieve readable topics with Python's standard library and optional 
 
 ## Decision
 
-Keep FTS5 as the default cache and share a structured lexical projection with the fallback. Preserve complete identifiers while retaining component queries. Encode tokens before SQLite indexing so the database cannot introduce different token boundaries. Return body excerpts with original-file line numbers. The [search contract](../../../skills/knowledge/recap/references/search.md) owns the current consumer behavior and cache compatibility.
+Keep FTS5 as the default cache and share a structured lexical projection with the fallback. Preserve complete identifiers while retaining component queries. Encode tokens before SQLite indexing so the database cannot introduce different token boundaries. Map those token matches to original character positions for body excerpts and file line numbers. Mask link metadata in place so excluding it does not invalidate those positions. The [search contract](../../../skills/knowledge/recap/references/search.md) owns the current consumer behavior and cache compatibility.
 
-Treat index schema changes as disposable-cache rebuilds, not knowledge migrations. Preserve the existing locks, revision checks and allowed-topic enumeration. This retains low installation cost and keeps every candidate traceable to current Markdown.
+Treat index schema changes as disposable-cache rebuilds, not knowledge migrations. Projection changes require an index schema version change even if topic bytes are unchanged; otherwise a warm cache retains the previous search terms. Preserve the existing locks, revision checks and allowed-topic enumeration. This retains low installation cost and keeps every candidate traceable to current Markdown.
 
 The existing packaging, submodule and release decisions remain active. This record does not supersede them or change installation and release policy.
 

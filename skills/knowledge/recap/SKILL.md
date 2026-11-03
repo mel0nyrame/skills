@@ -29,7 +29,7 @@ Lead the reply with what the reader learned, then a short reading route and mate
 
 ## Query
 
-Search with short terms derived from the question; spaces separate required groups and contiguous CJK characters form an adjacent phrase. Keep dotted, underscored and `::` identifiers intact. See the [search contract](references/search.md) for indexed fields, matching boundaries, snippet locations and cache compatibility. Read the returned current files before answering. Preserve the returned revision across related `read`/`search` calls with `--revision`; if it changes, refresh the related material. Ranking finds passages; it does not verify facts. Try aliases/alternate terms before concluding absence. Keep dates, versions, applicability and uncertainty in the answer.
+Search with short terms derived from the question. Whitespace and punctuation outside identifiers separate required groups; contiguous CJK characters form an adjacent phrase. Keep dotted, underscored and `::` identifiers intact. See the [search contract](references/search.md) for indexed fields, matching boundaries, snippet locations and cache compatibility. Read the returned current files before answering. Preserve the returned revision across related `read`/`search` calls with `--revision`; if it changes, refresh the related material. Ranking finds passages; it does not verify facts. Try aliases/alternate terms before concluding absence. Keep dates, versions, applicability and uncertainty in the answer.
 
 ## Maintain or recover
 
