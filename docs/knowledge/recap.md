@@ -118,6 +118,10 @@ Do not add or modify formal knowledge in this query.
 
 Queries can update caches and lock files. Query-only use does not imply zero disk writes. State a strict read-only requirement first if that is necessary, so the assistant can establish a suitable access method.
 
+Search uses separate title, alias, summary and body fields. Dates, status and source-path metadata do not create matches. Defined reference-link keys are also excluded; visible labels remain searchable. Keep identifiers such as `session.prompt`, `foo_bar` and `std::vector` intact; their separate components are also searchable. Requesting `session.prompt` excludes pages that mention only `session.stop` and `client.prompt`.
+
+Results include a body excerpt and its original file line number. Excerpts follow normalized token matches, including phrases across punctuation or lines. An alias-only match can show the opening body text, so read the topic before drawing a conclusion. Search still depends on literal terms; use short keywords and alternate wording. For example, ask “Find `session.prompt` and explain its completion behavior” or “Search `并发 写入` and explain the lock requirement.” See the [search contract](../../skills/knowledge/recap/references/search.md) for matching and cache details. Existing search caches rebuild automatically without changing formal topics or their Git history.
+
 From this collection's root, this capability check does not create the library. Replace the example root.
 
 ```sh

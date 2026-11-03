@@ -2,6 +2,7 @@
 """Capture/query knowledge through bounded reads and reviewed Git worktree publication."""
 from __future__ import annotations
 import argparse
+from bisect import bisect_right
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -42,12 +43,26 @@ def doctor(root):
             'default_scope': 'topics/**/*.md', 'creates_files': False}
 
 CJK = r"\u3400-\u9fff\uf900-\ufaff\U00020000-\U0002ffff"
-TOKEN = re.compile(rf"[{CJK}]|[A-Za-z0-9_]+|[^\W_]+", re.UNICODE)
-QUERY_GROUP = re.compile(rf"[{CJK}]+|[A-Za-z0-9_]+|[^\W_]+", re.UNICODE)
+IDENTIFIER = r"[A-Za-z0-9_]+(?:(?:\.|::)[A-Za-z0-9_]+)*"
+TOKEN = re.compile(rf"[{CJK}]|{IDENTIFIER}|[^\W_]+", re.UNICODE)
+QUERY_GROUP = re.compile(rf"[{CJK}]+|{IDENTIFIER}|[^\W_]+", re.UNICODE)
+INDEX_SCHEMA = "3"
+
+
+def normalized_tokens(text):
+    for match in TOKEN.finditer(text):
+        token = match[0].casefold()
+        # Encode complete tokens so SQLite cannot split punctuation or fold accents.
+        yield "t" + token.encode("utf-8").hex(), match.start(), match.end()
+        if re.search(r"[_\.:]", token):
+            # Keep ordinary component queries useful without loosening full identifiers.
+            for part in re.finditer(r"[^_\.:]+", match[0]):
+                yield ("t" + part[0].casefold().encode("utf-8").hex(),
+                       match.start() + part.start(), match.start() + part.end())
 
 
 def normalize(text):
-    return " ".join(t.casefold() for t in TOKEN.findall(text))
+    return " ".join(token for token, _, _ in normalized_tokens(text))
 
 
 def query_groups(query):
@@ -86,14 +101,93 @@ def title_for(path, text):
     return match.group(1).strip() if match else PurePosixPath(path).stem
 
 
+def topic_parts(text):
+    try:
+        metadata, body = documents.split_document(text, legacy=True)
+    except documents.DocumentError:
+        return {}, text, 0
+    return metadata, body, text[:len(text) - len(body)].count("\n")
+
+
+def visible_text(text):
+    """Mask link metadata while preserving original character and line positions."""
+    def blank(value):
+        return re.sub(r"[^\r\n]", " ", value)
+
+    def keep_group(match, group):
+        start = match.start(group) - match.start()
+        end = match.end(group) - match.start()
+        return blank(match[0][:start]) + match[group] + blank(match[0][end:])
+
+    def reference_id(value):
+        return " ".join(value.split()).casefold()
+
+    definitions = r"(?m)^ {0,3}\[([^]\n]+)\]:[^\n]*"
+    references = {reference_id(match[1]) for match in re.finditer(definitions, text)}
+    text = re.sub(definitions, lambda match: blank(match[0]), text)
+    text = re.sub(r"\[([^]\n]+)\]\[([^]\n]*)\]",
+                  lambda match: keep_group(match, 1)
+                  if reference_id(match[2] or match[1]) in references else match[0], text)
+    text = re.sub(r"\]\(<?[^\s)>]+>?(?:\s+[^)]*)?\)",
+                  lambda match: "]" + blank(match[0][1:]), text)
+    return re.sub(r"\[\[([^\]|\n]+)(?:\|([^]\n]+))?\]\]",
+                  lambda match: keep_group(match, 2 if match[2] is not None else 1), text)
+
+
+def search_fields(path, text):
+    metadata, body, _ = topic_parts(text)
+    return (title_for(path, body), "\n".join(metadata.get("aliases", [])),
+            metadata.get("summary", ""), visible_text(body))
+
+
+def contains_group(normalized, group):
+    return " " + group + " " in " " + normalized + " "
+
+
+def matching_spans(text, groups):
+    """Locate encoded query groups in the original character coordinates."""
+    tokens, bounds, cursor = [], {}, 1
+    for token, start, end in normalized_tokens(text):
+        bounds[cursor] = start
+        tokens.append(token)
+        cursor += len(token)
+        bounds[cursor] = end
+        cursor += 1
+    normalized = " " + " ".join(tokens) + " "
+    for group_id, group in enumerate(groups):
+        position = normalized.find(" " + group + " ")
+        while position >= 0:
+            yield group_id, bounds[position + 1], bounds[position + 1 + len(group)]
+            position = normalized.find(" " + group + " ", position + 1)
+
+
 def snippet_for(text, query):
     groups = query_groups(query)
-    lines = text.splitlines()
-    for i, line in enumerate(lines):
-        normalized = " " + normalize(line) + " "
-        if any(" " + group + " " in normalized for group in groups):
-            return i + 1, line[:350]
-    return 1, " ".join(lines[:3])[:350]
+    _, body, offset = topic_parts(text)
+    lines = body.splitlines(keepends=True)
+    projected = visible_text(body)
+    projected_lines = projected.splitlines(keepends=True)
+    starts, cursor = [], 0
+    for line in lines:
+        starts.append(cursor)
+        cursor += len(line)
+    candidates = {}
+    for group_id, start, end in matching_spans(projected, groups):
+        i = bisect_right(starts, start) - 1
+        candidates.setdefault(i, []).append((group_id, start, end))
+    if candidates:
+        i = max(candidates, key=lambda i: (
+            len({match[0] for match in candidates[i]}),
+            not re.match(r"^\s*#{1,6}\s", projected_lines[i]), -i))
+    else:
+        i = next((i for i, line in enumerate(projected_lines) if line.strip()), 0)
+    start = 0
+    if candidates and len(lines[i]) > 350:
+        _, match_start, match_end = min(candidates[i], key=lambda match: match[1])
+        context = max(0, min(80, 350 - (match_end - match_start)))
+        start = max(0, match_start - starts[i] - context)
+    snippet = "".join(lines[i:i + 3]).rstrip("\r\n")
+    return offset + i + 1, snippet[start:start + 350]
 
 
 def plain_search(root, query, limit):
@@ -102,8 +196,8 @@ def plain_search(root, query, limit):
     if not groups:
         return []
     for path, text in topic_files(root):
-        normalized = " " + normalize(text) + " "
-        if not all(" " + group + " " in normalized for group in groups):
+        fields = [normalize(field) for field in search_fields(path, text)]
+        if not all(any(contains_group(field, group) for field in fields) for group in groups):
             continue
         line, snippet = snippet_for(text, query)
         results.append({"path": path, "title": title_for(path, text),
@@ -124,12 +218,12 @@ def open_index(path):
             raise sqlite3.DatabaseError("Index integrity check failed")
         conn.execute("CREATE TABLE IF NOT EXISTS metadata (key TEXT PRIMARY KEY, value TEXT)")
         version = conn.execute("SELECT value FROM metadata WHERE key='schema'").fetchone()
-        if version and version[0] != "1":
+        if not version or version[0] != INDEX_SCHEMA:
             conn.execute("DROP TABLE IF EXISTS documents")
             conn.execute("DROP TABLE IF EXISTS search")
         conn.execute("CREATE TABLE IF NOT EXISTS documents (path TEXT PRIMARY KEY, sha TEXT, title TEXT, body TEXT)")
-        conn.execute("CREATE VIRTUAL TABLE IF NOT EXISTS search USING fts5(path UNINDEXED, title, body)")
-        conn.execute("INSERT OR REPLACE INTO metadata VALUES ('schema','1')")
+        conn.execute("CREATE VIRTUAL TABLE IF NOT EXISTS search USING fts5(path UNINDEXED, title, aliases, summary, body)")
+        conn.execute("INSERT OR REPLACE INTO metadata VALUES ('schema',?)", (INDEX_SCHEMA,))
         return conn
     except Exception:
         conn.close()
@@ -145,11 +239,12 @@ def refresh(conn, root):
         sha = digest(text.encode())
         if known.get(path) == sha:
             continue
-        title = title_for(path, text)
+        fields = search_fields(path, text)
+        title = fields[0]
         conn.execute("DELETE FROM documents WHERE path=?", (path,))
         conn.execute("DELETE FROM search WHERE path=?", (path,))
         conn.execute("INSERT INTO documents VALUES (?,?,?,?)", (path, sha, title, text))
-        conn.execute("INSERT INTO search VALUES (?,?,?)", (path, normalize(title), normalize(text)))
+        conn.execute("INSERT INTO search VALUES (?,?,?,?,?)", (path, *(normalize(field) for field in fields)))
         changes["updated" if path in known else "added"] += 1
     for path in known.keys() - seen:
         conn.execute("DELETE FROM documents WHERE path=?", (path,))
@@ -188,9 +283,9 @@ def _search_unlocked(root, query, limit=8):
             rebuilt = True
         match = " AND ".join('"' + g.replace('"', '""') + '"' for g in groups)
         rows = conn.execute(
-            "SELECT documents.path,documents.title,documents.body,bm25(search,0,3,1) "
+            "SELECT documents.path,documents.title,documents.body,bm25(search,0,3,2,2,1) "
             "FROM search JOIN documents ON documents.path=search.path "
-            "WHERE search MATCH ? ORDER BY bm25(search,0,3,1),documents.path LIMIT ?",
+            "WHERE search MATCH ? ORDER BY bm25(search,0,3,2,2,1),documents.path LIMIT ?",
             (match, limit)).fetchall()
     finally:
         if conn is not None:
