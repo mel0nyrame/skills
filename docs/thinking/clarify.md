@@ -2,7 +2,7 @@
 
 English | [简体中文](clarify.zh.md) · [All guides](../README.md)
 
-`clarify` is useful when you have an idea but have not established the problem you most need to solve. It identifies assumptions, explains which missing information could affect the answer, and asks one decisive question. After your reply, it delivers the solution.
+`clarify` is useful when you have an idea but have not established the problem you most need to solve. Select it when you want to clarify intent or stress-test the question before receiving a substantive answer. It identifies assumptions, explains which missing information could affect the answer, and asks one decisive question. After your reply, it delivers the solution.
 
 The first output is a question in the conversation. Stage one calls no tools, creates no files, and does not select a solution before checking your intent.
 
