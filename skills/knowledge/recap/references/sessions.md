@@ -44,6 +44,8 @@ Codex can have a session index, history projections, and original rollout JSONL.
 
 OpenCode layouts vary by version. Supported v2 records have explicit session/message sequences and branch fields; older message/part layouts are not interchangeable. Report unsupported schema and use a full export instead of inspecting unrelated tables.
 
+In the supported v2 projection, `session_message.seq` records message-creation event positions. Other durable events consume positions without adding message rows. A first message at 4 or a jump from 7 to 20 does not establish lost history. The adapter reads every persisted row through the selected cutoff, retains its original locator, and records numeric gaps in `source.sequence_gaps` (count and at most 20 examples). It checks unique increasing positions, cutoff availability, branch metadata, supported content, attachments, streaming and incremental prefix continuity. Completeness describes that database snapshot; it cannot prove that the host never deleted or failed to persist a message. Preserve this warning in the source record. Old receipts remain historical declarations; do not rewrite their status to repair an extraction error.
+
 Other hosts can provide an exact transcript/export with declared provenance and gaps. An undated excerpt can be useful without being called the whole conversation.
 
 The helper's interchange schema is:

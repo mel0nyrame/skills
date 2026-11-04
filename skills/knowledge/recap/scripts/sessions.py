@@ -459,9 +459,9 @@ def extract_opencode(args, receipt: dict[str, Any], writer: ChunkWriter):
         digest = hashlib.sha256()
         prior_hash = hashlib.sha256(b"").hexdigest() if args.after == -1 else None
         prefix_hash = None
-        observed = 0
         first = None
         last = None
+        sequence_gaps = {"count": 0, "examples": []}
         cursor = connection.execute("SELECT id,type,seq,data FROM session_message WHERE session_id = ? AND seq <= ? ORDER BY seq", (args.session_id, cutoff))
         while True:
             batch = cursor.fetchmany(256)
@@ -469,9 +469,14 @@ def extract_opencode(args, receipt: dict[str, Any], writer: ChunkWriter):
                 break
             for row in batch:
                 ordinal = row["seq"]
+                if last is not None and ordinal <= last:
+                    receipt["missing"].append("Persisted message sequences are not unique and increasing")
+                elif last is not None and ordinal > last + 1:
+                    sequence_gaps["count"] += 1
+                    if len(sequence_gaps["examples"]) < 20:
+                        sequence_gaps["examples"].append({"after": last, "before": ordinal})
                 first = ordinal if first is None else first
                 last = ordinal
-                observed += 1
                 digest.update((dump([row["id"], row["type"], ordinal, row["data"]]) + "\n").encode("utf-8"))
                 if ordinal == args.after:
                     prior_hash = digest.hexdigest()
@@ -487,15 +492,15 @@ def extract_opencode(args, receipt: dict[str, Any], writer: ChunkWriter):
                 for record in normalize_opencode(row["type"], data, ordinal, row["id"], receipt, args.include_tools):
                     writer.add(record)
         prefix_hash = digest.hexdigest()
-        if first is not None and first > 1:
-            receipt["missing"].append("Session sequence starts after its initial record")
-        if first is not None and last is not None and observed != last - first + 1:
-            receipt["missing"].append("Persisted message sequence has gaps")
+        # OpenCode projects message creation from a shared durable-event sequence.
+        # Other events consume positions without creating session_message rows.
+        receipt["warnings"].append("Coverage is the persisted message snapshot; event-sequence gaps do not prove missing messages or exclude deleted history")
         if last != cutoff:
             receipt["missing"].append("Requested cutoff is not an available sequence")
         receipt["source"] = {"kind": "opencode_v2_read_snapshot", "locator": str(path.resolve()),
-                             "prefix_sha256": prefix_hash, "persisted_rows": bounds[2]}
-        receipt["range"] = {"unit": "session_message.seq", "after": args.after if args.after is not None else first - 1,
+                             "prefix_sha256": prefix_hash, "persisted_rows": bounds[2],
+                             "first_persisted_seq": first, "sequence_gaps": sequence_gaps}
+        receipt["range"] = {"unit": "session_message.seq", "after": args.after if args.after is not None else (first - 1 if first is not None else -1),
                             "through": cutoff, "available_through": available,
                             "full_source_snapshot": args.through is None}
         read_prior(args, "opencode", cutoff, prior_hash, receipt)

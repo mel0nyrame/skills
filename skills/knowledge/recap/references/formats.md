@@ -90,3 +90,34 @@ Capture cursors are exact `.state/cursors/NAME.json` files containing a complete
 Optional packet `risk: reserved` requests explicit user preview/approval; routine is the default. Mechanical checks do not discover every judgment-changing edit, so the writer must classify those correctly.
 
 A resolution file has `{"changes": [...]}` with the same item envelope, hashes from the operation's new integration base, and replacements for every reported conflict. It may alter only that operation's authored paths. The helper rebuilds shared entries and invalidates old review approval. Inspect the returned candidate hash after each integration/resolution.
+
+### Guide introduction
+
+An `index.md` change uses `kind: update` or `correct`, its full file hash from the operation base, and `document: {"body": "# Reading route\n\nChoose a relevant topic below.\n"}`. The body replaces only the introduction before `<!-- recap:topics:start -->`; do not include helper markers or the generated catalog. The helper preserves trailing prose and regenerates the catalog from current topics. In a guide without markers, the existing text is the introduction. A guide update always needs explicit user approval of the candidate hash. Reader/publisher rules remain outside packet authoring.
+
+### Packet input directory
+
+After `begin OP --writer-id ID`, prepare a separate input directory containing `changes.json` and only the intended files at their root-relative paths. The manifest contains author-supplied declarations:
+
+```json
+{
+  "changes": [
+    {
+      "path": "topics/Example.md",
+      "kind": "add",
+      "reason": "Explain the mechanism and its limits",
+      "evidence": ["exact inspected source locator"]
+    }
+  ]
+}
+```
+
+Run `packet OP --from-dir DIR`. Save stdout to a separate packet file, then inspect it. The operation must still be `editing`; prepared candidates use `resolve` instead. Optional manifest `risk` is `routine` or `reserved`. Reasons/evidence are required declarations, not generated filler. Paths are explicit; unlisted files are never added and symlinks/traversal are rejected.
+
+- A topic input is Markdown with JSON frontmatter containing the structured `document` fields except `body`; the Markdown body supplies `body`. A full existing `recap-topic/v2` document is also accepted; helper-owned `schema`, `created` and `updated` are removed from the packet input. Other metadata, including aliases and verification scope, is retained. New topic dates still come from the helper at inspection.
+- A source or capture cursor contains its complete `content`. The author supplies honest coverage and represented paths. Generation cannot certify source inspection or invent acceptance.
+- `index.md` contains only the [guide introduction](#guide-introduction).
+
+The generator checks preparation conditions under the library lock before reading declared documents: no unfinished publication, a clean formal root, an editing operation, and an existing clean candidate with matching repository/branch identity. It preserves external edits and fails without repairing or adopting them. A newer clean formal revision is permitted; `expected_sha256` still comes from the operation's frozen base.
+
+Generation checks individual item formats without creating/modifying candidate files or publishing. `inspect` owns whole-candidate validation, including cross-file links and source/cursor relationships; publication retains its final checks. The lock may create a lock file.

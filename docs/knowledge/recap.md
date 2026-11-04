@@ -67,7 +67,7 @@ my-knowledge/
 | --- | --- |
 | `topics/**/*.md` | Formal explanations, examples, applicability, and source links |
 | `sources/<host>-<session-id>.md` | Source identity, inspected coverage, gaps, and necessary supporting excerpts |
-| `index.md` | Topic-summary reading routes, preserving existing prose outside the managed section |
+| `index.md` | Generated topic catalog and an introduction maintained through approved candidates; trailing prose is preserved |
 | `CHANGELOG.md` | What knowledge changed and why |
 | `drafts/` | Unpublished material, including drafts with unresolved coverage gaps |
 | `.state/library.json` | Library format, branch, and related machine state |
@@ -129,6 +129,30 @@ python3 -B skills/knowledge/recap/scripts/knowledge.py --root /path/to/my-knowle
 ```
 
 An existing populated directory needs migration review rather than empty-library initialization. See [publication, migration, and recovery](../../skills/knowledge/recap/references/operations.md).
+
+## Maintain routes and locate pending work
+
+```text
+$skills:recap
+List retained operations and identify missing candidate worktrees.
+Update the index.md introduction to cover the current topics.
+Prepare a candidate and show its diff before recording my approval.
+Preserve unpublished candidates and unrelated local files.
+```
+
+`knowledge.py status --all` lists operation records, worktree/branch presence, publication-record presence and interrupted transactions. An old `ready` operation is not automatically abandoned. Cleanup remains limited to matching, successfully published candidates.
+
+The summary retains other operations and recovery information when one operation record is damaged. That entry contains an error and the summary sets `complete: false`; check this field even when the inventory command exits successfully. Library metadata and recovery-journal errors still stop the command. `worktree_exists` reports directory presence only, not valid Git identity or publication readiness.
+
+Guide maintenance changes only the introduction before the generated topic catalog. It uses the same candidate, integration and publication flow as topic changes, with explicit approval of the current candidate hash. Concurrent introduction changes require independent review; a newer generated catalog alone does not. No direct formal-guide edit is necessary. The [guide-maintenance decision](../agents/adr/0005--recap-guide-maintenance.md) explains the boundary.
+
+Use the [command checklist](../../skills/knowledge/recap/references/checklist.md) for ordinary publication. `knowledge.py packet OP --from-dir DIR` computes hashes from the operation base and converts declared topic/source/cursor inputs into a structured packet. Authors still supply reasons, evidence and honest coverage. Generation does not run `inspect` or publish the candidate. See [input-directory format](../../skills/knowledge/recap/references/formats.md#packet-input-directory).
+
+Packet generation requires a clean formal root and a clean, existing editing candidate with matching repository and branch identity. It reports problems before reading declared documents and leaves external files intact. A newer clean formal revision does not change the operation's base hashes. Individual input checks do not replace whole-candidate link and source validation by `inspect`.
+
+OpenCode message sequences represent event positions and can begin after 1 or contain gaps. The extractor preserves those positions and records numeric gaps separately. Complete extraction means the supported persisted snapshot was read; it cannot prove the absence of deleted or unsaved host history. Genuine branch, attachment, format or incremental-prefix problems still prevent a complete receipt.
+
+For an external research directory, `research_index.py /path/to/research` prints a Markdown inventory to stdout. It does not write an index or edit a knowledge library. Capture status stays unmarked until separately checked; opening excerpts are navigation aids. Saving the inventory and adding external configuration pointers are separate authorized writes. Read [research inventory](../../skills/knowledge/recap/references/operations.md#research-inventory) before replacing an existing annotated index.
 
 ## Decide whether useful knowledge was preserved
 

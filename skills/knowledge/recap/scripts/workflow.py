@@ -13,7 +13,7 @@ import tempfile
 import documents as doc
 from storage import (KnowledgeError, allowed_path, assert_clean, assert_no_pending,
                      atomic_write, digest, git, git_content, git_text, head, json_bytes,
-                     library_files, load_json, locked, operation_id, private_mkdir, safe_path)
+                     library_files, load_json, locked, operation_id, pending, private_mkdir, safe_path)
 
 
 GUIDE = '''# Knowledge reading boundaries
@@ -157,11 +157,28 @@ def content_files(path):
     return {p: b.decode('utf-8') for p, b in library_files(path).items() if p.endswith('.md')}
 
 
+TOPICS_START, TOPICS_END = '<!-- recap:topics:start -->', '<!-- recap:topics:end -->'
+
+
+def guide_parts(content):
+    """Only the prefix is authorable; the catalog and trailing prose retain ownership."""
+    if content.count(TOPICS_START) != content.count(TOPICS_END) or content.count(TOPICS_START) > 1:
+        raise KnowledgeError('Guide has malformed managed-section markers')
+    if TOPICS_START not in content:
+        return content, '', ''
+    start, end = content.index(TOPICS_START), content.index(TOPICS_END)
+    if end < start:
+        raise KnowledgeError('Guide has reversed managed-section markers')
+    end += len(TOPICS_END)
+    return content[:start], content[start:end], content[end:]
+
+
 def render_item(item, prior, today):
     doc.object_keys(item, ('path', 'expected_sha256', 'kind', 'reason', 'evidence'), ('document', 'content'))
     relative = item['path']
-    if not isinstance(relative, str) or not (relative.startswith(('topics/', 'sources/', '.state/cursors/')) and allowed_path(relative)):
-        raise KnowledgeError('Model-authored paths are topics/, sources/ or exact capture cursors')
+    if not isinstance(relative, str) or not (relative == 'index.md' or
+            (relative.startswith(('topics/', 'sources/', '.state/cursors/')) and allowed_path(relative))):
+        raise KnowledgeError('Model-authored paths are topics/, sources/, exact capture cursors or the index.md introduction')
     doc.text(item['reason'], 'reason')
     doc.strings(item['evidence'], 'evidence', nonempty=True)
     if any('\n' in value or '\r' in value for value in [item['reason'], *item['evidence']]):
@@ -173,7 +190,17 @@ def render_item(item, prior, today):
         raise KnowledgeError(f'{relative}: expected hash differs from the operation base; reread it')
     if ('document' in item) == ('content' in item):
         raise KnowledgeError('Each change needs exactly one of document or content')
-    if relative.startswith('topics/'):
+    if relative == 'index.md':
+        if prior is None or item['kind'] not in ('update', 'correct') or 'document' not in item:
+            raise KnowledgeError('Guide introductions require an existing index.md, update/correct and document.body')
+        doc.object_keys(item['document'], ('body',))
+        body = item['document']['body']
+        doc.check_body(body)
+        if '<!-- recap:' in body:
+            raise KnowledgeError('Guide introduction cannot contain helper-managed markers')
+        _, catalog, suffix = guide_parts(prior.decode())
+        result = body.rstrip() + '\n\n' + catalog + suffix
+    elif relative.startswith('topics/'):
         if 'document' not in item:
             raise KnowledgeError('Topics require structured document input; helper owns file timestamps')
         result = doc.build_topic(item['document'], today, prior.decode() if prior else None)
@@ -258,10 +285,9 @@ def escape_label(value):
 def catalogs(tree, state):
     files = content_files(tree)
     topics = {p: doc.validate_topic(c)[0] for p, c in files.items() if p.startswith('topics/')}
-    start, end = '<!-- recap:topics:start -->', '<!-- recap:topics:end -->'
+    start, end = TOPICS_START, TOPICS_END
     current = files.get('index.md', '# Knowledge\n')
-    if current.count(start) != current.count(end) or current.count(start) > 1:
-        raise KnowledgeError('Guide has malformed managed-section markers')
+    prefix, _, suffix = guide_parts(current)
     chinese = bool(re.search(r'[\u3400-\u9fff]', current))
     lines = [start, '## 专题' if chinese else '## Topics', '']
     for path, meta in sorted(topics.items()):
@@ -270,7 +296,7 @@ def catalogs(tree, state):
     lines += ['', end]
     section = '\n'.join(lines)
     if start in current:
-        current = current[:current.index(start)] + section + current[current.index(end) + len(end):]
+        current = prefix + section + suffix
     else:
         current = current.rstrip() + '\n\n' + section + '\n'
     atomic_write(safe_path(tree, 'index.md'), current.encode())
@@ -327,6 +353,8 @@ def reserved_reasons(root, tree, state):
         reasons.append('writer-declared reserved change')
     for item in state['packet']['changes']:
         path = item['path']
+        if path == 'index.md':
+            reasons.append('index.md: changes the reading-route introduction')
         if not path.startswith('topics/'):
             continue
         new_meta, new_body = doc.validate_topic(safe_path(tree, path).read_text())
@@ -402,8 +430,11 @@ def ensure_candidate(root, state, dirty=False):
     tree = worktree(root, state)
     if head(tree) != state['candidate']:
         raise KnowledgeError('Candidate HEAD changed outside this operation')
-    if git(tree, 'ls-files', '--others', '--ignored', '--exclude-standard', '-z').stdout:
-        raise KnowledgeError('Candidate contains extra ignored files; preserve them before publication/cleanup')
+    ignored = git(tree, 'ls-files', '--others', '--ignored', '--exclude-standard', '-z').stdout.decode().split('\0')
+    ignored = [p for p in ignored if p]
+    if ignored:
+        raise KnowledgeError('Candidate contains extra ignored files: ' + json.dumps(ignored, ensure_ascii=False) +
+                             f'; preserve selected files outside the candidate, e.g. .state/tmp/{state["id"]}/preserved/, then retry. No files were removed')
     if not dirty:
         assert_clean(tree)
         if state.get('fingerprint') and fingerprint(tree, state) != state['fingerprint']:
@@ -424,10 +455,17 @@ def integrate(root, identifier):
         if latest == state['base']:
             return inspected_result(root, state)
         merged, conflicts, touched = {}, [], []
+        latest_guide = None
         for path in state['authored']:
             old = git_content(root, state['base'], path)
             ours = safe_path(tree, path).read_bytes()
             theirs = git_content(root, latest, path)
+            if path == 'index.md':
+                if old is None or theirs is None:
+                    raise KnowledgeError('Guide deletion requires explicit structural maintenance')
+                # Generated catalog changes do not constitute concurrent guide authorship.
+                latest_guide = guide_parts(theirs.decode())
+                old, ours, theirs = (guide_parts(value.decode())[0].encode() for value in (old, ours, theirs))
             if theirs == old or theirs == ours:
                 merged[path] = ours
                 continue
@@ -453,6 +491,8 @@ def integrate(root, identifier):
                 merged[path] = result.stdout
                 if result.returncode:
                     conflicts.append(path)
+        if latest_guide is not None:
+            merged['index.md'] += (latest_guide[1] + latest_guide[2]).encode()
         # The previous candidate is a clean, committed, operation-owned snapshot.
         # Replace only this disposable worktree's index/files, never the main root.
         git(tree, 'read-tree', '--reset', '-u', latest)
@@ -787,9 +827,74 @@ def cleanup(root, identifier):
                 'note': 'Temporary raw extraction is not staged; remove only the exact extraction you created.'}
 
 
-def status(root, identifier):
+def status(root, identifier=None):
     with locked(root):
-        return inspected_result(root, get_state(root, identifier))
+        if identifier is not None:
+            return inspected_result(root, get_state(root, identifier))
+        managed(root)
+        recovery_required = pending(root)
+        operations = []
+        directory = safe_path(root, '.state/operations')
+        for path in sorted(directory.glob('*.json')):
+            try:
+                safe_path(root, path.relative_to(root).as_posix())
+                state = get_state(root, operation_id(path.stem))
+                result = inspected_result(root, state)
+                tree = safe_path(root, '.worktree/' + state['id'])
+                result.update(worktree_exists=tree.is_dir(),
+                              branch_exists=git(root, 'show-ref', '--verify', '--quiet', state['branch'], check=False).returncode == 0,
+                              publication_record_exists=git_content(root, 'HEAD', f'.state/published/{state["id"]}.json') is not None)
+            except (KnowledgeError, OSError, ValueError, KeyError, TypeError) as exc:
+                result = {'id': path.stem, 'error': f'Cannot inspect operation {path.name}: {exc}'}
+            operations.append(result)
+        return {'root': str(root), 'operations': operations, 'recovery_required': recovery_required,
+                'complete': all('error' not in item for item in operations)}
+
+
+def build_packet(root, identifier, directory):
+    """Fill mechanical fields from an existing base and explicitly declared input files."""
+    directory = directory.expanduser().resolve()
+    with locked(root):
+        managed(root)
+        assert_no_pending(root)
+        assert_clean(root)
+        state = get_state(root, identifier)
+        if state['status'] != 'editing':
+            raise KnowledgeError('Packet generation requires an editing operation; use resolve for a prepared candidate')
+        assert_clean(worktree(root, state))
+        manifest = load_json(safe_path(directory, 'changes.json'))
+        doc.object_keys(manifest, ('changes',), ('risk',))
+        if not isinstance(manifest['changes'], list) or not manifest['changes']:
+            raise KnowledgeError('changes must be a nonempty array')
+        packet = {'id': identifier, 'writer_id': state['writer_id'], 'changes': []}
+        if 'risk' in manifest:
+            if manifest['risk'] not in ('routine', 'reserved'):
+                raise KnowledgeError('risk must be routine or reserved')
+            packet['risk'] = manifest['risk']
+        seen = set()
+        for declaration in manifest['changes']:
+            doc.object_keys(declaration, ('path', 'kind', 'reason', 'evidence'))
+            path = declaration['path']
+            source = safe_path(directory, path)
+            if path in seen:
+                raise KnowledgeError('Duplicate changed path')
+            seen.add(path)
+            prior = git_content(root, state['base'], path)
+            item = {**declaration, 'expected_sha256': digest(prior) if prior is not None else None}
+            content = source.read_text(encoding='utf-8')
+            if path == 'index.md':
+                item['document'] = {'body': content}
+            elif path.startswith('topics/'):
+                metadata, body = doc.split_document(content)
+                if 'schema' in metadata:
+                    doc.validate_topic(content)
+                    metadata = {k: v for k, v in metadata.items() if k not in ('schema', 'created', 'updated')}
+                item['document'] = {**metadata, 'body': body}
+            else:
+                item['content'] = content
+            render_item(item, prior, date.today().isoformat())
+            packet['changes'].append(item)
+        return packet
 
 
 def diff(root, identifier):
