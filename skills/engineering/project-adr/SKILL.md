@@ -1,11 +1,11 @@
 ---
 name: project-adr
-description: Use when adding or changing lasting engineering decisions, implementation affects existing ADRs, or reviewing, superseding, archiving, deleting records, or establishing project decision maintenance.
+description: Use during engineering design discussions to capture durable proposals, choices, and rejection reasons, when resuming related work, when implementation or lifecycle changes affect records, or when establishing project decision maintenance.
 ---
 
 # Project ADR
 
-Maintain decision memory that prevents repeated mistakes or debates. The scope extends beyond architecture decision records (ADRs). Follow the target repository's formats, locations, lifecycle, and validation rules.
+Maintain decision memory so another agent can resume a topic without recovering the conversation. The scope extends beyond architecture decision records (ADRs). Follow the target repository's formats, locations, lifecycle, and validation rules.
 
 ## Decide whether a record is useful
 
@@ -17,7 +17,7 @@ Follow explicit project creation criteria first. Without them, enter the durable
 
 Check architecture boundaries, dependency direction, public protocols/APIs, the security model, critical dependencies, data sources of truth, ownership, flow, isolation, persistent schemas, derived data and rebuilds, retention/deletion, migration/backward compatibility, lasting testing strategy, important process/tooling policy, significant simplifications, key bug lessons, important rejected alternatives, and conditions for reconsideration.
 
-Ordinary local bugs, styling, wording, and changes without these lasting constraints usually need no record. Category labels do not establish future value: not every feature, bug fix, or process change merits preservation.
+Preserve discussion progress when a meaningful constraint, real tradeoff, or question worth continuing affects future work. Passing suggestions without evaluation, ordinary local bugs, styling, and wording usually need no record. Category labels alone do not establish future value.
 
 When implementation work includes related record maintenance, add records, synchronize facts, and handle supersession in the same change as the code. Read-only reviews report gaps. Archive, deletion, and governance integration actions remain subject to the relevant task authorization.
 
@@ -25,17 +25,23 @@ When implementation work includes related record maintenance, add records, synch
 
 Read applicable repository and subtree instructions, contribution guides, documentation entry points, and decision configuration. Reuse existing directories, naming, metadata, and lifecycle. A directory name alone does not establish authority.
 
-This skill maintains records independently of other domain-modeling, discussion, or ADR skills. When multiple skills participate, establish one project record convention and use it throughout. Installing another skill does not adopt its default template or creation threshold. Assign writers according to the actual task's division of work rather than a fixed skill name.
+This skill owns record value, topic content, rationale, and lifecycle. `project-engineering`, when available, reads records during investigation and triggers synchronization as implementation changes. Project instructions expose the same contract to ordinary discussions and external discussion skills. Keep external skills unchanged; their installation does not adopt their default template or creation threshold. All participating workflows reuse one project convention and topic owner.
 
 Use creation criteria, locations, formats, states, and check entry points specified by the current user request and applicable project rules. Without explicit rules, reuse stable, consistent conventions in comparable records. One outlier or mixed samples do not establish a new rule. Use the defaults below for unresolved parts.
 
-Before writing, check existing same-topic records and uncommitted changes. Maintain an existing draft or delivered record that already owns the decision within task authorization. Preserve other work. Multiple skill triggers must not create duplicate records for one decision. Terminology documents own terms, engineering documents own current facts, and ADRs own reasons.
+Before proposing or implementing related work, search active records by task topic, capabilities, constraints, paths, and rejected alternatives. Read matching proposals, choices, rejection reasons, and open questions. If conditions changed, identify them explicitly before reconsidering the choice. Check uncommitted changes before writing and reuse an existing topic owner. Preserve other work. Terminology documents own terms, engineering documents own current facts, and ADRs own reasons.
 
-Without any repository conventions, use one Markdown file per decision in `docs/adr/`, named `NNNN--kebab-title.md`. Use the project's main language for record titles and prose. The default archive location is `docs/adr/archive/`.
+Without any repository conventions, use one Markdown file per decision topic in `docs/adr/`, named `NNNN--kebab-title.md`. Keep related candidates and their outcomes together; create a separate rejected record only for independent lasting value. Use the project's main language for record titles and prose. The default archive location is `docs/adr/archive/`.
 
 Prefer discovery through directories, metadata, filenames, and search. Avoid adding a central index that every branch must update manually. Follow existing index policy. An index fully generated from authoritative metadata with a freshness check may remain.
 
 Read [project integration](references/PROJECT-INTEGRATION.md) when the user requests ongoing maintenance or the first decision is being written in a project whose existing instruction entry point lacks maintenance rules. It owns standing triggers, directory contracts, and check integration. Installing a skill does not complete project integration.
+
+## Capture discussion progress
+
+When a durable constraint settles, a real candidate is rejected, or a substantial proposal needs further work, update the topic record at that point within task authorization. Keep a proposal when the discussion pauses without a final choice. Distinguish selected conclusions, agent recommendations, and unresolved questions; record the next decision or investigation needed to resume. Read [discussion capture](references/DISCUSSIONS.md) when recording or resuming a design discussion.
+
+Before closing or pausing the discussion, confirm that meaningful progress is preserved in the topic owner and its state matches what has been decided and implemented. Implementation and final delivery are later synchronization points, not prerequisites for a record.
 
 ## Check same-topic records before adding one
 
@@ -52,7 +58,7 @@ Without a reusable format, or when old records are mixed and no explicit convent
 ```markdown
 # Decision title
 
-Status: implemented
+Status: proposed
 
 ## Problem
 ## Decision
@@ -63,8 +69,8 @@ Status: implemented
 Each default section must meet its completion criterion. For a project template, check its required content and put necessary reasons and tradeoffs where that template permits:
 
 - **Problem:** state the constraints or conflict requiring a choice and the applicable scope.
-- **Decision:** state the choice or proposal, its reasons, and the assumptions and boundaries under which it holds.
-- **Alternatives:** record every real candidate and why it lost, so future readers can see which plausible paths were evaluated. When history cannot be reliably recovered, mark it unknown or use the project's allowed missing-value notation. Preserve the evidence gap rather than inventing alternatives.
+- **Decision:** state the current choice or proposal, its reasons, assumptions, and boundaries. For unfinished topics, distinguish selected conclusions from recommendations and name unresolved questions and next steps.
+- **Alternatives:** record the candidates actually evaluated, their current outcomes, and reasons for rejection where decided. Pending candidates remain pending. When history cannot be reliably recovered, mark it unknown or use the project's allowed missing-value notation. Preserve the evidence gap rather than inventing alternatives or rejection reasons.
 - **Consequences and risks:** state benefits, costs, and limits. Include relevant failure modes, validation evidence, known gaps, or conditions for reconsideration. Mark unverified content unknown.
 
 Empty sections, a list containing only the chosen technology, or all four information types mixed into one paragraph do not satisfy the default structure. Add dates, owners, and other fields when the project requires them. For supersession, state its direction, scope, and record links near the state. Current engineering documents explain how the system works. Decisions explain why a choice was made and what was rejected. Link them without copying the full content.
@@ -101,6 +107,6 @@ Run the repository's focused checks for format, required sections, path/lifecycl
 
 For the default English or Chinese structure without a matching project checker, run [the default checker](scripts/check_adr.py) on the affected files or ADR directory. Read project integration for check wiring. Use project-specific checks for short templates, custom states, or other structures. When none exist, review records individually and report scope. Preserve other valid templates rather than rewriting them to satisfy this checker.
 
-Completion requires every affected active record to be synchronized in the same change, a same-topic review conclusion for every new record, authorized supersession and lifecycle work to be complete, and passing format, state, and local-link-path checks. Report missing historical evidence, actions outside authorization, and project-integration gaps honestly. A passing checker does not resolve them.
+Completion requires meaningful discussion progress to be preserved, every affected active record to be synchronized, a same-topic review conclusion for every new record, authorized supersession and lifecycle work to be complete, and passing format, state, and local-link-path checks. A successor must be able to distinguish the current conclusion, evaluated alternatives, open questions, and implementation evidence. Report missing historical evidence, actions outside authorization, and project-integration gaps honestly. A passing checker does not resolve them.
 
 Mechanical checks establish structure, state values, and link consistency. Semantic judgment still establishes content completeness, real alternatives, and the future value of rationale.

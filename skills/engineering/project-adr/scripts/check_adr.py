@@ -10,7 +10,7 @@ from urllib.parse import unquote, urlsplit
 
 SECTIONS = ("Problem", "Decision", "Alternatives", "Consequences and risks")
 CHINESE_SECTIONS = ("问题", "决策", "备选方案", "后果与风险")
-STATES = {"proposed", "implemented", "rejected", "superseded", "archived"}
+STATES = {"proposed", "accepted", "implemented", "rejected", "superseded", "archived"}
 ARCHIVES = {"archive", "archived"}
 ENTRY_FILES = {"README.md", "AGENTS.md", "CLAUDE.md"}
 INLINE_LINK = re.compile(

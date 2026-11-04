@@ -32,6 +32,10 @@ Use Python's standard-library `unittest`; name files `tests/test_*.py` and metho
 
 Packaging changes must still discover nine bundled skills. Verify actual Claude/Codex discovery in isolated configuration directories; schema validation alone is insufficient.
 
+## Decision Maintenance
+
+Before proposing or implementing related work, search active decisions and read relevant proposals, choices, rejection reasons, and open questions. During discussion, preserve durable constraints, evaluated alternatives, and substantial proposals in the existing topic owner. Checkpoint progress before pausing, distinguish selection from implementation, and synchronize records as implementation changes. Follow the [decision rules](docs/agents/adr/README.md) for creation criteria, lifecycle, and checks.
+
 ## Submodules, Decisions, and Licensing
 
 Before changing manifests or submodule policy, read the [packaging decisions](docs/agents/adr/). Maintain affected records with implementation changes.

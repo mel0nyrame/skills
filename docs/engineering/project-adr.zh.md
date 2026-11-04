@@ -2,7 +2,7 @@
 
 [English](project-adr.md) | 简体中文 · [全部指南](../README.zh.md)
 
-`project-adr` 用来保存一项工程选择为什么成立，哪些方案已经比较过，以及什么条件变化后需要重新讨论。文件通常叫 ADR，即架构决策记录。这个 Skill 也处理架构之外的长期工程选择。
+`project-adr` 在设计讨论中保存有长期价值的提案、已选方案、否决理由和未决问题，让下一个 agent 能接续工作。它也维护实现事实和替代关系。文件通常叫 ADR，即架构决策记录。记录范围也包括架构之外的长期工程选择。
 
 代码可以说明项目用了哪种数据库，却未必能解释为什么放弃另外两种。几年后重读一份合格的记录，应当能看懂当时的问题和取舍，而不必重新找回原来的聊天。
 
@@ -14,7 +14,18 @@
 
 ## 怎样提出请求
 
-在需要处理的项目中发送下面的请求。示例使用本项目的 Codex 插件。
+在目标项目中，可以先记录尚未实施的设计讨论。示例使用本项目的 Codex 插件。
+
+```text
+$skills:project-adr
+我们正在比较上传文件的本地存储和对象存储方案。
+讨论中及时保存重要约束、已评估方案、否决理由和未决问题。
+复用这个议题已有的记录。目前尚未选定方案，不实施存储改动。
+```
+
+用户或获授权的 agent 已经选定方案，但实施尚未完成时，默认状态为 `accepted`。仅提出建议时仍为 `proposed`。例如，可以要求“已选定对象存储，以后再实施。记录选择、理由和剩余工作”。
+
+已有记录或实现发生变化时，可以提出维护请求。
 
 ```text
 $skills:project-adr
@@ -24,13 +35,15 @@ $skills:project-adr
 先展示准备修改的文件，不归档或删除其他记录。
 ```
 
-单独安装时使用 `$project-adr`。Claude Code 插件中使用 `/skills:project-adr`。如果你尚未作出选择，也可以要求整理 `proposed` 状态的提案，不能将仍在讨论的方案写成已经实施。
+单独安装时使用 `$project-adr`。Claude Code 插件中使用 `/skills:project-adr`。普通讨论和外部访谈技能都遵守相同的项目规则，复用同一议题的记录，无需修改外部技能。
+
+开始提出或实施相关方案前，助手先检索活跃记录，读取已有选择、否决理由和未决问题。条件变化可以成为重新评估的依据，原有理由仍需保留。`project-adr` 负责记录，`project-engineering` 负责在调查和实施时触发读取及同步。持续生效还需要完成[项目接入](../../skills/engineering/project-adr/references/PROJECT-INTEGRATION.md)，仅安装技能并不足够。
 
 ## 会生成什么文件
 
 助手先找已有记录和项目模板。同一项决策已有负责人时，优先维护原文件。确实出现新的选择或替代关系时，才按项目制度新增记录。
 
-项目完全没有约定时，一项决策放在一个 Markdown 文件中，默认路径如下。
+项目完全没有约定时，一个决策议题放在一个 Markdown 文件中，相关候选方案及其结论放在一起。被拒方案具有独立的长期价值时，才单独记录。默认路径如下。
 
 ```text
 docs/adr/NNNN--kebab-title.md
@@ -38,27 +51,28 @@ docs/adr/NNNN--kebab-title.md
 
 例如 `docs/adr/0001--upload-storage.md` 是一个示例文件名，不会因为调用 Skill 就固定创建。归档的缺省位置是 `docs/adr/archive/`。本集合已经明确使用 `docs/agents/adr/`，因此维护本集合时沿用该目录。
 
-默认英文记录采用下面的结构。这是结构示例，实际理由和备选方案需要来自真实调查。
+下面用一个尚未选定方案的虚构存储讨论演示默认英文结构。实际理由和备选方案需要来自证据。尚未确定的候选方案无需编造否决理由。
 
 ```markdown
-# Keep skill source in categorized directories
+# Upload storage
 
-Status: implemented
+Status: proposed
 
 ## Problem
-Readers need categories, while three installers need to find the same skills.
+Uploads need durable retention and a clear deletion owner.
 
 ## Decision
-Keep one source per skill and declare the paths each installer needs.
+Local and object storage remain under evaluation. Deletion ownership is open.
 
 ## Alternatives
-A flat layout simplifies discovery but does not provide physical categories.
+Local storage needs a backup assessment. Object storage needs a cost assessment.
+Both candidates remain pending.
 
 ## Consequences and risks
-Adding a category requires checking the installer paths and discovery results.
+Retention, deletion behavior, and operating costs still need verification.
 ```
 
-`proposed` 表示仍在考虑，`implemented` 表示已经实施，`rejected` 保存仍有预防价值的拒绝理由，`superseded` 表示被完全替代，`archived` 表示冻结的历史。项目已有状态体系时，继续遵守项目体系。
+`proposed` 表示仍在评估，`accepted` 表示已经选定但尚未完成实施，`implemented` 表示已经完成实施且有证据。`rejected` 保存仍有预防价值的被拒提案，`superseded` 表示被完全替代，`archived` 表示冻结的历史。议题中可以包含被拒候选方案，整个议题不必标为 `rejected`。接受方案本身不授予执行权限。项目已有状态体系时，继续遵守项目体系。
 
 项目没有生命周期约定时，助手才读取[默认状态定义](../../skills/engineering/project-adr/references/LIFECYCLE.md#default-states)。归档或删除记录前，再读取单独的[内容保留和依赖检查](../../skills/engineering/project-adr/references/LIFECYCLE.md#archive-or-delete)。
 
@@ -79,3 +93,5 @@ python3 -B skills/engineering/project-adr/scripts/check_adr.py docs/agents/adr
 ```
 
 它会读文件并报告结果，不会替你生成 ADR。默认检查器也兼容完整的中文结构，但不能用它强行改造另一个项目的有效模板。详细约定见[执行指令](../../skills/engineering/project-adr/SKILL.md)和[项目接入流程](../../skills/engineering/project-adr/references/PROJECT-INTEGRATION.md)。
+
+交接设计讨论时，还要检查下一个 agent 能否找到议题、恢复真实否决理由、区分已选结论与建议，并在没有原聊天的情况下找到下一个未决问题。格式检查通过不能证明这些行为。

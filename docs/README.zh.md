@@ -13,7 +13,7 @@
 | [clarify](thinking/clarify.zh.md) | 先明确真正要解决的问题 | 对话中的关键问题及后续方案，没有默认文件 |
 | [karpathy-guidelines](thinking/karpathy-guidelines.zh.md) | 控制工作范围，核实假设和结果 | 原任务的代码、文档或答案，没有固定产物目录 |
 | [project-engineering](engineering/project-engineering.zh.md) | 按项目规则实现功能、修复或迁移 | 相关源文件和测试，必要时更新工程知识及决策 |
-| [project-adr](engineering/project-adr.zh.md) | 保存重要工程选择的理由并维护旧记录 | 项目 ADR 目录中的 Markdown 记录和关联链接 |
+| [project-adr](engineering/project-adr.zh.md) | 保存长期提案与选择，接续议题并维护记录 | 项目 ADR 目录中的议题记录，包含否决理由、未决问题、状态和链接 |
 | [project-git](engineering/project-git.zh.md) | 审查改动、拆分提交、按授权推送 | 审查说明、本地提交哈希或推送结果，取决于授权 |
 | [project-prose](engineering/project-prose.zh.md) | 让技术说明脱离聊天也能读懂 | 指定文档或注释的更新，或只读审查意见 |
 | [pr](engineering/pr.zh.md) | 根据真实 diff 和验证结果写 PR 正文 | 对话草稿，或你指定的 `PR.md` 等文件 |
@@ -50,7 +50,7 @@ $skills:project-engineering
 
 以导出功能这个教学示例来说，`project-engineering` 先确认项目规则和实现入口，再修改功能及测试。有值得长期保留的发现时，它优先补进已有工程文档。目标项目没有合适负责人时，才考虑 `docs/engineering/ENGINEERING.md` 或 `DATA.md` 这些缺省位置。
 
-如果功能涉及新的长期选择，`project-adr` 再负责理由和替代关系。目标项目没有约定时，默认记录放在 `docs/adr/`。本集合自己的记录使用 `docs/agents/adr/`，不会因此要求所有项目使用同一路径。
+设计议题具有长期价值时，`project-adr` 就在讨论中保存理由、已评估方案、未决问题和替代关系，尚未选定或实施时也可以记录。`project-engineering` 在选择方案前读取相关记录，并随实现变化同步。目标项目没有约定时，默认记录放在 `docs/adr/`。本集合自己的记录使用 `docs/agents/adr/`，不会因此要求所有项目使用同一路径。
 
 代码和说明准备好以后，你可以让 `project-git` 先审查，再明确决定是否 commit 或 push。需要评审正文时再调用外部 `pr`。一次小改动不需要把所有 Skill 依次运行一遍。
 
