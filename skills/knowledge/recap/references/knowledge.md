@@ -4,7 +4,9 @@
 
 Use readable, stable topic names under `topics/`, normally in the user's language. Name the understanding problem, not the chat date. Start shallow; add real subject groups only when they improve navigation. Keep aliases and dates in metadata rather than accumulating filename prefixes. No global document-ID service is required. Update relative links after an approved rename.
 
-The helper builds `index.md` entries from topic summaries. Write each summary around the reader's question and learning value, with the case scope where needed; keep it consistent with the body. Put useful prerequisite and next-reading links in the topics themselves, with a reason to follow each. Preserve guide prose outside the managed section; packets cannot replace it. Write `CHANGELOG.md` for substantive knowledge changes, not tool transcripts.
+The helper builds `index.md` entries from topic summaries. Write each summary around the reader's question and learning value, with the case scope where needed; keep it consistent with the body. Put useful prerequisite and next-reading links in the topics themselves, with a reason to follow each. Preserve existing guide prose unless the requested maintenance includes its introduction; use the [bounded guide input](formats.md#guide-introduction) and exact user approval. Packets cannot replace the generated catalog or trailing prose. Write `CHANGELOG.md` for substantive knowledge changes, not tool transcripts.
+
+When representative queries miss a relevant topic, consider precise aliases that readers actually use. Preserve existing aliases. Do not assume all topics need additions or infer empty aliases by searching for a YAML-only spelling; topic metadata is JSON frontmatter.
 
 ## Built-in writing contract
 

@@ -66,7 +66,7 @@ my-knowledge/
 | --- | --- |
 | `topics/**/*.md` | 正式专题正文，包含解释、示例、适用范围和来源链接 |
 | `sources/<host>-<session-id>.md` | 会话来源、读取范围、缺口和支持结论的必要摘录 |
-| `index.md` | 从主题摘要生成的阅读入口，保留非管理区的已有正文 |
+| `index.md` | 自动生成专题清单；导读通过已批准的候选维护；清单后的正文保留原样 |
 | `CHANGELOG.md` | 本次知识新增或修正了什么、为什么改 |
 | `drafts/` | 尚未正式发布的材料，例如来源覆盖仍有缺口的草稿 |
 | `.state/library.json` | 知识库格式和分支等机器状态 |
@@ -125,6 +125,24 @@ python3 -B skills/knowledge/recap/scripts/knowledge.py --root /path/to/my-knowle
 ```
 
 已有内容的目录不能直接当作空库初始化，需要先检查迁移方案。相关步骤见[发布、迁移和恢复](../../skills/knowledge/recap/references/operations.md)。
+
+## 怎样维护导读和查找待处理操作
+
+```text
+$skills:recap
+列出保留的操作，找出候选工作区缺失的记录。
+更新 index.md 的导读，让它覆盖当前专题。
+先准备候选并展示差异，再记录我的批准。
+保留未发布候选和无关本地文件。
+```
+
+`knowledge.py status --all` 列出操作记录、工作区和分支是否存在、是否有发布记录，以及需要恢复的中断事务。旧的 `ready` 操作不能自动视为已放弃。自动清理仍只适用于已成功发布且内容匹配的候选。
+
+导读维护只修改生成清单之前的介绍文字。它采用与专题相同的候选、集成和发布流程，并要求用户批准当前候选哈希。两次操作同时修改导读时，需要独立审查。仅生成清单更新不会触发这项要求。维护导读不需要直接修改正式文件。[导读维护决策](../agents/adr/0005--recap-guide-maintenance.md)说明了这项边界的原因。
+
+普通发布可先读[命令清单](../../skills/knowledge/recap/references/checklist.md)。`knowledge.py packet OP --from-dir DIR` 从操作基准版本计算哈希，把明确列出的专题、来源和回执转换为变更包。作者仍需填写修改理由、证据和真实覆盖范围。生成命令不会检查或发布候选。输入结构见[输入目录格式](../../skills/knowledge/recap/references/formats.md#packet-input-directory)。
+
+OpenCode 的消息序号表示事件位置，可以从大于 1 的数字开始，也可以跳号。提取器保留原始位置，单独记录数字间隙。完整提取只说明已读取受支持格式的持久化快照，不能证明宿主从未删除或漏存历史。分支、附件、格式或增量前缀确有问题时，仍不能获得完整回执。
 
 ## 怎样判断这次知识值得保留
 

@@ -405,6 +405,12 @@ def apply_bundle(root, filename, approved_sha256):
     return workflow.publish(root, packet['id'], approved_sha256)
 
 
+def reading_purpose(value):
+    if value == 'edit':
+        raise argparse.ArgumentTypeError('Use --purpose topic to read a topic you plan to edit')
+    return value
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', help='Exact library root; otherwise RECAP_KNOWLEDGE_ROOT or ~/.agents/knowledge')
@@ -419,7 +425,9 @@ def main(argv=None):
     p.add_argument('--revision')
     p = sub.add_parser('read', help='Read an exact current file for a bounded purpose')
     p.add_argument('path')
-    p.add_argument('--purpose', required=True, choices=['topic', 'source', 'route', 'changes', 'draft', 'history', 'state'])
+    p.add_argument('--purpose', required=True, type=reading_purpose,
+                   choices=['topic', 'source', 'route', 'changes', 'draft', 'history', 'state'],
+                   help='For a topic you plan to edit, use topic; edit is not a reading purpose')
     p.add_argument('--owner')
     p.add_argument('--revision')
     p.add_argument('--at', help='Exact historical commit; requires --purpose history')
@@ -431,7 +439,13 @@ def main(argv=None):
     p = sub.add_parser('apply', help='Publish the exact inspected packet; alias of publish')
     p.add_argument('packet')
     p.add_argument('--approved-sha256', required=True)
-    for name in ['integrate', 'status', 'diff', 'recover', 'cleanup']:
+    p = sub.add_parser('packet', help='Generate packet JSON from declared files without inspecting or publishing')
+    p.add_argument('operation')
+    p.add_argument('--from-dir', required=True)
+    p = sub.add_parser('status', help='Inspect one operation or list all retained operation records')
+    p.add_argument('operation', nargs='?')
+    p.add_argument('--all', action='store_true')
+    for name in ['integrate', 'diff', 'recover', 'cleanup']:
         p = sub.add_parser(name)
         p.add_argument('operation')
     for name in ['resolve', 'review', 'approve']:
@@ -447,6 +461,8 @@ def main(argv=None):
     p.add_argument('plan')
     p.add_argument('--approved-sha256', required=True)
     args = parser.parse_args(argv)
+    if args.command == 'status' and (bool(args.operation) == args.all):
+        parser.error('status requires either OPERATION or --all, not both')
     root = root_path(args.root)
     try:
         if not 0 <= args.lock_timeout <= 30:
@@ -460,6 +476,7 @@ def main(argv=None):
                 raise KnowledgeError('--at requires an explicit history purpose')
             result = read_version(root, args.path, args.at, args.owner) if args.at else read_document(root, args.path, args.purpose, args.owner, args.revision)
         elif args.command == 'begin': result = workflow.begin(root, args.operation, args.writer_id)
+        elif args.command == 'packet': result = workflow.build_packet(root, args.operation, Path(args.from_dir))
         elif args.command == 'inspect': result = inspect_bundle(root, Path(args.packet))
         elif args.command == 'apply': result = apply_bundle(root, Path(args.packet), args.approved_sha256)
         elif args.command in ('integrate', 'status', 'diff', 'recover', 'cleanup'):
