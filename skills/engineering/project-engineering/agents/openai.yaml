@@ -1,6 +1,6 @@
 interface:
   display_name: "Project Engineering"
   short_description: "Implement changes, preserve knowledge, and maintain decisions"
-  default_prompt: "Use $project-engineering to establish project rules and change entry points, implement and validate the change, persist engineering knowledge, and update affected decisions."
+  default_prompt: "Use $project-engineering to read related decisions, establish project rules and change entry points, preserve durable design progress, implement and validate the authorized change, and synchronize project knowledge."
 policy:
   allow_implicit_invocation: true

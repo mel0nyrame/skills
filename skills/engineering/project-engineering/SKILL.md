@@ -1,6 +1,6 @@
 ---
 name: project-engineering
-description: Use when implementing features, fixing defects, refactoring or migrating a project, or organizing its engineering knowledge.
+description: Use when investigating or implementing features, fixes, refactors, or migrations, or organizing project engineering knowledge. Read related decisions before choosing an approach and preserve durable design progress as it develops.
 ---
 
 # Project Engineering
@@ -25,7 +25,9 @@ For a simple local change without architecture or data-boundary effects, stop in
 
 Locate engineering knowledge through rules or documentation entry points. Without an explicit entry point, inspect relevant READMEs, ADRs or decisions, CI, package/build metadata, formatter/lint/type-check configuration, schemas, migrations, code generation, target modules, and tests. Start at entry points and follow dependencies relevant to this task. Stop when the context is sufficient for a safe change.
 
-Search active decisions by affected capabilities, paths, symbols, and configuration keys. Identify which decisions still constrain this change and which facts will change with the implementation. Read the relevant records, or establish that none match the scope, before implementing. Use archives only when historical evidence is explicitly needed.
+Before proposing or implementing an approach, search active decisions by affected capabilities, constraints, paths, symbols, and configuration keys. Read related proposals, selected choices, rejection reasons, and open questions, or establish that none match. Identify constraints and facts that may change. When changed conditions justify reconsideration, state them explicitly and reevaluate with the earlier rationale visible. Existing plans do not authorize execution. Use archives only when historical evidence is explicitly needed.
+
+During investigation and design, use `project-adr` to preserve meaningful constraints, real rejection reasons, or substantial proposals with future value when they arise. Reuse the topic owner, distinguish recommendations from selected choices, and checkpoint open questions before pausing. `project-adr` owns record criteria, content, and lifecycle; this workflow supplies reading and synchronization triggers. When it is unavailable, follow the project's decision rules directly. External discussion skills use the same project convention and need no modification.
 
 Classify engineering knowledge for the current task:
 
@@ -81,7 +83,7 @@ When adding persistent data or changing its schema, flow, ownership, isolation, 
 
 Make the smallest change within confirmed boundaries and entry points. When engineering documents conflict with implementation, check applicable rules, active decisions, configuration, tests, generation pipelines, and necessary Git history. Then correct implementation that violates a Confirmed Rule, update stale facts, describe a verifiable migration state, or retain an Unknown. History explains change; it cannot alone establish current behavior.
 
-After implementation, inspect each engineering finding introduced or changed by this task. Persist module boundaries, reuse conditions, authoritative change entry points, data ownership and lifecycle, validation limits, or non-obvious constraints when they affect future changes and code, configuration, or tests cannot express them directly. Conversation, plans, and delivery notes do not replace project files. Reuse accurate existing records. Avoid duplicating implementation details that are directly discoverable.
+Preserve durable decision progress during design under section 2. After implementation, inspect each engineering finding introduced or changed by this task. Persist module boundaries, reuse conditions, authoritative change entry points, data ownership and lifecycle, validation limits, or non-obvious constraints when they affect future changes and code, configuration, or tests cannot express them directly. Conversation, plans, and delivery notes do not replace project files. Reuse accurate existing records. Avoid duplicating implementation details that are directly discoverable.
 
 Preserve each finding's single owner: reusable assets own common capabilities, change-entry-point documentation owns source/generated relationships, data-governance documents own current data facts, and architecture documents own module responsibilities. Update gaps in existing owners. Without a suitable owner, create a minimal record under project conventions, or use the defaults in the governance reference. Persist only knowledge within the current scope. The existence of `AGENTS.md` or ADRs does not establish coverage of these topics. Instructions still own standing rules, and decisions still own lasting reasons.
 
@@ -95,7 +97,7 @@ When creating or extending standing instructions, engineering documents, indexes
 
 Run the project's focused validation for this change. Review generated artifacts, migrations, and rollback effects. Report only commands actually executed and their results.
 
-Before delivery, account for every finding that section 7 requires preserving. Confirm a persistent record and discoverable entry point exist, references resolve, and content matches implementation. Report added, updated, or reused knowledge locations, or explain why nothing needs preserving. Reading a skill or finishing code edits does not complete this check.
+Before delivery, account for design progress under section 2 and every finding that section 7 requires preserving. Confirm a persistent record and discoverable entry point exist, references resolve, and implementation claims match evidence. Selected but unfinished work retains its applicable pre-implementation state and remaining questions. Report added, updated, or reused knowledge locations, or explain why nothing needs preserving. Reading a skill or finishing code edits does not complete this check.
 
 Compare the active decisions found in section 2 with the actual changes. When paths, symbols, defaults, owners, or mechanisms change, use `project-adr` to update existing records in the same change. Use it for new decisions and same-topic supersession when lasting reasons change or arise. Check affected records' facts even when no new decision is needed.
 

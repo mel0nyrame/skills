@@ -42,7 +42,7 @@ class CheckADRTests(unittest.TestCase):
 
     def test_both_languages_and_active_states(self):
         for language in ("en", "zh"):
-            for state in ("proposed", "implemented", "rejected", "superseded"):
+            for state in ("proposed", "accepted", "implemented", "rejected", "superseded"):
                 with self.subTest(language=language, state=state):
                     self.assertEqual(self.check_text(record(language, state)), [])
 

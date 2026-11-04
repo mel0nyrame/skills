@@ -24,7 +24,9 @@ Use `$project-engineering` standalone or `/skills:project-engineering` in Claude
 
 ## Follow the work through
 
-The assistant first reads instructions applying to the target paths, contribution guidance, relevant documents, and decisions that constrain the change. Investigation scales with the task. One component change should not automatically become a whole-project audit.
+The assistant first reads instructions applying to the target paths, contribution guidance, and relevant documents. Before choosing an approach, it searches active decision topics and reads related proposals, selected choices, rejection reasons, and open questions. Changed conditions must be stated when reopening an earlier choice. Investigation scales with the task. One component change should not automatically become a whole-project audit.
+
+During design, it uses `project-adr` to preserve meaningful constraints, evaluated rejection reasons, and substantial proposals as they arise, including when implementation is deferred. The same topic owner serves ordinary discussions and external interview skills. `project-adr` owns record content and lifecycle; `project-engineering` supplies reading and synchronization triggers under project instructions.
 
 It then follows relevant calls to find the change entry point. An existing shared export service needs a suitability check. A generated client normally requires changing its schema and regenerating. One example of a coding pattern is a lead for investigation, not evidence of a repository-wide rule.
 
@@ -43,7 +45,7 @@ There is no fixed bundle generated on every invocation. The task determines impl
 | Target modules, tests, necessary generated artifacts | Required by implementation | Delivered behavior and executable verification |
 | `docs/engineering/ENGINEERING.md` | Useful findings need preserving and no suitable document owns them | Module boundaries, reuse conditions, editing entry points, validation limits |
 | `docs/engineering/DATA.md` | Relevant lasting data rules have no existing owner | Ownership, lifecycle, deletion, and rebuild constraints |
-| The project's ADR directory | A lasting decision needs creation or maintenance | Reasons, alternatives, consequences, and replacement relationships |
+| The project's ADR directory | A durable design topic or implementation change needs recording | Proposals, selected choices, rejection reasons, open questions, evidence, and replacement relationships |
 
 In the teaching example, routing exports through a shared permission service could affect future export features and merit documentation. A function's current line number is directly discoverable and usually needs no separate record.
 

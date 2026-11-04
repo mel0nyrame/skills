@@ -2,7 +2,7 @@
 
 English | [简体中文](project-adr.zh.md) · [All guides](../README.md)
 
-`project-adr` preserves why an engineering choice holds, which alternatives were considered, and when it should be reconsidered. The document is often called an architecture decision record, or ADR. The skill also covers lasting engineering choices outside architecture.
+`project-adr` captures durable design proposals, selected choices, rejection reasons, and open questions so another agent can resume the topic. It also maintains implementation facts and replacement relationships. The document is often called an architecture decision record, or ADR; its scope includes lasting choices outside architecture.
 
 Code may reveal the chosen database without explaining why other options were rejected. A useful record lets a later reader understand the original problem and tradeoffs without recovering the chat.
 
@@ -12,9 +12,21 @@ Follow the target project's creation criteria first. Without a policy, consider 
 
 This collection provides a real example. Its [first packaging decision](../agents/adr/0001--categorized-plugin-layout.md) explains shared categorized sources and the Codex compatibility manifest. The [later submodule decision](../agents/adr/0002--upstream-submodule-references.md) changes external-reference representation while retaining the other packaging choices. Readers can distinguish valid reasons from the replaced scope.
 
-## Give the assistant a maintenance request
+## Start a discussion or maintain a record
 
-Use this in the project whose records need work.
+Capture a design discussion before implementation in the target project:
+
+```text
+$skills:project-adr
+We are comparing local and object storage for uploads. Preserve meaningful
+constraints, evaluated alternatives, rejection reasons, and open questions as
+we discuss them. Reuse this topic's existing record. No choice has been made;
+do not implement storage changes.
+```
+
+When the user or an authorized agent selects a choice but implementation is deferred, the default state is `accepted`. A recommendation alone remains `proposed`. For example: "We have selected object storage, but will implement it later. Record the choice, reasons, and remaining work."
+
+Use a maintenance request when an existing record or implementation changes:
 
 ```text
 $skills:project-adr
@@ -24,13 +36,15 @@ implementation paths changed, synchronize the existing record's facts. Show the
 proposed file changes first. Do not archive or delete other records.
 ```
 
-Use `$project-adr` standalone or `/skills:project-adr` in Claude Code. An undecided choice can be a `proposed` record; discussion alone does not make it implemented.
+Use `$project-adr` standalone or `/skills:project-adr` in Claude Code. Ordinary discussions and external interview skills use the same project rules and topic owner; neither requires editing the external skill.
+
+Before proposing or implementing related work, the assistant searches active records and reads relevant choices, rejection reasons, and unresolved questions. Changed conditions can justify reconsideration, with the earlier reasons still visible. `project-adr` owns records; `project-engineering` supplies investigation and implementation-synchronization triggers. Ongoing behavior requires [project integration](../../skills/engineering/project-adr/references/PROJECT-INTEGRATION.md), not just installation.
 
 ## Understand the file output
 
 The assistant locates records and templates before writing. An existing owner of the same choice should normally be maintained. A new choice or replacement may need another record under project policy.
 
-Without repository conventions, one decision occupies one Markdown file.
+Without repository conventions, one decision topic occupies one Markdown file, with related candidates and their outcomes together. A separate rejected record needs independent lasting value.
 
 ```text
 docs/adr/NNNN--kebab-title.md
@@ -38,27 +52,28 @@ docs/adr/NNNN--kebab-title.md
 
 `docs/adr/0001--upload-storage.md` is an example name, not an automatically generated file. The fallback archive directory is `docs/adr/archive/`. This collection follows its explicit `docs/agents/adr/` location instead.
 
-The default English structure is illustrated below. Actual reasons and alternatives must come from evidence.
+The default English structure below uses a hypothetical unresolved storage discussion. Actual reasons and alternatives must come from evidence; pending candidates need no invented rejection reason.
 
 ```markdown
-# Keep skill source in categorized directories
+# Upload storage
 
-Status: implemented
+Status: proposed
 
 ## Problem
-Readers need categories, while three installers need to find the same skills.
+Uploads need durable retention and a clear deletion owner.
 
 ## Decision
-Keep one source per skill and declare the paths each installer needs.
+Local and object storage remain under evaluation. Deletion ownership is open.
 
 ## Alternatives
-A flat layout simplifies discovery but does not provide physical categories.
+Local storage needs a backup assessment. Object storage needs a cost assessment.
+Both candidates remain pending.
 
 ## Consequences and risks
-Adding a category requires checking the installer paths and discovery results.
+Retention, deletion behavior, and operating costs still need verification.
 ```
 
-Default states distinguish `proposed`, `implemented`, a still-useful `rejected` choice, fully `superseded` records, and frozen `archived` history. An existing project lifecycle takes precedence.
+Default states distinguish `proposed` (evaluating), `accepted` (selected but not fully implemented), `implemented` (completed with evidence), a still-useful `rejected` proposal, fully `superseded` records, and frozen `archived` history. A topic can contain rejected candidates without itself being rejected. Acceptance does not grant execution permission. An existing project lifecycle takes precedence.
 
 The assistant reads [default-state definitions](../../skills/engineering/project-adr/references/LIFECYCLE.md#default-states) when the project lacks a lifecycle convention. Before archiving or deleting records, it reads the separate [preservation and dependency checks](../../skills/engineering/project-adr/references/LIFECYCLE.md#archive-or-delete).
 
@@ -77,3 +92,5 @@ python3 -B skills/engineering/project-adr/scripts/check_adr.py docs/agents/adr
 ```
 
 It reads files and reports results; it does not generate ADRs. Complete Chinese default templates are also accepted. Use project-specific checks for other valid formats rather than rewriting them to satisfy this script. See the [execution instructions](../../skills/engineering/project-adr/SKILL.md) and [project integration](../../skills/engineering/project-adr/references/PROJECT-INTEGRATION.md).
+
+For a discussion handoff, check that another agent can find the topic, recover actual rejection reasons, distinguish selected conclusions from recommendations, and identify the next open question without the original chat. A passing format check does not prove this behavior.

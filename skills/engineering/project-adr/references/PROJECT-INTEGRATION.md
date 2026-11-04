@@ -8,7 +8,7 @@ Locate the project's actual `AGENTS.md`, `CLAUDE.md`, or other instruction entry
 
 Establish record conventions through [the skill's discovery rules](../SKILL.md#locate-rules-and-records): creation criteria, location, naming, state representation, template, and checks. Reuse rules in `docs/agents/` or another owner. Rules describe project actions and document locations without requiring an external skill installation.
 
-Without a suitable rule owner, put these conventions in the decision directory's `README.md`, including factual synchronization, supersession, and the project's actual archive rules. Base them on the skill and project conventions. Preserve valid short templates and optional states. When formats are mixed, establish allowed formats and existing exceptions for this scope. Finding another installed skill is not a reason to switch systems.
+Without a suitable rule owner, put these conventions in the decision directory's `README.md`, including task-entry retrieval, discussion-time capture, factual synchronization, supersession, and the project's actual archive rules. Base them on the skill and project conventions. Preserve valid short templates and optional states. When formats are mixed, establish allowed formats and existing exceptions for this scope. Finding another installed skill is not a reason to switch systems.
 
 Completion: standing instructions contain a short trigger, one owner holds the detailed contract, and the template and record directory are discoverable from the entry point.
 
@@ -19,14 +19,16 @@ Adapt this short rule to project paths and language, merging it into existing in
 ```markdown
 ## Decision maintenance
 
-Before changes, search active decisions related to target capabilities, paths, and configuration. Add or update lasting choices that meet project creation criteria in the same change. Synchronize affected active records when paths, symbols, defaults, or mechanisms change. For every new record, check full or partial replacement of same-topic decisions and maintain cross-links. Reuse an existing record or draft that already owns the decision.
+Before proposing or implementing related work, search active decisions by task topic, capabilities, constraints, paths, and configuration. Read relevant proposals, selected choices, rejection reasons, and open questions. State changed conditions before reconsidering an earlier choice.
 
-Before delivery, confirm affected records match implementation, run decision-directory checks, and report update locations or why maintenance is unnecessary. See [decision rules](docs/adr/README.md) for formats, lifecycle, and validation.
+During discussion, preserve meaningful constraints, evaluated rejection reasons, and substantial proposals that meet project creation criteria. Reuse one topic owner and distinguish selected conclusions, recommendations, open questions, and implementation evidence. Checkpoint meaningful progress before pausing or closing, even when no implementation follows.
+
+Synchronize affected active records as implementation facts change. For new choices, check same-topic replacement and maintain links. Before delivery, check required records, state accuracy, and local links, then report update locations or why maintenance is unnecessary. See [decision rules](docs/adr/README.md) for formats, lifecycle, and validation.
 ```
 
 Use links relative to module-local entry points. Instructions own actions and reading conditions that recur during work. Detailed creation criteria, formats, and lasting reasons remain with their owners. Merge the trigger into existing ADR rules rather than adding parallel thresholds. Preserve project authorization boundaries for read-only work, archive, and deletion.
 
-Completion: future agents can discover when to read, maintain, and check decisions from project instructions even without selecting this skill. All installed skills use the same project rules.
+Completion: future agents can discover when to read, capture, maintain, and check decisions from project instructions even without selecting this skill. `project-adr` owns the record contract; `project-engineering` supplies investigation and implementation triggers when available. External discussion skills reuse existing owners without requiring edits to their instructions.
 
 ## 3. Integrate minimal mechanical checks
 
