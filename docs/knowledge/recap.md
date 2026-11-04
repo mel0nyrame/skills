@@ -148,6 +148,8 @@ Use the [command checklist](../../skills/knowledge/recap/references/checklist.md
 
 OpenCode message sequences represent event positions and can begin after 1 or contain gaps. The extractor preserves those positions and records numeric gaps separately. Complete extraction means the supported persisted snapshot was read; it cannot prove the absence of deleted or unsaved host history. Genuine branch, attachment, format or incremental-prefix problems still prevent a complete receipt.
 
+For an external research directory, `research_index.py /path/to/research` prints a Markdown inventory to stdout. It does not write an index or edit a knowledge library. Capture status stays unmarked until separately checked; opening excerpts are navigation aids. Saving the inventory and adding external configuration pointers are separate authorized writes. Read [research inventory](../../skills/knowledge/recap/references/operations.md#research-inventory) before replacing an existing annotated index.
+
 ## Decide whether useful knowledge was preserved
 
 Open a topic independently. Its question, applicability, and supporting evidence should make sense without the chat. Search for it using different wording and check that it can be found.

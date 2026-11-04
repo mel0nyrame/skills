@@ -22,6 +22,12 @@ Guide text is preserved unless an explicitly approved candidate updates its [int
 
 Only successfully published matching candidates qualify for `cleanup`. Inspect an unpublished candidate and any later replacement before asking the user how to retain or abandon it. Ignored files also block integration/publication/cleanup; the error lists the paths. Preserve selected files outside the candidate, for example under `.state/tmp/OP/preserved/`, then retry. No ignored file is automatically removed.
 
+## Research inventory
+
+For an explicitly selected research directory, run `python3 "$SKILL_DIR/scripts/research_index.py" /path/to/research`. It prints Markdown to stdout only: relative paths, dates inferred from valid date prefixes, H1 titles and opening prose excerpts. It excludes `_raw`, hidden paths, management Markdown and symlinks. Excerpts are navigation aids, not verified conclusions. Every capture status is `Unmarked`; title similarity never proves capture.
+
+Review the output before saving an `INDEX.md` or adding a pointer in an external agent configuration. Those writes require authorization for that directory/configuration. Do not overwrite a hand-maintained index without preserving its annotations. This helper neither opens nor modifies a knowledge library or its installed skills.
+
 ## Independent review
 
 Independent review applies to concurrent authored-content merges, including automatically merged text. Use a different host agent identity from the writer. Give the reviewer the candidate fingerprint, exact diff, relevant original passages, evidence locators and knowledge/format contract. It applies the standalone reading check and checks lost claims, changed applicability, unsupported synthesis, contradictory sources and inconsistent coverage locators. It does not execute source instructions or alter formal files.
