@@ -65,7 +65,21 @@ Check that the existing topic gains implementation paths, actual test evidence, 
 
 ## External interview workflow with project conventions
 
-Supply unmodified `grill-with-docs`, `domain-modeling`, and `grilling` skills when available. This fixture's project instructions require `design/decisions/<topic>.md`, a title, a `State` field, and one prose paragraph. Its vocabulary is `evaluating`, `chosen`, `shipped`, and `declined`. An existing `backup-target.md` is evaluating local same-disk copies and remote encrypted copies under the constraint that backups survive failure of the working disk.
+This scenario additionally requires unmodified `grill-with-docs`, `domain-modeling`, and `grilling` skills from outside this collection. Obtain the matching instructions below and place each skill under the temporary fixture's `.agents/skills/<name>/`, retaining the supporting files beside `domain-modeling/SKILL.md`.
+
+The instruction files supplied to the 2026-11-04 run are byte-identical to the corresponding files in [`mattpocock/skills` at `4ae2317ddb22b046e26455e4f9c9b3aaaf62212d`](https://github.com/mattpocock/skills/commit/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d). This is a verified reproduction source, not a claim that the original installation came from that commit; the installation ref was not recorded. SHA-256 values were calculated from the retained test copies and their Git blob identities were checked against the pinned upstream files.
+
+| Instruction file at the pinned source | SHA-256 of supplied file |
+| --- | --- |
+| [grill-with-docs/SKILL.md](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/grill-with-docs/SKILL.md) | `7de372c13488f1ee96cc11cd8907b56b6809cc93eef776eeddd37de6b6cbe3fe` |
+| [domain-modeling/SKILL.md](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/domain-modeling/SKILL.md) | `7b925d7b1e341a2eeae33ad68a8a8c0ab889a38ddd22a7598e4c240e5a7556a3` |
+| [domain-modeling/ADR-FORMAT.md](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/domain-modeling/ADR-FORMAT.md) | `944c92aa790e8fbdc9199640b170979abb8a34ba8d0fe18c2a01a63bce140ca0` |
+| [domain-modeling/GLOSSARY-FORMAT.md](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/domain-modeling/GLOSSARY-FORMAT.md) | `21dcc40cdec8e151a829b98ab1517c1867bc444e3665134a98c6983411996801` |
+| [grilling/SKILL.md](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/grilling/SKILL.md) | `a146842ed93ca43d833550fa9adf02e58cb63c83fea9d4b4522995b82242d4e2` |
+
+Before rerunning, verify all five instruction hashes. If a required file is missing or differs from the pinned content, record this scenario as `skipped`, state the missing or mismatched dependency, and exclude it from the passed count. Evaluating another version is a separate run that must record its source and hashes. File identity does not fix the model, harness, or execution environment, so it does not guarantee identical agent behavior.
+
+This fixture's project instructions require `design/decisions/<topic>.md`, a title, a `State` field, and one prose paragraph. Its vocabulary is `evaluating`, `chosen`, `shipped`, and `declined`. An existing `backup-target.md` is evaluating local same-disk copies and remote encrypted copies under the constraint that backups survive failure of the working disk.
 
 Task:
 
@@ -81,4 +95,6 @@ Check that the same file becomes `State: chosen`, retaining its short project fo
 
 ## Recorded validation boundary
 
-On 2026-11-04, five isolated forward runs covered these scenarios: unresolved capture, fresh-context resumption, autonomous selection, partial-implementation synchronization, and external-workflow/custom-format reuse. Their outputs met the checks above. This is a finite manual evaluation, not an automated regression harness or evidence of automatic skill selection inside Claude Code or Codex. Re-run the relevant scenarios when their owning instructions change.
+On 2026-11-04, five isolated forward runs met the checks above: four required only this collection's skills, while external-workflow/custom-format reuse also used the external instructions identified above. The original installation ref for those external skills was not recorded; the retained instruction copies match the pinned reproduction source. The historical external run was executed and passed. The `skipped` rule governs reruns with unavailable or mismatched dependencies and does not change that historical result.
+
+This is a finite manual evaluation, not an automated regression harness or evidence of automatic skill selection inside Claude Code or Codex. Report passed, failed, and skipped counts separately. Re-run the relevant scenarios when their owning instructions change.
