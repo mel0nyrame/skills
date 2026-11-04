@@ -138,9 +138,13 @@ $skills:recap
 
 `knowledge.py status --all` 列出操作记录、工作区和分支是否存在、是否有发布记录，以及需要恢复的中断事务。旧的 `ready` 操作不能自动视为已放弃。自动清理仍只适用于已成功发布且内容匹配的候选。
 
+某条操作记录损坏时，汇总仍保留其他操作和恢复信息。损坏条目包含错误，汇总标记 `complete: false`。即使命令成功退出，也要检查这个字段。知识库元数据或恢复事务记录损坏时，命令仍会报错。`worktree_exists` 只表示目录存在，不代表 Git 身份有效或候选可以发布。
+
 导读维护只修改生成清单之前的介绍文字。它采用与专题相同的候选、集成和发布流程，并要求用户批准当前候选哈希。两次操作同时修改导读时，需要独立审查。仅生成清单更新不会触发这项要求。维护导读不需要直接修改正式文件。[导读维护决策](../agents/adr/0005--recap-guide-maintenance.md)说明了这项边界的原因。
 
-普通发布可先读[命令清单](../../skills/knowledge/recap/references/checklist.md)。`knowledge.py packet OP --from-dir DIR` 从操作基准版本计算哈希，把明确列出的专题、来源和回执转换为变更包。作者仍需填写修改理由、证据和真实覆盖范围。生成命令不会检查或发布候选。输入结构见[输入目录格式](../../skills/knowledge/recap/references/formats.md#packet-input-directory)。
+普通发布可先读[命令清单](../../skills/knowledge/recap/references/checklist.md)。`knowledge.py packet OP --from-dir DIR` 从操作基准版本计算哈希，把明确列出的专题、来源和回执转换为变更包。作者仍需填写修改理由、证据和真实覆盖范围。生成命令不会执行 `inspect` 或发布候选。输入结构见[输入目录格式](../../skills/knowledge/recap/references/formats.md#packet-input-directory)。
+
+生成变更包要求正式库和候选没有未提交修改。候选必须存在、处于编辑状态，并具有匹配的仓库和分支身份。命令在读取声明的文档前报告这些问题，保留外部文件。正式库可以推进到更新的干净版本，哈希仍取自操作基准。单项输入检查不能替代 `inspect` 对整个候选的链接和来源关系验证。
 
 OpenCode 的消息序号表示事件位置，可以从大于 1 的数字开始，也可以跳号。提取器保留原始位置，单独记录数字间隙。完整提取只说明已读取受支持格式的持久化快照，不能证明宿主从未删除或漏存历史。分支、附件、格式或增量前缀确有问题时，仍不能获得完整回执。
 

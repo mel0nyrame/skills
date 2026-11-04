@@ -832,33 +832,40 @@ def status(root, identifier=None):
         if identifier is not None:
             return inspected_result(root, get_state(root, identifier))
         managed(root)
+        recovery_required = pending(root)
         operations = []
         directory = safe_path(root, '.state/operations')
         for path in sorted(directory.glob('*.json')):
-            safe_path(root, path.relative_to(root).as_posix())
-            state = get_state(root, operation_id(path.stem))
-            result = inspected_result(root, state)
-            tree = safe_path(root, '.worktree/' + state['id'])
-            result.update(worktree_exists=tree.is_dir(),
-                          branch_exists=git(root, 'show-ref', '--verify', '--quiet', state['branch'], check=False).returncode == 0,
-                          publication_record_exists=git_content(root, 'HEAD', f'.state/published/{state["id"]}.json') is not None)
+            try:
+                safe_path(root, path.relative_to(root).as_posix())
+                state = get_state(root, operation_id(path.stem))
+                result = inspected_result(root, state)
+                tree = safe_path(root, '.worktree/' + state['id'])
+                result.update(worktree_exists=tree.is_dir(),
+                              branch_exists=git(root, 'show-ref', '--verify', '--quiet', state['branch'], check=False).returncode == 0,
+                              publication_record_exists=git_content(root, 'HEAD', f'.state/published/{state["id"]}.json') is not None)
+            except (KnowledgeError, OSError, ValueError, KeyError, TypeError) as exc:
+                result = {'id': path.stem, 'error': f'Cannot inspect operation {path.name}: {exc}'}
             operations.append(result)
-        return {'root': str(root), 'operations': operations, 'recovery_required': pending(root)}
+        return {'root': str(root), 'operations': operations, 'recovery_required': recovery_required,
+                'complete': all('error' not in item for item in operations)}
 
 
 def build_packet(root, identifier, directory):
     """Fill mechanical fields from an existing base and explicitly declared input files."""
     directory = directory.expanduser().resolve()
-    manifest = load_json(safe_path(directory, 'changes.json'))
-    doc.object_keys(manifest, ('changes',), ('risk',))
-    if not isinstance(manifest['changes'], list) or not manifest['changes']:
-        raise KnowledgeError('changes must be a nonempty array')
     with locked(root):
         managed(root)
         assert_no_pending(root)
+        assert_clean(root)
         state = get_state(root, identifier)
         if state['status'] != 'editing':
             raise KnowledgeError('Packet generation requires an editing operation; use resolve for a prepared candidate')
+        assert_clean(worktree(root, state))
+        manifest = load_json(safe_path(directory, 'changes.json'))
+        doc.object_keys(manifest, ('changes',), ('risk',))
+        if not isinstance(manifest['changes'], list) or not manifest['changes']:
+            raise KnowledgeError('changes must be a nonempty array')
         packet = {'id': identifier, 'writer_id': state['writer_id'], 'changes': []}
         if 'risk' in manifest:
             if manifest['risk'] not in ('routine', 'reserved'):

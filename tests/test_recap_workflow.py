@@ -1,6 +1,6 @@
 """Run candidate maintenance through disposable Git libraries."""
 
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 import io
 import json
 from pathlib import Path
@@ -170,6 +170,116 @@ class MaintenanceTests(unittest.TestCase):
         result = workflow.status(self.root)
         self.assertEqual(result["recovery_required"], ["interrupted"])
         self.assertTrue(result["operations"][0]["publication_record_exists"])
+
+    def test_status_all_keeps_valid_operations_and_recovery_when_one_record_is_corrupt(self):
+        workflow.begin(self.root, 'valid', 'writer')
+        workflow.begin(self.root, 'broken', 'writer')
+        broken = self.root / '.state/operations/broken.json'
+        broken.write_text('{')
+        transactions = self.root / '.state/transactions'
+        transactions.mkdir()
+        (transactions / 'interrupted.json').write_bytes(json_bytes({'id': 'interrupted', 'status': 'prepared'}))
+        output = io.StringIO()
+        with redirect_stdout(output):
+            self.assertEqual(knowledge.main(['--root', str(self.root), 'status', '--all']), 0)
+        result = json.loads(output.getvalue())
+        entries = {entry['id']: entry for entry in result['operations']}
+        self.assertFalse(result['complete'])
+        self.assertEqual(result['recovery_required'], ['interrupted'])
+        self.assertEqual(entries['valid']['status'], 'editing')
+        self.assertIn('Invalid JSON', entries['broken']['error'])
+        self.assertNotIn('status', entries['broken'])
+        self.assertEqual(broken.read_text(), '{')
+        with self.assertRaises(KnowledgeError):
+            workflow.status(self.root, 'broken')
+
+    def test_status_all_reports_missing_required_state_fields_per_operation(self):
+        workflow.begin(self.root, 'broken', 'writer')
+        state = workflow.get_state(self.root, 'broken')
+        del state['base']
+        workflow.save_state(self.root, state)
+        result = workflow.status(self.root)
+        self.assertFalse(result['complete'])
+        self.assertIn('base', result['operations'][0]['error'])
+
+    def test_status_all_is_complete_without_optional_fingerprint(self):
+        workflow.begin(self.root, 'editing', 'writer')
+        self.assertNotIn('fingerprint', workflow.get_state(self.root, 'editing'))
+        result = workflow.status(self.root)
+        self.assertTrue(result['complete'])
+        self.assertIsNone(result['operations'][0]['approval_sha256'])
+
+    def test_status_all_keeps_global_library_and_recovery_failures_strict(self):
+        workflow.begin(self.root, 'valid', 'writer')
+        transactions = self.root / '.state/transactions'
+        transactions.mkdir()
+        journal = transactions / 'broken.json'
+        journal.write_text('{')
+        output, errors = io.StringIO(), io.StringIO()
+        with redirect_stdout(output), redirect_stderr(errors):
+            code = knowledge.main(['--root', str(self.root), 'status', '--all'])
+        self.assertEqual(code, 2)
+        self.assertEqual(output.getvalue(), '')
+        self.assertIn('Invalid JSON', json.loads(errors.getvalue())['error'])
+        journal.write_bytes(json_bytes({'id': 'broken', 'status': 'complete'}))
+        (self.root / '.state/library.json').write_text('{')
+        with self.assertRaises(KnowledgeError):
+            workflow.status(self.root)
+
+    def test_worktree_exists_reports_directory_presence_not_candidate_validity(self):
+        workflow.begin(self.root, 'selected', 'writer')
+        tree = self.root / '.worktree/selected'
+        (tree / '.git').rename(tree / '.git.saved')
+        result = workflow.status(self.root)
+        self.assertTrue(result['complete'])
+        self.assertTrue(result['operations'][0]['worktree_exists'])
+        with self.assertRaises(KnowledgeError):
+            workflow.worktree(self.root, workflow.get_state(self.root, 'selected'))
+
+    def packet_inputs(self, identifier='selected'):
+        workflow.begin(self.root, identifier, 'writer')
+        staging = Path(self.temp.name) / 'input'
+        staging.mkdir()
+        (staging / 'index.md').write_text('# Route\n\nRead the relevant topic.\n')
+        (staging / 'changes.json').write_bytes(json_bytes({'changes': [{
+            'path': 'index.md', 'kind': 'update', 'reason': 'Maintain the route', 'evidence': ['fixture review']}]}))
+        return staging
+
+    def test_packet_rejects_dirty_formal_root_without_adopting_or_overwriting_it(self):
+        staging = self.packet_inputs()
+        formal = self.root / 'index.md'
+        formal.write_text('# Knowledge\n\nExternal edit.\n')
+        before = formal.read_bytes()
+        state = (self.root / '.state/operations/selected.json').read_bytes()
+        with self.assertRaisesRegex(KnowledgeError, 'External/uncommitted'):
+            workflow.build_packet(self.root, 'selected', staging)
+        self.assertEqual(formal.read_bytes(), before)
+        self.assertEqual((self.root / '.state/operations/selected.json').read_bytes(), state)
+
+    def test_packet_rejects_missing_candidate_before_reading_declared_documents(self):
+        staging = self.packet_inputs()
+        (staging / 'index.md').unlink()
+        (self.root / '.worktree/selected').rename(self.root / '.worktree/preserved')
+        with self.assertRaisesRegex(KnowledgeError, 'Candidate worktree is missing'):
+            workflow.build_packet(self.root, 'selected', staging)
+        self.assertTrue((self.root / '.worktree/preserved').is_dir())
+
+    def test_packet_rejects_wrong_candidate_branch_without_changing_it(self):
+        staging = self.packet_inputs()
+        tree = self.root / '.worktree/selected'
+        git(tree, 'switch', '-c', 'unrelated')
+        with self.assertRaisesRegex(KnowledgeError, 'Candidate branch identity changed'):
+            workflow.build_packet(self.root, 'selected', staging)
+        self.assertEqual(git(tree, 'branch', '--show-current').stdout.decode().strip(), 'unrelated')
+
+    def test_packet_rejects_dirty_candidate_and_keeps_external_bytes(self):
+        staging = self.packet_inputs()
+        candidate = self.root / '.worktree/selected/index.md'
+        candidate.write_text('# Knowledge\n\nCandidate edit.\n')
+        before = candidate.read_bytes()
+        with self.assertRaisesRegex(KnowledgeError, 'External/uncommitted'):
+            workflow.build_packet(self.root, 'selected', staging)
+        self.assertEqual(candidate.read_bytes(), before)
 
     def test_packet_generator_uses_operation_base_and_does_not_inspect(self):
         workflow.begin(self.root, "route", "writer")

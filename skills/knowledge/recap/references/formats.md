@@ -118,4 +118,6 @@ Run `packet OP --from-dir DIR`. Save stdout to a separate packet file, then insp
 - A source or capture cursor contains its complete `content`. The author supplies honest coverage and represented paths. Generation cannot certify source inspection or invent acceptance.
 - `index.md` contains only the [guide introduction](#guide-introduction).
 
-The generator computes `expected_sha256` from the operation's frozen base even if the formal library has advanced. It checks item formats but does not create/modify candidate files, validate cross-file links as a batch, or publish. `inspect` owns whole-candidate validation. The generator uses the library lock, which may create a lock file.
+The generator checks preparation conditions under the library lock before reading declared documents: no unfinished publication, a clean formal root, an editing operation, and an existing clean candidate with matching repository/branch identity. It preserves external edits and fails without repairing or adopting them. A newer clean formal revision is permitted; `expected_sha256` still comes from the operation's frozen base.
+
+Generation checks individual item formats without creating/modifying candidate files or publishing. `inspect` owns whole-candidate validation, including cross-file links and source/cursor relationships; publication retains its final checks. The lock may create a lock file.
