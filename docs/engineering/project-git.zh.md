@@ -59,4 +59,4 @@ $skills:project-git
 
 验证失败或 hooks 阻止提交时，应报告原因，保留可恢复状态。不能为了交付绕过 hooks。强推、改写历史和删除远端引用需要与目标范围相匹配的明确授权。
 
-写 PR 正文可以交给外部 [pr](pr.zh.md)。创建或更新托管平台上的 PR 仍是另一项操作。默认命名和记录规则分别见[命名约定](../../skills/engineering/project-git/references/CONVENTIONS.md)、[交付记录](../../skills/engineering/project-git/references/TRACKER.md)和[执行指令](../../skills/engineering/project-git/SKILL.md)。
+外部 [pr](pr.zh.md) 负责正文，标题遵循项目约定。明确要求创建或更新 PR 时，助手使用可用的平台工具，并核对授权的仓库和分支。报告 PR URL 或完成状态前，必须核实平台结果。正文写完或推送成功，都不代表发布已经完成。写作指导缺失和平台访问不可用应分别报告。评论也需要用户明确要求。默认命名和记录规则分别见[命名约定](../../skills/engineering/project-git/references/CONVENTIONS.md)、[交付记录](../../skills/engineering/project-git/references/TRACKER.md)和[执行指令](../../skills/engineering/project-git/SKILL.md)。
