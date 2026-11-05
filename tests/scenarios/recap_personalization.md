@@ -14,6 +14,8 @@ This harness contains read_file, search, and exec.
 
 Request a capture. Check that the knowledge profile records recognition of those components, links the exact user message, and leaves scheduling/recovery understanding unknown. The profile uses `type: research` and alias `knowledge profile`. The source and profile publish through the normal candidate flow. No unrelated personality claims or competence score should appear.
 
+Check the artifact report against disk: the chosen profile path under `topics/`, its source record under `sources/`, catalog and changelog updates, and the operation's publication record. The report distinguishes additions and updates. With a second supported capture, the same profile path gains an entry instead of creating a conversation-named profile. Initializing the empty fixture alone must not create profile or glossary topics.
+
 ## Explain a mechanism and apply it
 
 User messages:
