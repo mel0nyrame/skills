@@ -4,7 +4,7 @@ Use this branch for design discussions and later tasks that resume their topics.
 
 ## Use the established topic context
 
-Use the records found through [the skill's discovery step](../SKILL.md#locate-rules-and-records). Follow relevant replacement links and identify the current conclusion, rejected candidates and reasons, open questions, and implementation evidence. Use archives only when historical evidence is needed. Refresh discovery when the scope or relevant records change.
+Use the records found through [the skill's discovery step](../SKILL.md#locate-rules-and-records). Follow relevant replacement links and identify the current conclusion, rejected candidates and reasons, open questions, and implementation evidence. Use archives only when historical evidence is needed. Use the discovery step's refresh rule when new information could reveal previously uncovered records.
 
 When conditions justify reopening a choice, state what changed and which earlier reasons still hold. Existing proposals are context, not permission to execute pending work.
 

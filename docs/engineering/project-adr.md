@@ -42,7 +42,7 @@ Before proposing or implementing related work, the assistant searches active rec
 
 ## Understand the file output
 
-The assistant locates records and templates before writing, then reuses that topic context until the scope or relevant records change. Candidate evaluation, open questions, and selection of a pending choice stay in the existing topic record. Replacing a previously selected choice follows project replacement rules; by default it creates a linked successor, even when the earlier choice was not implemented.
+The assistant locates records and templates before writing, then reuses the topic context while the search inputs remain valid. New scope, constraints, capabilities, paths, terms, evidence, or changed records can require another search. Candidate evaluation, open questions, and selection of a pending choice stay in the existing topic record. Replacing a previously selected choice follows project replacement rules; by default it creates a linked successor, even when the earlier choice was not implemented.
 
 Without repository conventions, one decision topic occupies one Markdown file, with related candidates and their outcomes together. A separate rejected record needs independent lasting value.
 
