@@ -20,7 +20,7 @@ Start with the result you need. `clarify` provides a focused clarification round
 | [firecrawl-mcp](research/firecrawl-mcp.md) | Read and extract web information | Sourced answers or structured data, saved locally only when requested |
 | [tinyfish-mcp](research/tinyfish-mcp.md) | Read pages and interact with filters or controls when necessary | Extracted data and run status, with optional requested local saving |
 | [context7-mcp](research/context7-mcp.md) | Consult matching library documentation | Documentation evidence, code examples, and explanations without default project edits |
-| [recap](knowledge/recap.md) | Preserve or query reusable conversation knowledge | Topics, sources, reading routes, and change records in a separate knowledge library |
+| [recap](knowledge/recap.md) | Preserve or query conversation knowledge, terminology, and a knowledge profile | Sourced topics, including glossaries and knowledge profiles, plus reading routes and change records in a separate library |
 
 These are common outcomes, not files generated on every invocation. Individual guides explain actual locations, creation conditions, and acceptance checks.
 

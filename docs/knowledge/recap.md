@@ -2,7 +2,7 @@
 
 English | [简体中文](recap.zh.md) · [All guides](../README.md)
 
-`recap` turns a selected conversation into topic documents preserving explanations, reasons, procedures, and sources. It also queries existing topics and maintains selected knowledge. Use it for material you will need to understand again, such as debugging methods, engineering decisions, and repeatable procedures.
+`recap` turns a selected conversation into topic documents preserving explanations, reasons, procedures, and sources. It also queries existing topics and maintains selected knowledge, contextual glossaries, and an evidence-backed knowledge profile. Use it for material you will need to understand again, such as debugging methods, engineering decisions, and repeatable procedures.
 
 A long conversation may cover two independent questions and later correct one conclusion. The resulting knowledge should explain each topic, identify the correction, and show what supports the current account. A chat date or a few conclusions alone cannot do that.
 
@@ -104,6 +104,37 @@ message coverage and necessary excerpts.
 ```
 
 The topic should explain the reason and when verification matters again. A single sentence saying not to initialize submodules would omit applicability and checks.
+
+## Maintain terminology and a knowledge profile
+
+During an explicit capture, recap also considers resolved terms and evidence about the selected user's understanding. It updates relevant existing topics and creates a glossary or profile only when there are supported entries. Ordinary conversations do not update these resources in the background.
+
+Both resources use the existing `topics/` format and candidate/publication flow. A contextual glossary is a `concept` topic with the alias `glossary`; a knowledge profile is a `research` topic with the alias `knowledge profile`. Titles and filenames normally use the user's language. They remain searchable formal topics with source links, rather than new root files or machine-state fields.
+
+The glossary defines terms within a subject or project. A short local definition and a direct entry link can replace a repeated extended explanation. For example, `agent = harness + AI` can be a local shorthand when its meaning and context are established; it does not establish a universal definition. Define or link its constituent terms. Each topic still preserves essential background, reasons, examples, and operating conditions.
+
+The knowledge profile separates the user's observed contribution from the agent's interpretation. It records concept/scope, the contribution and source/message locator, date when known, evidence conditions, uncertainty, and the explanation depth supported by that evidence. Knowing a term, explaining a mechanism, and applying it in a scenario are separate dimensions.
+
+For example, correctly naming tools in one harness supports recognition of those components. Explaining their interaction supports a mechanism claim. A library containing an assistant's explanation does not demonstrate the user's understanding. Quoted text and self-report retain their evidence conditions; missing evidence stays unknown. Corrections or conflicting observations can revise the same entry.
+
+```text
+$skills:recap
+Capture this conversation and update the relevant glossary and knowledge profile.
+Use my contributions as evidence, retain message locators, and distinguish
+component recognition from mechanism understanding and application.
+Keep uncertain interpretations explicit.
+```
+
+When explaining retrieved knowledge, recap searches for relevant glossary/profile topics and reads them before choosing terms and explanation depth. A query uses existing evidence without adding formal profile claims. Other agents need an explicit recap query or their own authorized reading instruction; saved topics do not automatically change all conversations.
+
+```text
+$skills:recap
+Explain the saved topic about harness recovery. Use relevant glossary and profile
+entries to choose prerequisites. Introduce mechanisms whose understanding is
+unknown. Do not modify formal knowledge in this query.
+```
+
+The [personalization contract](../../skills/knowledge/recap/references/personalization.md) owns evidence interpretation, glossary scope, corrections, and answer behavior. The [decision](../agents/adr/0007--recap-knowledge-profile-and-glossary.md) explains why these resources reuse ordinary topics.
 
 ## Retrieve the knowledge later
 
