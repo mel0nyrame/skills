@@ -22,6 +22,8 @@ files and knowledge worth preserving. Do not stage, commit, or push.
 
 Use `$project-engineering` standalone or `/skills:project-engineering` in Claude Code. The assistant needs project-file access and, for implementation, editing and validation tools.
 
+Before the first file mutation in a Git repository, the assistant uses `project-git` when available to resolve the one-time worktree preference. A recorded choice is reused without asking again. Existing task worktrees are reused; after changing worktrees, the assistant checks the base and rereads applicable instructions. Read-only investigation skips setup. See [Git working context](project-git.md#establish-the-working-context-once).
+
 ## Follow the work through
 
 The assistant first reads instructions applying to the target paths, contribution guidance, and relevant documents. Before choosing an approach, it searches active decision topics and reads related proposals, selected choices, rejection reasons, and open questions. Changed conditions must be stated when reopening an earlier choice. Investigation scales with the task. One component change should not automatically become a whole-project audit.

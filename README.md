@@ -14,7 +14,7 @@ New to the collection? Start with the [usage guides](docs/README.md) for purpose
 | --- | --- |
 | [project-engineering](docs/engineering/project-engineering.md) | Implement changes, preserve engineering knowledge, and maintain affected decisions. |
 | [project-adr](docs/engineering/project-adr.md) | Capture durable design discussions and maintain choices, rejection reasons, lifecycle, and replacement links. |
-| [project-git](docs/engineering/project-git.md) | Review working trees, split commits, and push within user authorization. |
+| [project-git](docs/engineering/project-git.md) | Establish parallel-worktree preferences, review changes, and deliver authorized Git work. |
 | [project-prose](docs/engineering/project-prose.md) | Write and review self-contained technical prose with complete contracts. |
 | [pr ↗](https://github.com/mattpocock/skills/tree/main/skills/engineering/pr) | External recommendation: Matt Pocock's upstream PR skill. [Usage guide](docs/engineering/pr.md) · [Submodule](skills/engineering/pr). |
 

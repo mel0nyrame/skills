@@ -1,11 +1,17 @@
 ---
 name: project-git
-description: Use when reviewing a Git working tree, splitting or creating commits, pushing branches, or recording Git delivery. Check changes and validation against repository rules, and execute only the authorized delivery stage. Use the external pr skill for PR/MR titles, descriptions, and publication.
+description: Use when establishing a repository worktree preference for parallel tasks, reviewing a Git working tree, splitting or creating commits, pushing branches, or recording Git delivery. Check changes and validation against repository rules, and execute only the authorized delivery stage. Use the external pr skill for PR/MR titles, descriptions, and publication.
 ---
 
 # Project Git
 
 Handle the working tree, commits, and pushes within the user's authorization. A commit request does not authorize a push. A push request does not authorize creating or updating a PR/MR or changing an external tracker. Route PR/MR requests to the external [pr skill](https://github.com/mattpocock/skills/tree/main/skills/engineering/pr). If it is unavailable, report that dependency rather than treating a push as a completed PR/MR.
+
+## Establish the working context
+
+For a Git-backed task that will modify files or Git state, read [worktree policy](references/WORKTREES.md) before the first mutation. Resolve the repository's recorded preference, ask once only when it is missing, and reuse or establish this task's working context. An explicit task instruction takes precedence over the standing preference. Purely read-only reviews skip setup and leave files and Git state unchanged.
+
+Worktree setup does not authorize commits, pushes, PR/MR publication, or moving existing changes. When invoked after edits already exist, preserve their checkout and ownership rather than treating a new worktree as an automatic migration.
 
 ## Confirm scope
 
