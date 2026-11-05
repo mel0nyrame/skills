@@ -15,13 +15,19 @@ Use existing formal topic types and publication paths rather than add a profile 
 - Store contextual glossaries as `concept` topics and profiles as `research` topics, with the role aliases `glossary` and `knowledge profile`. Keep titles and filenames in the user's language. Create resources only when there are supported entries, and reuse existing topic owners.
 - Maintain relevant entries during explicit capture or selected maintenance. Preserve observations, exact user/source attribution, dates when known, context, inference limits, and the explanation strategy supported by each claim. Recognition, mechanism understanding, and application are separate dimensions. Correctness and independent contribution matter; library coverage or assistant work does not establish user competence.
 - Keep definitions separate from profile claims. Glossary entries own contextual meanings and relationships. Profiles link to those concepts and retain evidence. A formula such as `agent = harness + AI` can be local shorthand when supported by its source; it is not a universal identity.
-- During a query, discover relevant resources through the guide and title/alias searches, read current topics at the query revision, and use them to select terms and explanation depth. Queries do not save new profile claims. Other consumers need an explicit recap query or their own authorized reading instruction.
+- When a personalized explanation is requested, discover relevant profiles through the guide and title/alias searches, read current evidence at the query revision, and use it to select explanation depth. A topic's linked glossary definition can be followed separately. Ordinary fact lookup does not require profile discovery. Queries do not save new profile claims. Other consumers need an explicit recap query or their own authorized reading instruction.
 - Let short local definitions and direct glossary links replace repeated extended definitions. Topics retain essential background, causal reasoning, examples, and operating conditions. Reconcile dependent interpretations when evidence or definitions change, keeping meaningful contradictions and unrelated supported claims.
 - Keep entry data in Markdown bodies under existing source, coverage, candidate, approval, and revision rules. No migration, new root-level store, numerical competence score, background updates, or global personalization hook is introduced.
 
-The [personalization contract](../../../skills/knowledge/recap/references/personalization.md) owns the operational rules. The [writing contract](../../../skills/knowledge/recap/references/knowledge.md#built-in-writing-contract) owns topic readability. The skill entry point routes capture, query, and maintenance to those rules. English/Chinese usage guides and discovery summaries expose the capability.
+The [storage contract](../../../skills/knowledge/recap/references/personalization.md) owns shared discovery and publication rules. [Glossary](../../../skills/knowledge/recap/references/glossary.md) and [profile](../../../skills/knowledge/recap/references/profile.md) references own their respective entry and use rules. The [writing contract](../../../skills/knowledge/recap/references/knowledge.md#built-in-writing-contract) owns topic readability. The skill entry point routes capture, query, and maintenance to their task files. English/Chinese usage guides and discovery summaries expose the capability.
 
 Existing lexical-search and guide-maintenance decisions remain active. This record supersedes none of them. Role aliases use current lexical search; they do not add synonym expansion or change the search cache contract.
+
+### Conditional loading refinement
+
+Route [capture](../../../skills/knowledge/recap/references/capture.md) and [query](../../../skills/knowledge/recap/references/query.md) through separate reference files, keep glossary and profile rules under their respective branches, and retain shared storage/discovery rules in one small owner. Ordinary queries require neither capture instructions nor profile-maintenance rules. A personalized explanation is an explicit query branch; a linked glossary definition can be followed independently. Compact entries reuse existing source and correction rules instead of adding a second assessment checklist.
+
+The refinement is implemented in the task and resource references, with synchronized usage guidance. Static checks validate branch pointers, unchanged capture steps except resource routing, and distinct required reading paths for ordinary lookup, glossary capture, profile capture, and personalized query. File/word counts describe instruction structure, not measured model token use or inference accuracy.
 
 ## Alternatives
 
@@ -30,6 +36,7 @@ Existing lexical-search and guide-maintenance decisions remain active. This reco
 - **Use a dedicated profile/glossary file type or root-level store.** Not selected. Existing concept/research topics can express definitions and evidence-backed interpretations while retaining supported search, provenance, and publication. A separate store would require new lifecycle and consumer integration without a demonstrated need.
 - **Infer mastery directly from library contents or combine mastery into definitions.** Not selected. Coverage and user competence are different claims, and definitions should remain useful when competence judgments change.
 - **Shorten all topics according to the current profile.** Not selected. A mistaken or outdated inference could remove prerequisites needed later or by another reader.
+- **Load one combined personalization contract before every explanation.** Not selected. Fact lookup and term definition do not require competence assessment. Conditional pointers preserve the relevant rules without making all branches pay for them.
 
 ## Consequences and risks
 

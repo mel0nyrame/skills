@@ -8,6 +8,8 @@ A long conversation may cover two independent questions and later correct one co
 
 File descriptions below follow the [execution instructions](../../skills/knowledge/recap/SKILL.md), [document contract](../../skills/knowledge/recap/references/formats.md), and [helper implementation](../../skills/knowledge/recap/scripts/knowledge.py). Reading this guide does not initialize a library.
 
+The entry point loads the selected task: [capture](../../skills/knowledge/recap/references/capture.md), [query](../../skills/knowledge/recap/references/query.md), or maintenance. Their conditional pointers keep unrelated instructions out of that task's required reading.
+
 ## Choose a knowledge-library location
 
 Root selection uses an explicit root first, then `RECAP_KNOWLEDGE_ROOT`, then `~/.agents/knowledge`. This is a separate knowledge directory; working on a project does not automatically select that project as the destination.
@@ -113,7 +115,7 @@ Both resources use the existing `topics/` format and candidate/publication flow.
 
 The glossary defines terms within a subject or project. A short local definition and a direct entry link can replace a repeated extended explanation. For example, `agent = harness + AI` can be a local shorthand when its meaning and context are established; it does not establish a universal definition. Define or link its constituent terms. Each topic still preserves essential background, reasons, examples, and operating conditions.
 
-The knowledge profile separates the user's observed contribution from the agent's interpretation. It records concept/scope, the contribution and source/message locator, date when known, evidence conditions, uncertainty, and the explanation depth supported by that evidence. Knowing a term, explaining a mechanism, and applying it in a scenario are separate dimensions.
+The knowledge profile separates the user's observed contribution from the agent's interpretation. A compact entry records a scoped interpretation and its supporting observation/source locator, with the date when known. Preserve evidence conditions that affect the judgment and add an explanation strategy only when useful. This can be a sentence rather than a fixed form. Knowing a term, explaining a mechanism, and applying it in a scenario are separate dimensions.
 
 For example, correctly naming tools in one harness supports recognition of those components. Explaining their interaction supports a mechanism claim. A library containing an assistant's explanation does not demonstrate the user's understanding. Quoted text and self-report retain their evidence conditions; missing evidence stays unknown. Corrections or conflicting observations can revise the same entry.
 
@@ -125,7 +127,7 @@ component recognition from mechanism understanding and application.
 Keep uncertain interpretations explicit.
 ```
 
-When explaining retrieved knowledge, recap searches for relevant glossary/profile topics and reads them before choosing terms and explanation depth. A query uses existing evidence without adding formal profile claims. Other agents need an explicit recap query or their own authorized reading instruction; saved topics do not automatically change all conversations.
+When the user requests an explanation adapted to their knowledge, recap finds relevant profile evidence before choosing explanation depth. A topic's linked glossary definition can be followed independently. Ordinary fact lookup does not require profile discovery or profile-maintenance instructions. A query uses existing evidence without adding formal claims. Other agents need an explicit recap query or their own authorized reading instruction; saved topics do not automatically change all conversations.
 
 ```text
 $skills:recap
@@ -134,7 +136,7 @@ entries to choose prerequisites. Introduce mechanisms whose understanding is
 unknown. Do not modify formal knowledge in this query.
 ```
 
-The [personalization contract](../../skills/knowledge/recap/references/personalization.md) owns evidence interpretation, glossary scope, corrections, and answer behavior. The [decision](../agents/adr/0007--recap-knowledge-profile-and-glossary.md) explains why these resources reuse ordinary topics.
+The [storage contract](../../skills/knowledge/recap/references/personalization.md) owns shared discovery and publication rules. Read the [glossary rules](../../skills/knowledge/recap/references/glossary.md) when defining or using shared terms, and the [profile rules](../../skills/knowledge/recap/references/profile.md) when recording understanding evidence or personalizing an explanation. The [decision](../agents/adr/0007--recap-knowledge-profile-and-glossary.md) explains why these resources reuse ordinary topics.
 
 ## Retrieve the knowledge later
 
