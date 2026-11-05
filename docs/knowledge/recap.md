@@ -38,7 +38,9 @@ The assistant establishes the selected conversation, branch, and inspected cover
 
 It prepares topic bodies and necessary source records. Coverage gaps and unread attachments remain visible. Locators support traceability, but deleting the original chat leaves only retained excerpts independently inspectable; full replay is not guaranteed.
 
-Formal updates use a candidate worktree and checks. Concurrent changes to the same content require independent review. The inspected version is then published, saved prose and important retrieval are checked, and this successful operation's temporary worktree is cleaned. Failed or pending work remains available.
+The capture workflow has six stages: establish coverage, develop topics, select writing guidance, prepare a candidate, integrate and review, then publish and verify. Each stage states its completion condition. The [command checklist](../../skills/knowledge/recap/references/checklist.md) supplies the ordinary helper sequence.
+
+Formal updates use a candidate worktree and checks. Concurrent changes to the same content require independent review. Publication uses the same candidate hash that was inspected and approved. Current task authorization and existing approval rules determine when explicit user approval is required. Saved prose and important retrieval must pass verification before cleanup. Claimed incremental progress must have its cursor published with the represented knowledge. Only this successful operation's eligible temporary material is cleaned; failed or pending work remains available.
 
 ## Know the resulting files
 
