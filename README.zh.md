@@ -39,7 +39,7 @@
 
 | Skill | 用途 |
 | --- | --- |
-| [recap](docs/knowledge/recap.zh.md) | 将会话整理为可复用、可追溯的专题知识。仅由用户显式调用。 |
+| [recap](docs/knowledge/recap.zh.md) | 保存和查询有来源的专题知识、共用术语，以及有证据支持的知识画像。仅由用户显式调用。 |
 
 项目包含 **9 个可安装 Skill**。`pr` 和 `context7-mcp` 使用默认不检出的 Git 子模块，不进入插件和 Skills CLI 的 Skill 清单。对应使用指南提供精确的上游链接和单独安装方法。
 

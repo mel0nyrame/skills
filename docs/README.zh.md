@@ -20,7 +20,7 @@
 | [firecrawl-mcp](research/firecrawl-mcp.zh.md) | 读取和提取网页内容 | 有来源的答案、结构化结果，明确要求后再保存文件 |
 | [tinyfish-mcp](research/tinyfish-mcp.zh.md) | 读取网页，必要时执行筛选和点击 | 提取数据、任务状态，明确要求后再保存文件 |
 | [context7-mcp](research/context7-mcp.zh.md) | 查阅匹配版本的开发文档 | 文档依据、代码示例和解释，查询本身不改项目 |
-| [recap](knowledge/recap.zh.md) | 从会话保存或查询可复用知识 | 独立知识库中的专题、来源、导读及变更记录 |
+| [recap](knowledge/recap.zh.md) | 保存或查询会话知识、术语和知识画像 | 独立知识库中有来源的专题，包括术语表和知识画像，以及导读和变更记录 |
 
 上表描述常见结果，不代表每次都固定创建这些文件。单篇指南会说明实际路径、出现条件，以及怎样检查结果。
 

@@ -2,11 +2,13 @@
 
 English | [简体中文](recap.zh.md) · [All guides](../README.md)
 
-`recap` turns a selected conversation into topic documents preserving explanations, reasons, procedures, and sources. It also queries existing topics and maintains selected knowledge. Use it for material you will need to understand again, such as debugging methods, engineering decisions, and repeatable procedures.
+`recap` turns a selected conversation into topic documents preserving explanations, reasons, procedures, and sources. It also queries existing topics and maintains selected knowledge, contextual glossaries, and an evidence-backed knowledge profile. Use it for material you will need to understand again, such as debugging methods, engineering decisions, and repeatable procedures.
 
 A long conversation may cover two independent questions and later correct one conclusion. The resulting knowledge should explain each topic, identify the correction, and show what supports the current account. A chat date or a few conclusions alone cannot do that.
 
 File descriptions below follow the [execution instructions](../../skills/knowledge/recap/SKILL.md), [document contract](../../skills/knowledge/recap/references/formats.md), and [helper implementation](../../skills/knowledge/recap/scripts/knowledge.py). Reading this guide does not initialize a library.
+
+The entry point loads the selected task: [capture](../../skills/knowledge/recap/references/capture.md), [query](../../skills/knowledge/recap/references/query.md), or maintenance. Their conditional pointers keep unrelated instructions out of that task's required reading.
 
 ## Choose a knowledge-library location
 
@@ -50,7 +52,9 @@ my-knowledge/
 ├── index.md
 ├── CHANGELOG.md
 ├── topics/
-│   └── a-specific-topic.md
+│   ├── a-specific-topic.md
+│   ├── knowledge-profile.md
+│   └── agent-glossary.md
 ├── sources/
 │   └── host-session-id.md
 ├── drafts/
@@ -66,6 +70,8 @@ my-knowledge/
 | Location | Contents and creation condition |
 | --- | --- |
 | `topics/**/*.md` | Formal explanations, examples, applicability, and source links |
+| `topics/knowledge-profile.md` | Example profile path; created on a supported capture, with concept entries in one sourced topic |
+| `topics/agent-glossary.md` | Example glossary path for one context; created when reusable terms are established |
 | `sources/<host>-<session-id>.md` | Source identity, inspected coverage, gaps, and necessary supporting excerpts |
 | `index.md` | Generated topic catalog and an introduction maintained through approved candidates; trailing prose is preserved |
 | `CHANGELOG.md` | What knowledge changed and why |
@@ -104,6 +110,41 @@ message coverage and necessary excerpts.
 ```
 
 The topic should explain the reason and when verification matters again. A single sentence saying not to initialize submodules would omit applicability and checks.
+
+## Maintain terminology and a knowledge profile
+
+During an explicit capture, recap also considers resolved terms and evidence about the selected user's understanding. It updates relevant existing topics and creates a glossary or profile only when there are supported entries. Ordinary conversations do not update these resources in the background.
+
+Both resources use the existing `topics/` format and candidate/publication flow. A contextual glossary is a `concept` topic with the alias `glossary`; a knowledge profile is a `research` topic with the alias `knowledge profile`. Titles and filenames normally use the user's language. They remain searchable formal topics with source links, rather than new root files or machine-state fields.
+
+For example, a supported first capture can add `topics/knowledge-profile.md`, `topics/agent-glossary.md`, and `sources/<host>-<session-id>.md` under the selected library root. The publisher updates the catalog in `index.md`, appends `CHANGELOG.md` entries, and writes `.state/published/<operation-id>.json`. Incremental capture cursors are conditional. The profile and glossary do not appear merely because the library was initialized.
+
+These filenames are examples. Later captures update the matching profile and contextual glossary instead of creating a new pair for each conversation. The assistant reports the exact saved paths and whether each was added or updated.
+
+The glossary defines terms within a subject or project. A short local definition and a direct entry link can replace a repeated extended explanation. For example, `agent = harness + AI` can be a local shorthand when its meaning and context are established; it does not establish a universal definition. Define or link its constituent terms. Each topic still preserves essential background, reasons, examples, and operating conditions.
+
+The knowledge profile separates the user's observed contribution from the agent's interpretation. A compact entry records a scoped interpretation and its supporting observation/source locator, with the date when known. Preserve evidence conditions that affect the judgment and add an explanation strategy only when useful. This can be a sentence rather than a fixed form. Knowing a term, explaining a mechanism, and applying it in a scenario are separate dimensions.
+
+For example, correctly naming tools in one harness supports recognition of those components. Explaining their interaction supports a mechanism claim. A library containing an assistant's explanation does not demonstrate the user's understanding. Quoted text and self-report retain their evidence conditions; missing evidence stays unknown. Corrections or conflicting observations can revise the same entry.
+
+```text
+$skills:recap
+Capture this conversation and update the relevant glossary and knowledge profile.
+Use my contributions as evidence, retain message locators, and distinguish
+component recognition from mechanism understanding and application.
+Keep uncertain interpretations explicit.
+```
+
+When the user requests an explanation adapted to their knowledge, recap finds relevant profile evidence before choosing explanation depth. A topic's linked glossary definition can be followed independently. Ordinary fact lookup does not require profile discovery or profile-maintenance instructions. A query uses existing evidence without adding formal claims. Other agents need an explicit recap query or their own authorized reading instruction; saved topics do not automatically change all conversations.
+
+```text
+$skills:recap
+Explain the saved topic about harness recovery. Use relevant glossary and profile
+entries to choose prerequisites. Introduce mechanisms whose understanding is
+unknown. Do not modify formal knowledge in this query.
+```
+
+The [storage contract](../../skills/knowledge/recap/references/personalization.md) owns shared discovery and publication rules. Read the [glossary rules](../../skills/knowledge/recap/references/glossary.md) when defining or using shared terms, and the [profile rules](../../skills/knowledge/recap/references/profile.md) when recording understanding evidence or personalizing an explanation. The [decision](../agents/adr/0007--recap-knowledge-profile-and-glossary.md) explains why these resources reuse ordinary topics.
 
 ## Retrieve the knowledge later
 

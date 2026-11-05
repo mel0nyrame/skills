@@ -39,7 +39,7 @@ The four `project-*` skills form a project-engineering suite: implementation and
 
 | Skill | Purpose |
 | --- | --- |
-| [recap](docs/knowledge/recap.md) | Turn conversations into reusable, traceable topic knowledge. Explicit invocation only. |
+| [recap](docs/knowledge/recap.md) | Preserve and query sourced knowledge, shared terms, and an evidence-backed knowledge profile. Explicit invocation only. |
 
 The package contains **nine installable skills**. `pr` and `context7-mcp` are upstream Git submodules left unchecked out by default. They are excluded from the plugin and Skills CLI skill inventory. Their guides provide exact upstream links and separate installation instructions.
 
