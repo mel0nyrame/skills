@@ -1,4 +1,4 @@
 interface:
   display_name: "Clarify"
-  short_description: "Clarify the real goal before answering"
-  default_prompt: "Use $clarify to clarify my real goal before answering this question."
+  short_description: "Clarify key gaps or answer when context is sufficient"
+  default_prompt: "Use $clarify to check for decision-changing gaps, ask one decisive question when needed, or answer directly when the supplied context is sufficient."

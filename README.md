@@ -24,7 +24,7 @@ The four `project-*` skills form a project-engineering suite: implementation and
 
 | Skill | Purpose |
 | --- | --- |
-| [clarify](docs/thinking/clarify.md) | Surface assumptions and ask one decisive question before answering. |
+| [clarify](docs/thinking/clarify.md) | Check assumptions, ask one decisive question when needed, or answer directly when context is sufficient. |
 | [karpathy-guidelines](docs/thinking/karpathy-guidelines.md) | Keep work focused, verify results, and make outcomes understandable. Maintained fork. |
 
 ### Research
@@ -109,7 +109,7 @@ codex plugin add skills@mel0nyrame-skills
 
 ## Behavior and dependencies
 
-- `clarify` pauses after one decisive question, then answers after your reply.
+- `clarify` asks one decisive question and waits when a key gap remains. When the supplied context is sufficient, it answers in the same reply.
 - `recap` is explicitly invoked. It preserves both `disable-model-invocation: true` and the Codex implicit-invocation opt-out.
 - `project-git` keeps separate authorization for commits, pushes, and PR/MR operations. It checks project rules and consistent structured commit history before falling back to Chinese commit descriptions. Explicit task instructions take precedence.
 - `project-adr` follows project conventions first. Its default checker accepts complete English and Chinese schemas and preserves archive exclusions.
