@@ -24,23 +24,7 @@ Choose the lightest tool that completes the task. Read a known URL directly inst
 
 ## Search and Source Selection
 
-The current hosted `firecrawl_search` schema requires `query` and `objective`. State the user's underlying goal in one sentence in `objective`; reuse it across related calls without including credentials or unrelated private information.
-
-```json
-{
-  "query": "site:docs.firecrawl.dev MCP tools",
-  "objective": "Verify the official Firecrawl MCP usage instructions and retain source URLs",
-  "limit": 3,
-  "toolDetail": "compact",
-  "domainTools": false
-}
-```
-
-Adjust the result count to the task. Use `includeDomains` or `excludeDomains` when supported by the live schema. Preserve the user's date, region, and language constraints.
-
-Read relevant excerpts before fetching pages. Adding `scrapeOptions` fetches the full page of each web result and bills those fetches as scrapes; use it only when those full pages are actually needed.
-
-Authenticated search can also return Alexandria provider suggestions in `data.tools`. `domainTools: false` disables domain-matched suggestions only; `sources: ["web"]` does not reliably exclude semantic provider suggestions on the current hosted surface. Suggestions do not execute providers. Read [Provider Data and Large Results](references/workflows.md#provider-data-and-large-results) before using them.
+Before constructing a Search request, read [Search requests](references/workflows.md#search-requests) for hosted arguments, examples, source constraints, and page-fetch costs.
 
 ## Page Reading and Extraction
 
@@ -57,22 +41,7 @@ Choose the output format for the actual information needed, usually one format p
 
 For page text, use `onlyMainContent: true` and, when appropriate, scope the page with `includeTags` or `excludeTags`. Request HTML, screenshots, or link lists only when the task needs them; avoid multiple redundant output formats.
 
-For a specific question, use this argument shape, replacing the URL, question, and objective.
-
-```json
-{
-  "url": "https://example.com",
-  "objective": "Verify the domain's intended use using an exact passage from its page",
-  "formats": ["query"],
-  "queryOptions": {
-    "prompt": "What is this domain for?",
-    "mode": "directQuote"
-  },
-  "domainTools": false
-}
-```
-
-For structured extraction, describe fields, units, and missing-value handling in `jsonOptions.prompt`. Supply a strict JSON Schema through `jsonOptions.schema` only if the client-exposed schema accepts that object. Validate returned fields and types even when extraction succeeds. Free-form query answers and summaries are generated content; verify the source before presenting them as quotations.
+Before asking a page-specific question or extracting named fields, read [Targeted extraction](references/workflows.md#targeted-extraction) for Query and JSON options. Verify generated answers and summaries against the source before presenting them as quotations.
 
 Set `maxAge: 0` when the task needs a live fetch. Default requests may use recently indexed or cached content; a successful response alone does not establish freshness. Keep source URLs, final URLs, and relevant cache timestamps. If an excerpt contains script noise, lacks the needed text, or provides insufficient evidence, inspect the source page.
 
@@ -87,7 +56,7 @@ Set `maxAge: 0` when the task needs a live fetch. Default requests may use recen
 
 ## Read before conditional operations
 
-Read the matching section before invoking these operations; ordinary Search and URL Scrape do not require every reference section.
+Read only the matching section before invoking an operation. Search and targeted extraction have reading routes above; ordinary Markdown page reads can use the instructions in this file.
 
 | Before this operation | Required reference |
 | --- | --- |

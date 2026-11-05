@@ -40,7 +40,9 @@ $skills:firecrawl-mcp
 
 你要求收集一个站点时，还需要约定路径、页数和深度。长任务可能先返回任务编号，助手要保留编号并继续检查状态。拿到编号不代表内容已经收集完成。
 
-浏览器交互、本地文件上传、付费数据操作等条件任务开始前，助手会按照[操作对应的读取入口](../../skills/research/firecrawl-mcp/SKILL.md#read-before-conditional-operations)加载所需规则。普通检索和页面读取无需加载全部流程。
+调用 Search 前，助手先读[检索请求](../../skills/research/firecrawl-mcp/references/workflows.md#search-requests)。页面问答和指定字段提取先读[定向提取](../../skills/research/firecrawl-mcp/references/workflows.md#targeted-extraction)。普通 Markdown 页面读取直接使用主文件中的规则，无需加载这些示例。
+
+浏览器交互、本地文件上传、付费数据操作等条件任务开始前，助手会按照[操作对应的读取入口](../../skills/research/firecrawl-mcp/SKILL.md#read-before-conditional-operations)加载所需规则。每个入口只加载对应流程。
 
 提取到数字之后，还要确认它对应哪个方案、币种和计费周期。自动摘要或问答结果仍需对照来源核验，不能直接当作逐字引文。
 
