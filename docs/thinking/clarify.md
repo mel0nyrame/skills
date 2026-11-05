@@ -2,9 +2,9 @@
 
 English | [简体中文](clarify.zh.md) · [All guides](../README.md)
 
-`clarify` is useful when you have an idea but have not established the problem you most need to solve. Select it when you want to clarify intent or stress-test the question before receiving a substantive answer. It identifies assumptions, explains which missing information could affect the answer, and asks one decisive question. After your reply, it delivers the solution.
+`clarify` is useful when you have an idea but have not established the problem you most need to solve. Select it when you want to clarify intent or stress-test the question before receiving a substantive answer. It identifies assumptions and missing information that could affect the answer. If a key gap remains, it asks one decisive question and delivers the solution after your reply.
 
-The first output is a question in the conversation. Stage one calls no tools, creates no files, and does not select a solution before checking your intent.
+The initial intent check uses the supplied context without tools or file changes. When a decision-changing gap remains, the first output asks one question and waits. When the context is sufficient, the assistant says so and answers in the same reply.
 
 ## Decide whether clarification is useful
 
@@ -22,7 +22,7 @@ I want to build a personal knowledge base. Help identify the actual problem
 first. Do not recommend products or modify files in the first round.
 ```
 
-The first reply should cover hidden assumptions, critical information gaps, one common mistake, and one question that determines the next direction. Depending on context, the final question might resemble this example.
+When clarification is needed, the first reply covers hidden assumptions, critical information gaps, and one question that determines the next direction. It may include one relevant supported mistake or a clearly labeled risk. Depending on context, the final question might resemble this example.
 
 ```text
 Which problem should we solve first, collecting material or finding what you
@@ -37,7 +37,8 @@ Use `$clarify` standalone or `/skills:clarify` in Claude Code. `$skills:clarify`
 
 | Stage | Visible result | File effects |
 | --- | --- | --- |
-| First reply | Assumptions, gaps, one mistake, one question | No tools or file changes |
+| A key gap remains | Assumptions, gaps, an optional supported mistake/risk, one question | No tools or file changes |
+| Context is sufficient | A brief sufficiency statement and the answer in the same reply | No default output file; later actions follow the task's authorization |
 | After your reply | Explanation, recommendation, or plan addressing the original goal | No default output file |
 | A separate request to save the answer | A document at your requested path | Written later within your authorization |
 
@@ -47,4 +48,4 @@ Installing or invoking the skill does not automatically create `requirements.md`
 
 Its answer should change the eventual solution. The assistant should not repeat supplied information or disguise several unrelated questions as one. The second reply should visibly use your clarification.
 
-A full proposal, browser task, or created project file during stage one violates this workflow. Another question is reserved for an ambiguity that prevents a correct or safe response. See the [execution instructions](../../skills/thinking/clarify/SKILL.md). For working principles across the entire task, read [karpathy-guidelines](karpathy-guidelines.md).
+A full proposal, browser task, or created project file while waiting for a necessary clarification violates this workflow. When the context is sufficient, the assistant should proceed without inventing a gap or mistake. Another question is reserved for an ambiguity that prevents a correct or safe response. See the [execution instructions](../../skills/thinking/clarify/SKILL.md). For working principles across the entire task, read [karpathy-guidelines](karpathy-guidelines.md).
