@@ -29,7 +29,7 @@ This skill owns record value, topic content, rationale, and lifecycle. `project-
 
 Use creation criteria, locations, formats, states, and check entry points specified by the current user request and applicable project rules. Without explicit rules, reuse stable, consistent conventions in comparable records. One outlier or mixed samples do not establish a new rule. Use the defaults below for unresolved parts.
 
-Before proposing or implementing related work, search active records by task topic, capabilities, constraints, paths, and rejected alternatives. Read matching proposals, choices, rejection reasons, and open questions. If conditions changed, identify them explicitly before reconsidering the choice. Check uncommitted changes before writing and reuse an existing topic owner. Preserve other work. Terminology documents own terms, engineering documents own current facts, and ADRs own reasons.
+Before proposing or implementing related work, search active records by task topic, capabilities, constraints, paths, and rejected alternatives. Read matching proposals, choices, rejection reasons, and open questions, or establish that none match. Keep this topic context for discussion and same-topic review below. Refresh it when the scope or relevant records change. If conditions changed, identify them explicitly before reconsidering the choice. Check uncommitted changes before writing and preserve other work. Terminology documents own terms, engineering documents own current facts, and ADRs own reasons.
 
 Without any repository conventions, use one Markdown file per decision topic in `docs/adr/`, named `NNNN--kebab-title.md`. Keep related candidates and their outcomes together; create a separate rejected record only for independent lasting value. Use the project's main language for record titles and prose. The default archive location is `docs/adr/archive/`.
 
@@ -39,13 +39,11 @@ Read [project integration](references/PROJECT-INTEGRATION.md) when the user requ
 
 ## Capture discussion progress
 
-When a durable constraint settles, a real candidate is rejected, or a substantial proposal needs further work, update the topic record at that point within task authorization. Keep a proposal when the discussion pauses without a final choice. Distinguish selected conclusions, agent recommendations, and unresolved questions; record the next decision or investigation needed to resume. Read [discussion capture](references/DISCUSSIONS.md) when recording or resuming a design discussion.
-
-Before closing or pausing the discussion, confirm that meaningful progress is preserved in the topic owner and its state matches what has been decided and implemented. Implementation and final delivery are later synchronization points, not prerequisites for a record.
+When recording or resuming a design discussion, read [discussion capture](references/DISCUSSIONS.md) for capture triggers, topic content, and the checkpoint before pausing. Use the topic context established above. Completion requires meaningful progress to be preserved with an accurate state and enough context for the next agent to resume.
 
 ## Check same-topic records before adding one
 
-Before drafting, search active records for the same capabilities, mechanisms, constraints, and rejected alternatives. Classify them under “Maintain current facts and decisions.” Update the existing owner of the same decision. A new decision states what it replaces and which constraints remain valid. Maintain links in both directions within the change.
+Before drafting, classify the records already found under “Maintain current facts and decisions.” Reuse the existing topic owner for evolving candidates, recommendations, open questions, and selection of a previously pending choice. Search again only when the scope or relevant records change. When a new record replaces a selected choice, state what it replaces and which constraints remain valid. Maintain replacement links in both directions within the change.
 
 Complete this scope's supersession review for every new record. For fully replaced records needing consolidation, archive, or deletion, perform lifecycle maintenance within authorization. Otherwise, preserve the original file and state relationships and pending actions. Partial replacement preserves each record's unique reasons. Limit review to active same-topic records unless the task requests a full corpus audit.
 
@@ -82,7 +80,8 @@ Read-only reviews report format and content gaps. When authorized to maintain ol
 Compare the record with current code, configuration, tests, engineering documents, active same-topic records, and inbound links. Distinguish:
 
 - **Implementation facts change; the decision holds:** synchronize paths, packages, configuration keys, defaults, owners, or implementation locations so the record points to current implementation. Update facts directly rather than appending a changelog.
-- **The decision changes:** create a new record with supersession and cross-links. Preserve what the old decision actually chose.
+- **The discussion evolves:** update the topic owner for candidate evaluation, recommendations, open questions, or selection of a pending choice. These updates alone do not create a replacement record.
+- **A selected choice is replaced:** follow project replacement rules; by default, create a new record with supersession and cross-links. Preserve what the old decision actually chose, including when that choice was accepted but not yet implemented.
 - **Partial replacement:** the old record still owns unique rationale, constraints, alternatives, compatibility promises, or reconsideration conditions. Keep both records and cross-link them.
 - **Full replacement:** consolidate under repository rules only after the new owner preserves meaningful rationale, alternatives, consequences, required verification, coverage gaps, and reconsideration conditions, and inbound links are repaired.
 - **Still valid:** nearby topics own different decisions and both remain active.
