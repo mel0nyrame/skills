@@ -21,7 +21,7 @@ Apply the repository's precedence rules to global and local instructions. Root i
 
 For a simple local change without architecture or data-boundary effects, stop investigation after identifying the target module, change entry point, nearby reusable implementation, and focused validation. Check the relevant specialized concerns for changes involving multiple modules, infrastructure, generation pipelines, persistent data, or lasting engineering policy.
 
-Before the first file mutation in a Git repository, resolve its parallel-worktree preference with `project-git` when available. That skill owns the one-time question, persistence, and setup procedure. Honor the recorded preference before editing; reuse an existing task worktree. If the skill is unavailable, follow an existing repository policy and establish a missing working-context choice with the user before editing. Read-only investigation requires no setup. After changing worktrees, reread applicable instructions and verify the task's base before implementation.
+Before the first file mutation in a Git repository, use `project-git` for worktree setup when available. It owns preference resolution and the ready-to-edit check. If unavailable, follow the repository policy and resolve any missing working-context choice with the user before editing. Read-only investigation skips setup.
 
 ## 2. Build a just-enough change map
 

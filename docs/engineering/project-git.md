@@ -20,7 +20,7 @@ location and record the choice in AGENTS.md. Do not commit or push.
 
 The main checkout's dedicated preference section is the fallback when an older branch lacks it. Only that preference is reused; other instructions retain their normal scope. Setup preserves unrelated edits and reports where it wrote the preference and ignore rule. Existing edits remain in their original checkout unless migration is explicitly authorized. Independent worktrees do not eliminate later merge conflicts or isolate external services.
 
-See the [worktree procedure](../../skills/engineering/project-git/references/WORKTREES.md) for persistence, base selection, and conflicting-policy handling.
+The [worktree procedure](../../skills/engineering/project-git/references/WORKTREES.md) orders preference resolution, persistence, checkout selection, and a ready-to-edit check. Implementation starts only after pending choices are resolved and task ownership, base, source preservation, and applicable ignore rules are verified. Read-only Git inspection uses `GIT_OPTIONAL_LOCKS=0` without loading setup details.
 
 ## Establish the permitted action
 

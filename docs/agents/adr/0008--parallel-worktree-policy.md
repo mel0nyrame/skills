@@ -18,7 +18,9 @@ Default new task worktrees to the main checkout's `.worktree/`, unless the task 
 
 Keep the procedure in the [worktree reference](../../../skills/engineering/project-git/references/WORKTREES.md). `project-git` owns preference persistence and setup; `project-engineering` triggers resolution before editing. Existing dirty edits keep their checkout and ownership. Setup grants no automatic migration, commit, push, publication, or cleanup permission.
 
-The implementation consists of the skill entry point, its conditional worktree reference, discovery metadata, the engineering workflow's pre-edit trigger, and synchronized English/Chinese guides. This record owns the worktree policy and supersedes no active record. The [discussion-capture decision](0006--capture-decisions-during-design.md) continues to own decision persistence.
+The implementation consists of the skill entry point, its conditional worktree reference, discovery metadata, the engineering workflow's pre-edit trigger, and synchronized English/Chinese guides. The reference owns four ordered stages with completion checks: preference resolution, persistence, checkout selection, and readiness to edit. Read-only Git inspection keeps `GIT_OPTIONAL_LOCKS=0` in the skill entry point because that branch skips the reference.
+
+This record owns the worktree policy and supersedes no active record. The [discussion-capture decision](0006--capture-decisions-during-design.md) continues to own decision persistence.
 
 ## Alternatives
 

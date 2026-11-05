@@ -37,4 +37,16 @@ One independent agent received the skill and raw fixtures without the scenario t
 - For a read-only review without a recorded preference, it reported the existing diff. Parent snapshots confirmed unchanged files, index bytes, HEAD, refs, and worktree registry.
 - For first use without a preference, it asked the required question before writing. Parent snapshots confirmed no changes while the answer was pending. After an explicit enabled reply, it saved the preference and ignore rule, created a task worktree under the main checkout's `.worktree/` from local `main`, and edited only the task copy. Parent inspection confirmed the main branch and index stayed unchanged, both setup copies matched, and neither checkout staged or committed changes.
 
-These finite runs support the named paths only. They do not establish automatic skill selection, the engineering trigger across all hosts, disabled-choice resumption, conflicting-policy handling, unavailable main checkouts, dirty-task migration, custom roots, remote operations, cross-clone distribution, or simultaneous initialization. Those cases remain specified above where applicable.
+These finite runs support the named paths only. They do not establish automatic skill selection, the engineering trigger across all hosts, disabled-choice recording, conflicting-policy handling, unavailable main checkouts, dirty-task migration, remote operations, cross-clone distribution, or simultaneous initialization. Those cases remain specified above where applicable.
+
+### Instruction refinement
+
+The worktree reference groups preference resolution, persistence, checkout selection, and the ready-to-edit check into ordered stages with explicit completion conditions. The skill entry point retains the read-only inspection rule, while setup-only details stay behind its conditional pointer. The combined `wc -w` count of `project-git/SKILL.md` and `references/WORKTREES.md` changed from 1834 to 1464. This describes text size, not measured token savings or model reliability.
+
+A fresh independent agent received the revised skill and three raw fixtures without expected outcomes or this record. Parent inspection confirmed:
+
+- A read-only review preserved file bytes, index bytes, HEAD, refs, and worktree registry. The agent used `GIT_OPTIONAL_LOCKS=0` for Git inspection.
+- A repository with a recorded disabled choice continued in its existing checkout without asking again. Only the requested note changed; unrelated staged and unstaged content remained intact.
+- A task-specific external creation root and explicit local `main` base produced the requested linked worktree. The agent changed only the task note, preserved the standing `.worktree/` preference, and kept the source checkout's files, index, branch, and HEAD unchanged.
+
+Both revised skills passed format validation. ADR, changed-document links/anchors, bilingual-pair checks, and nine-skill discovery passed. Existing executable files were unchanged, so the preceding 67-test regression result was reused. The finite behavior limits above still apply.

@@ -1,6 +1,6 @@
 ---
 name: project-git
-description: Use when establishing a repository worktree preference for parallel tasks, reviewing a Git working tree, splitting or creating commits, pushing branches, or recording Git delivery. Check changes and validation against repository rules, and execute only the authorized delivery stage. Use the external pr skill for PR/MR titles, descriptions, and publication.
+description: Use for repository worktree setup, Git change review, commits, and pushes. Route PR/MR requests to the external pr skill.
 ---
 
 # Project Git
@@ -9,9 +9,9 @@ Handle the working tree, commits, and pushes within the user's authorization. A 
 
 ## Establish the working context
 
-For a Git-backed task that will modify files or Git state, read [worktree policy](references/WORKTREES.md) before the first mutation. Resolve the repository's recorded preference, ask once only when it is missing, and reuse or establish this task's working context. An explicit task instruction takes precedence over the standing preference. Purely read-only reviews skip setup and leave files and Git state unchanged.
+For a Git-backed task, before modifying files or Git state, follow [worktree setup](references/WORKTREES.md) to resolve the repository preference and task checkout. Continue when its ready-to-edit check is satisfied.
 
-Worktree setup does not authorize commits, pushes, PR/MR publication, or moving existing changes. When invoked after edits already exist, preserve their checkout and ownership rather than treating a new worktree as an automatic migration.
+For a purely read-only review, skip setup and use `GIT_OPTIONAL_LOCKS=0` for Git inspection. Leave files, index, refs, and worktree registrations unchanged.
 
 ## Confirm scope
 
@@ -37,5 +37,3 @@ When repository delivery rules require local issues, specifications, or changelo
 Push only when the user explicitly requests it. Read and follow the repository's pre-push policy. Confirm the remote, target branch, upstream, and outgoing commits. Establish a normal upstream on the first push. Reuse validation that still covers the outgoing diff unless project policy requires another run.
 
 Preserve hooks. Force pushes, history rewrites, and remote ref deletion require explicit authorization matching the target and scope. On failure, leave a recoverable state and report completed actions, sanitized errors, and the smallest repair recommendation.
-
-Use the external `pr` skill for PR/MR descriptions and platform operations. A successful push does not mean a PR/MR has been created.
