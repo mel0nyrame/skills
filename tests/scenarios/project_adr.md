@@ -63,6 +63,34 @@ add tests, or guarantee unverified behavior.
 
 Check that the existing topic gains implementation paths, actual test evidence, and remaining gaps. It stays `accepted` while required implementation is incomplete. A passing focused test alone must not turn it into a fully implemented claim.
 
+## Replace a selected but unimplemented choice
+
+Provide a default-format `docs/adr/0001--backup-target.md` with `Status: accepted`. It selects encrypted remote backup because backups must survive failure of the working disk. Its alternatives reject same-disk copies for that reason. No implementation exists. The project has no custom replacement rules.
+
+Task:
+
+```text
+Our backup policy now requires all backup copies to remain offline. Replace the
+selected encrypted remote service with encrypted removable drives kept at a
+separate site. This is the selected approach, not a request to compare options.
+Preserve why we originally chose remote backup and why same-disk copies failed.
+Record the new choice and the changed condition. Key custody and rotation are
+still open. Do not implement or delete the original record.
+```
+
+Check that a linked successor is `accepted`, the predecessor is `superseded`, and both replacement directions are explicit. Preserve the original choice and reasons. The successor must state the offline constraint, selected removable-drive approach, open questions, and lack of implementation. Merely reopening evaluation without selecting a replacement must not cause supersession. Run the default checker.
+
+## Refresh discovery after a new constraint
+
+Prepare an existing implemented decision about the `runtime_state/` namespace. It requires that namespace to be reconstructed from startup inputs and forbids treating it as authoritative storage. First ask the producer to record a proposal for a user preference file without specifying a path. Keep the same producer for a second turn:
+
+```text
+The preference file will be runtime_state/profile.json. User edits must survive
+restarts. Reuse the proposal and continue the design; do not implement yet.
+```
+
+Check that the producer refreshes relevant-record discovery for the new path and persistence constraint, reads the namespace decision, and preserves the conflict or a justified compatible approach in the existing proposal. The unchanged high-level task scope must not prevent retrieval. Reading all records in the first turn also satisfies retrieval, but does not independently demonstrate second-turn search refresh; report that limitation.
+
 ## External interview workflow with project conventions
 
 This scenario additionally requires unmodified `grill-with-docs`, `domain-modeling`, and `grilling` skills from outside this collection. Obtain the matching instructions below and place each skill under the temporary fixture's `.agents/skills/<name>/`, retaining the supporting files beside `domain-modeling/SKILL.md`.
@@ -98,3 +126,30 @@ Check that the same file becomes `State: chosen`, retaining its short project fo
 On 2026-11-04, five isolated forward runs met the checks above: four required only this collection's skills, while external-workflow/custom-format reuse also used the external instructions identified above. The original installation ref for those external skills was not recorded; the retained instruction copies match the pinned reproduction source. The historical external run was executed and passed. The `skipped` rule governs reruns with unavailable or mismatched dependencies and does not change that historical result.
 
 This is a finite manual evaluation, not an automated regression harness or evidence of automatic skill selection inside Claude Code or Codex. Report passed, failed, and skipped counts separately. Re-run the relevant scenarios when their owning instructions change.
+
+### 2026-11-05 review-follow-up run
+
+Seven scenarios passed, none failed, and none were skipped. Producers used fresh independent agent contexts with only the supplied fixture files and task. Resumption used another fresh agent. The discovery-refresh case retained its producer for the second turn. The partial-implementation case used the selected record plus a small storage prototype and one existing test. Outputs were inspected against the checks above; the default checker passed for the default-format fixtures. The custom-format external fixture used a targeted format/content check instead.
+
+| Scenario | Observed result |
+| --- | --- |
+| Unresolved discussion | One `proposed` record retained both rejection reasons, the local-directory candidate, encryption uncertainty, and quota/cleanup questions; no icon record. |
+| Resume without the conversation | A fresh agent recovered the real constraints and rejected approaches, kept encryption unselected, and asked a cleanup-boundary question without duplicating the record. |
+| Autonomous selection | The agent selected per-report manifests under delegated authority, recorded `accepted`, and left implementation and measured performance unclaimed. |
+| Partial implementation | The existing import/delete test passed; the same record remained `accepted` and distinguished that narrow evidence from missing schema, validation, quota, isolation, and recovery behavior. |
+| Selected-choice replacement | The unimplemented predecessor became `superseded`; a successor was `accepted`. Both links, the original rationale, changed offline constraint, and remaining key-management questions were preserved. |
+| Discovery refresh | The second turn repeated discovery for `runtime_state/profile.json` and persistence terms, retained the same proposal, and exposed the conflict with startup replacement. |
+| External custom format | The existing `design/decisions/backup-target.md` became `State: chosen`, retained one prose paragraph and real rejection reasons, and created no parallel ADR system or glossary. |
+
+The discovery producer had already read the runtime-state record in its first turn. The second turn demonstrates renewed search and correct use of a known record; it does not independently demonstrate finding a previously unread record. No broader retrieval-recall claim follows from this case.
+
+The evaluated `project-adr` instruction hashes are below. These identify the supplied content, not a fixed model or execution environment:
+
+| File | SHA-256 |
+| --- | --- |
+| `SKILL.md` | `e8b8d60ef24c2e243120aff304f24c484fc91ae7318a708c4c152db35c357bbc` |
+| `references/DISCUSSIONS.md` | `2d88da1d8805bdca1de0b87e012d7c3c2bc8b17f6f76041010decc9d03df7c58` |
+| `references/LIFECYCLE.md` | `4a1cf3c1cc515abfe60d1456fbd66c310282a5128501511ffa7c9756674b3df7` |
+| `references/PROJECT-INTEGRATION.md` | `d1987f9f5074ffacbbd995480d986fe9edb759178ae64ab6533dba81254a1165` |
+
+The partial-implementation fixture also used `project-engineering/SKILL.md` with SHA-256 `75c8cafddcfa6ae50301c882c077920925e4f75fe576301b0b3794eaf29fd2f0`, including the explicit project-rule-precedence clarification. This is a joint fixture using both supplied skills, not an isolated evaluation of either installation. For the external scenario, all five files were retrieved from the pinned reproduction source above and matched its recorded hashes before execution. Fixture directories were not Git repositories; Git status checks were unavailable. No implementation changes by the evaluated agents, real knowledge-library writes, commits, pushes, or external messages were performed.
