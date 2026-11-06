@@ -1,11 +1,17 @@
 ---
 name: project-git
-description: Use when reviewing a Git working tree, splitting or creating commits, pushing branches, or recording Git delivery. Coordinate PR/MR body drafting and explicitly requested platform delivery after Git checks.
+description: Use for repository worktree setup, Git change review, commits, and pushes. Coordinate PR/MR body drafting and explicitly requested platform delivery after Git checks.
 ---
 
 # Project Git
 
 Handle the working tree, commits, and pushes within the user's authorization. A commit request does not authorize a push. A push request does not authorize creating or updating a PR/MR or changing an external tracker. For PR/MR requests, follow the writing and platform-delivery responsibilities below.
+
+## Establish the working context
+
+For a Git-backed task, before modifying files or Git state, follow [worktree setup](references/WORKTREES.md) to resolve the owning workflow, repository preference, and task checkout. Continue when that workflow permits editing or the generic ready-to-edit check is satisfied.
+
+For a purely read-only review, skip setup and use `GIT_OPTIONAL_LOCKS=0` for Git inspection. Leave files, index, refs, and worktree registrations unchanged.
 
 ## Confirm scope
 

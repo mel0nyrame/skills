@@ -1,10 +1,28 @@
-# Project Git for review, commits, and delivery
+# Project Git for parallel worktrees, review, and delivery
 
 English | [简体中文](project-git.zh.md) · [All guides](../README.md)
 
-`project-git` handles changes already present in a project. It helps inspect the working tree, form coherent commits, and execute a commit or push only when requested.
+`project-git` establishes or follows a repository's parallel-worktree preference and handles existing changes. It helps inspect the working tree, form coherent commits, and execute a commit or push only when requested.
 
 A commit saves a version in local Git history. A push sends commits to a remote repository. They are separate decisions. You can use the skill only to review changes without authorizing either action.
+
+## Establish the working context once
+
+Dedicated setup and publication workflows take precedence. For a managed root such as a recap library, follow its owner instead of adding a generic worktree or editing protected instructions and ignore rules.
+
+For an ordinary project checkout, before modifying files or Git state, the assistant reads the recorded preference in `AGENTS.md`. If none exists, it asks once whether to enable independent worktrees for parallel tasks. The question covers setup-only writes to the main and task checkouts' `AGENTS.md` and any necessary `.gitignore` updates. It records either choice, so later sessions reuse the authorization without asking again. Explicit path restrictions still apply; optional policy distribution outside scope is deferred and reported. Purely read-only reviews do not initialize a preference or change Git state.
+
+When enabled, new tasks use distinct worktrees and branches. An existing worktree dedicated to this task, including one created by the agent's host, is reused. The default location is `.worktree/` under the main checkout; an explicit task location or recorded custom location takes precedence. The assistant verifies ignore rules before creating a project-local checkout. It does not guess agent-specific default directories.
+
+```text
+$skills:project-git
+Enable independent worktrees for this repository. Use the default .worktree/
+location and record the choice in AGENTS.md. Do not commit or push.
+```
+
+The main checkout's dedicated preference section is the fallback when an older branch lacks it. Only that preference is reused; other instructions retain their normal scope. Before copying into a newly selected task checkout, compare its existing section again: matching content needs no edit, missing content may be copied within scope, and a conflicting choice or root must be resolved before implementation. Setup preserves unrelated edits and reports where it wrote the preference and ignore rule. Existing edits remain in their original checkout unless migration is explicitly authorized. Independent worktrees do not eliminate later merge conflicts or isolate external services.
+
+The [worktree procedure](../../skills/engineering/project-git/references/WORKTREES.md) orders preference resolution, persistence, checkout selection, and a ready-to-edit check. Implementation starts only after pending choices are resolved and task ownership, base, source preservation, and applicable ignore rules are verified. Read-only Git inspection uses `GIT_OPTIONAL_LOCKS=0` without loading setup details.
 
 ## Establish the permitted action
 
