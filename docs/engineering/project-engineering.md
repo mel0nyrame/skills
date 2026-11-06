@@ -22,7 +22,7 @@ files and knowledge worth preserving. Do not stage, commit, or push.
 
 Use `$project-engineering` standalone or `/skills:project-engineering` in Claude Code. The assistant needs project-file access and, for implementation, editing and validation tools.
 
-Before the first file mutation in a Git repository, the assistant uses `project-git` when available to resolve the one-time worktree preference. A recorded choice is reused without asking again. Existing task worktrees are reused; after changing worktrees, the assistant checks the base and rereads applicable instructions. Read-only investigation skips setup. See [Git working context](project-git.md#establish-the-working-context-once).
+Before the first file mutation in a Git repository, the assistant follows any dedicated workflow that owns this task's setup or publication. Otherwise it uses `project-git` when available to resolve the one-time worktree preference within task authorization. A recorded choice is reused without asking again. Existing task worktrees are reused; after changing worktrees, the assistant checks the base and rereads applicable instructions. Read-only investigation skips setup. See [Git working context](project-git.md#establish-the-working-context-once).
 
 ## Follow the work through
 

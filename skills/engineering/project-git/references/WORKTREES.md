@@ -2,13 +2,21 @@
 
 ## 1. Resolve the preference
 
+Read the repository's owning workflow before generic setup. A dedicated candidate, worktree, or publication contract takes precedence, including restrictions on instruction and ignore-file writes. Managed-root metadata, such as a recap library's `.state/library.json`, is a reason to inspect that contract. When it owns setup, use its permitted workflow and exit this generic procedure; a missing preference does not authorize another worktree or direct configuration edits. Report an unavailable or incompatible owner instead of bypassing it.
+
 Inspect the current checkout, branch, staged and unstaged changes, and `git worktree list --porcelain`. Identify the main checkout from Git metadata and read applicable instructions.
 
 Compare the current and main checkouts' root `AGENTS.md` sections named `## Parallel worktrees`, including equivalent existing repository rules. A missing current section falls back to the main checkout's preference only; other branch-specific instructions keep their normal scope. Resolve conflicting preferences before setup.
 
 An explicit task instruction overrides the preference for that task. Change the standing preference only when requested. A host-created worktree alone does not establish a repository-wide choice.
 
-If no repository-wide choice is recorded or explicitly supplied, ask whether to enable independent task worktrees. Explain that either answer is saved in `AGENTS.md`, the default creation root is the main checkout's `.worktree/`, and a custom root is supported. Wait for the answer. Save a declined choice as disabled.
+If no repository-wide choice is recorded or explicitly supplied, ask once using this complete disclosure in the user's language:
+
+> Enable independent task worktrees for this repository? Either answer is saved in the main checkout's `AGENTS.md` and may be copied into task instructions. Enabled project-local setup may also update both checkouts' `.gitignore`. The default is the main checkout's `.worktree/`; a custom root is supported.
+
+This confirmation covers those setup-only edits. Wait for the answer and save a declined choice as disabled.
+
+Use existing confirmation or standing authorization without asking again. Explicit task path restrictions still apply. If a required setup edit is outside scope, report the blocker; defer optional policy distribution rather than enlarging scope. A read-only request permits none of these writes.
 
 Proceed with the resolved choice and task override; an unanswered question or unresolved conflict blocks setup.
 
@@ -21,7 +29,7 @@ Use a concise dedicated section. For enabled defaults:
 ```markdown
 ## Parallel worktrees
 
-Use a distinct worktree and branch for each independent task before modifying files. Reuse a worktree already dedicated to the current task. Create new worktrees under `.worktree/` in the main checkout. Apply this preference without asking again. Explicit task instructions take precedence.
+Use a distinct worktree and branch for each independent task before modifying files. Reuse a worktree already dedicated to the current task. Create new worktrees under `.worktree/` in the main checkout. Allow setup-only instruction copies and required worktree ignore rules. Apply this preference without asking again. Explicit task instructions take precedence.
 ```
 
 Replace the location with its agreed path and anchor for a custom root. For disabled:
@@ -29,7 +37,7 @@ Replace the location with its agreed path and anchor for a custom root. For disa
 ```markdown
 ## Parallel worktrees
 
-Automatic task worktrees are disabled for this repository. Continue in the current checkout without asking again. Preserve unrelated changes. Explicit task instructions take precedence.
+Automatic task worktrees are disabled for this repository. Continue in the current checkout without asking again. Allow setup to copy this preference into task instructions. Preserve unrelated changes. Explicit task instructions take precedence.
 ```
 
 Proceed when the confirmed choice is saved or an existing choice remains unchanged. Re-reading is not an atomic lock; simultaneous first sessions can still duplicate initialization.
@@ -54,11 +62,12 @@ Proceed only when the task checkout is identified and its branch and base are ve
 
 ## 4. Ready-to-edit check
 
-In the resolved task checkout, reread applicable instructions. Copy the confirmed preference section into its `AGENTS.md` if missing, along with any agreed root ignore entry into its `.gitignore`; preserve their other content. These copies let normal Git delivery distribute setup to other clones, which cannot rely on the main-checkout fallback.
+In the resolved task checkout, reread applicable instructions and compare its complete preference section with the resolved choice before copying. A matching section needs no edit. Copy a missing section only within authorization. A different choice or root is a conflict: retain both versions and resolve it before implementation rather than appending, overwriting, or silently keeping a stale preference. Apply the same repository and task-scope checks to any agreed ignore entry; preserve other content. Defer optional copies outside the authorized paths and report that distribution is incomplete. Normal Git delivery distributes permitted setup copies to other clones, which cannot rely on the main-checkout fallback.
 
 Before implementation, confirm all of the following:
 
 - No preference question, conflict, or required migration remains unresolved.
+- Every required setup write is covered by confirmed or standing authorization and the owning workflow; any out-of-scope distribution copy is deferred and reported.
 - Task path, branch, base, and reused/created/retained state are known; a newly created project-local worktree passed the ignore check.
 - Source edits and staging are preserved. Report the working context and all setup paths changed, including copies left in the main checkout.
 

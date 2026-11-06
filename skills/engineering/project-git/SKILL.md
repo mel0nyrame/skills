@@ -9,7 +9,7 @@ Handle the working tree, commits, and pushes within the user's authorization. A 
 
 ## Establish the working context
 
-For a Git-backed task, before modifying files or Git state, follow [worktree setup](references/WORKTREES.md) to resolve the repository preference and task checkout. Continue when its ready-to-edit check is satisfied.
+For a Git-backed task, before modifying files or Git state, follow [worktree setup](references/WORKTREES.md) to resolve the owning workflow, repository preference, and task checkout. Continue when that workflow permits editing or the generic ready-to-edit check is satisfied.
 
 For a purely read-only review, skip setup and use `GIT_OPTIONAL_LOCKS=0` for Git inspection. Leave files, index, refs, and worktree registrations unchanged.
 

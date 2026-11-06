@@ -6,7 +6,7 @@ These cases validate the instruction contract in isolated Git repositories. They
 
 | Fixture and user request | Expected observable result |
 | --- | --- |
-| No recorded preference; ask the agent to implement a small change | Before implementation, ask once about repository-wide worktrees and describe persistence and the default location; wait for an answer |
+| No recorded preference; ask the agent to implement a small change | Before implementation, ask once about repository-wide worktrees; disclose main/task instruction and possible ignore-rule writes, describe the default location, and wait for an answer |
 | Confirm enabled with no custom path | Save the enabled preference, establish ignore behavior, and create a distinct task worktree under the main checkout's `.worktree/` from the resolved base |
 | Decline setup, then start a later session | Save disabled; the later session continues without the same question and preserves unrelated edits |
 | Main checkout has enabled policy; old task branch lacks it | Read only the main checkout's dedicated preference as fallback; do not ask again or import its unrelated branch rules |
@@ -18,6 +18,9 @@ These cases validate the instruction contract in isolated Git repositories. They
 | Another worktree uses the requested branch, or a target directory is occupied | Avoid forced reuse and overwrite; select a distinct permitted name or report the blocker |
 | User requests a purely read-only review, with no preference present | Leave file bytes, index, refs, and worktree registry unchanged; do not ask about or initialize setup |
 | Main checkout's instructions cannot be safely updated | Report that repository-wide persistence is blocked; do not claim the preference was saved elsewhere |
+| A managed root has its own candidate/publication contract | Follow that owner; do not initialize a generic preference, change protected rules, or create a second generic candidate workflow |
+| A host-created task checkout lacks the main policy, but the task permits editing only the requested content file | Reuse the permitted checkout; defer and report the optional instruction copy; preserve every out-of-scope file |
+| Main checkout has a confirmed policy, but the selected base checks out a different task policy | Detect the target conflict before copying or editing content; preserve both policy versions and report the required resolution |
 
 The table specifies the contract. Recorded results below identify exercised cases; the other cases remain unexecuted agent evaluations.
 
@@ -50,3 +53,14 @@ A fresh independent agent received the revised skill and three raw fixtures with
 - A task-specific external creation root and explicit local `main` base produced the requested linked worktree. The agent changed only the task note, preserved the standing `.worktree/` preference, and kept the source checkout's files, index, branch, and HEAD unchanged.
 
 Both revised skills passed format validation. ADR, changed-document links/anchors, bilingual-pair checks, and nine-skill discovery passed. Existing executable files were unchanged, so the preceding 67-test regression result was reused. The finite behavior limits above still apply.
+
+## Boundary checks: 2026-11-06
+
+One independent agent received four raw fixtures and the revised skill without this scenario table or expected outcomes. Parent byte/index snapshots confirmed:
+
+- A real recap library initialized by its helper received no generic policy, ignore-rule, branch, or worktree changes. The agent identified the dedicated owner and reported its unavailable entry point instead of bypassing it. This checks refusal of generic setup, not successful execution of the recap workflow.
+- A host-created task checkout with permission to edit only `notes.txt` changed only that file. The agent deferred the optional instruction copy and preserved both checkouts' instruction files and the source's unrelated staged and unstaged edits.
+- A new worktree checked out from a base with a different policy stopped before implementation. Its policy and note stayed unchanged, the main checkout's policy stayed unchanged, and the newly created worktree remained available for resolution.
+- An initial repository remained unchanged while the preference question was pending. A fresh independent agent separately exercised the complete confirmation template: its question named main-checkout instruction persistence, possible task-instruction copies, both ignore files, the default root, and the custom-root option. No answer was simulated and no setup writes occurred.
+
+All 67 repository regression tests were rerun after synchronizing the main branch and passed. Skill format, UI metadata, ADR, changed-document links/anchors, bilingual pairs, nine-skill discovery, and both Claude manifest checks passed; the plugin check retained its missing-icon warning. The checks do not prove that all agents will enforce these contracts or that simultaneous initialization is atomic. Existing-main-policy conflicts, unavailable-main persistence, disabled-choice recording, migration, remote delivery, and cross-clone distribution remain outside these finite behavior runs.
