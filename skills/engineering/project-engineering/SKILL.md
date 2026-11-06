@@ -27,7 +27,7 @@ Locate engineering knowledge through rules or documentation entry points. Withou
 
 Before proposing or implementing an approach, search active decisions by affected capabilities, constraints, paths, symbols, and configuration keys. Read related proposals, selected choices, rejection reasons, and open questions, or establish that none match. Identify constraints and facts that may change. When changed conditions justify reconsideration, state them explicitly and reevaluate with the earlier rationale visible. Existing plans do not authorize execution. Use archives only when historical evidence is explicitly needed.
 
-During investigation and design, use `project-adr` to preserve meaningful constraints, real rejection reasons, or substantial proposals with future value when they arise. Reuse the topic owner, distinguish recommendations from selected choices, and checkpoint open questions before pausing. `project-adr` owns record criteria, content, and lifecycle; this workflow supplies reading and synchronization triggers. When it is unavailable, follow the project's decision rules directly. External discussion skills use the same project convention and need no modification.
+During investigation and design, use `project-adr` when meaningful constraints, evaluated rejection reasons, or substantial proposals need preserving. It owns record criteria, topic content, lifecycle, and discussion checkpoints; this workflow triggers it as progress occurs. When it is unavailable, follow the project's decision rules directly. External discussion skills reuse those rules and need no modification.
 
 Classify engineering knowledge for the current task:
 
@@ -57,17 +57,7 @@ Persist **Architecture Conventions** before repeating **Style Conventions**.
 
 Start with the capability index in engineering knowledge, then verify implementations, callers, and extension points. Only a Confirmed Rule can make an implementation a mandatory canonical asset. An Observed Convention only raises its investigation priority.
 
-Extend existing assets through their extension points when they can meet the need. Add parallel infrastructure only when existing assets do not own the responsibility or cannot meet a verified requirement. Record the reason where the project requires it. A capability entry contains only:
-
-```text
-Capability
-Canonical implementation
-Use for
-Do not
-Extension point
-```
-
-Source code or its API owner owns API details.
+Extend existing assets through their extension points when they can meet the need. Add parallel infrastructure only when existing assets do not own the responsibility or cannot meet a verified requirement. Record the reason where the project requires it. When writing capability entries, read [capability entries](references/PROJECT-GOVERNANCE.md#capability-entries) for their content boundary.
 
 ## 5. Change the authoritative entry point
 
@@ -99,10 +89,8 @@ Run the project's focused validation for this change. Review generated artifacts
 
 Before delivery, account for design progress under section 2 and every finding that section 7 requires preserving. Confirm a persistent record and discoverable entry point exist, references resolve, and implementation claims match evidence. Selected but unfinished work retains its applicable pre-implementation state and remaining questions. Report added, updated, or reused knowledge locations, or explain why nothing needs preserving. Reading a skill or finishing code edits does not complete this check.
 
-Compare the active decisions found in section 2 with the actual changes. When paths, symbols, defaults, owners, or mechanisms change, use `project-adr` to update existing records in the same change. Use it for new decisions and same-topic supersession when lasting reasons change or arise. Check affected records' facts even when no new decision is needed.
+Compare the active decisions read in section 2 with the actual changes. Use `project-adr` to synchronize affected facts in the same change, even when no new decision is needed, and to handle new choices or replacement relationships. Reuse records already produced by another workflow. When the skill is unavailable, complete the same factual review and required maintenance under project rules; report gaps without requiring another skill installation.
 
-Follow project conventions for creation criteria, locations, formats, and states. Reuse records already produced by another workflow for the same decision. Delegate maintenance to `project-adr` when available. Otherwise, perform the same factual review and required updates under project rules, and report gaps those rules do not cover. This does not require installing other domain-modeling or ADR skills.
+Complete delivery only when affected records are synchronized, replacement relationships are resolved, and required checks pass. Report record locations, remaining limits, or why this change needs no decision maintenance. The project's decision rules take precedence over skill defaults. Use `project-adr` for record criteria, content, and lifecycle within those rules.
 
-Lasting reasons can concern architecture and dependencies, public protocols, security and critical dependencies, data design and compatibility, testing strategy, important process/tooling policy, important simplifications, and rejected alternatives that remain tempting. For an ordinary local change without affected records or lasting reasons, explain why maintenance is unnecessary. Completion requires synchronized affected decisions, resolved relationships between old and new records, and passing required checks. Report record locations or the exemption reason.
-
-Use `project-prose` to check factual ownership and complete contracts when changing technical prose. Use `project-git` when the user requests commits or pushes. For PR/MR titles, descriptions, creation, or updates, use the external [pr skill](https://github.com/mattpocock/skills/tree/main/skills/engineering/pr). If it is unavailable, report the dependency. These skills do not expand user authorization.
+Use `project-prose` to check factual ownership and complete contracts when changing technical prose. Use `project-git` when the user requests commits or pushes. Use the external [pr skill](https://github.com/mattpocock/skills/tree/main/skills/engineering/pr) for PR/MR bodies; report the dependency if unavailable. Follow project conventions for titles. Create or update hosted requests through the available platform tools only within user authorization, and verify the platform result. A completed body alone does not complete a publication request.
