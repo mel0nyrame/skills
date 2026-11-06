@@ -2,11 +2,11 @@
 
 Use this branch for design discussions and later tasks that resume their topics. Project creation criteria, format, lifecycle, and task authorization take precedence.
 
-## Read the topic before extending it
+## Use the established topic context
 
-Search active records for the task's capabilities, constraints, mechanisms, and evaluated alternatives. Read matching proposals and accepted or implemented choices before recommending another approach. Follow relevant replacement links. Use archives only when historical evidence is needed.
+Use the records found through [the skill's discovery step](../SKILL.md#locate-rules-and-records). Follow relevant replacement links and identify the current conclusion, rejected candidates and reasons, open questions, and implementation evidence. Use archives only when historical evidence is needed. Use the discovery step's refresh rule when new information could reveal previously uncovered records.
 
-Identify the current conclusion, rejected candidates and their reasons, open questions, and implementation evidence. When conditions justify reopening a choice, state what changed and which earlier reasons still hold. Existing proposals are context, not permission to execute pending work.
+When conditions justify reopening a choice, state what changed and which earlier reasons still hold. Existing proposals are context, not permission to execute pending work.
 
 ## Capture meaningful progress
 

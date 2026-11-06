@@ -24,7 +24,7 @@
 
 | Skill | 用途 |
 | --- | --- |
-| [clarify](docs/thinking/clarify.zh.md) | 识别假设，提出一个关键问题，收到回复后再回答。 |
+| [clarify](docs/thinking/clarify.zh.md) | 检查假设；有关键缺口时只问一个问题，信息充分时直接回答。 |
 | [karpathy-guidelines](docs/thinking/karpathy-guidelines.zh.md) | 保持任务范围，验证结果，清楚表达结论。内容来自个人维护的 fork。 |
 
 ### 检索工具
@@ -109,7 +109,7 @@ codex plugin add skills@mel0nyrame-skills
 
 ## 行为与依赖
 
-- `clarify` 提出一个关键问题后暂停，收到回复后再回答。
+- `clarify` 在仍有关键缺口时只问一个问题并等待回复。已有上下文充分时，它在同一轮直接回答。
 - `recap` 仅由用户显式调用。保留 `disable-model-invocation: true` 和 Codex 禁止隐式调用的设置。
 - `project-git` 分别检查 commit、push 和 PR/MR 操作的授权。先检查项目规则和稳定的结构化提交历史，再决定是否使用中文默认说明。用户对本次任务的明确要求优先。
 - `project-adr` 优先遵守目标项目约定。默认检查器接受完整的英文或中文结构，并保留归档排除规则。

@@ -2,6 +2,45 @@
 
 Read only the section relevant to the task. Confirm argument shapes against the live tool schema; the public README, source tree, and hosted deployment may differ.
 
+## Search requests
+
+The current hosted `firecrawl_search` schema requires `query` and `objective`. State the user's underlying goal in one sentence in `objective`; reuse it across related calls without including credentials or unrelated private information.
+
+```json
+{
+  "query": "site:docs.firecrawl.dev MCP tools",
+  "objective": "Verify the official Firecrawl MCP usage instructions and retain source URLs",
+  "limit": 3,
+  "toolDetail": "compact",
+  "domainTools": false
+}
+```
+
+Adjust the result count to the task. Use `includeDomains` or `excludeDomains` when supported by the live schema. Preserve the user's date, region, and language constraints.
+
+Read relevant excerpts before fetching pages. Adding `scrapeOptions` fetches the full page of each web result and bills those fetches as scrapes; use it only when those full pages are actually needed.
+
+Authenticated search can also return Alexandria provider suggestions in `data.tools`. `domainTools: false` disables domain-matched suggestions only; `sources: ["web"]` does not reliably exclude semantic provider suggestions on the current hosted surface. Suggestions do not execute providers. Read [Provider Data and Large Results](#provider-data-and-large-results) before using them.
+
+## Targeted extraction
+
+For a specific question, use this argument shape, replacing the URL, question, and objective.
+
+```json
+{
+  "url": "https://example.com",
+  "objective": "Verify the domain's intended use using an exact passage from its page",
+  "formats": ["query"],
+  "queryOptions": {
+    "prompt": "What is this domain for?",
+    "mode": "directQuote"
+  },
+  "domainTools": false
+}
+```
+
+For structured extraction, describe fields, units, and missing-value handling in `jsonOptions.prompt`. Supply a strict JSON Schema through `jsonOptions.schema` only if the client-exposed schema accepts that object. Validate returned fields and types even when extraction succeeds. Free-form query answers and summaries are generated content; verify the source before presenting them as quotations.
+
 ## Crawling and Research Jobs
 
 ### Site URL Discovery

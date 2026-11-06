@@ -12,6 +12,20 @@ When establishing ongoing ADR maintenance, use the project-integration workflow 
 
 When knowledge needs preserving and the project has neither a suitable owner nor a storage convention, use `docs/engineering/ENGINEERING.md` for relevant architecture, reusable assets, change entry points, validation, known constraints, observed conventions, or open questions. Use `docs/engineering/DATA.md` for persistent-data knowledge. Create only files and sections with actual content. These are fallback entry points, not mandatory filenames for every project.
 
+## Capability entries
+
+When writing an entry for a reusable capability, include only:
+
+```text
+Capability
+Canonical implementation
+Use for
+Do not
+Extension point
+```
+
+Source code or its API owner owns API details. Confirm a canonical implementation through project rules before documenting it as mandatory; an observed pattern is only an investigation lead.
+
 ## Prefer distributed discovery
 
 When directories, metadata, filenames, search, or repository tooling reliably discover records, prefer one file per record or an owner-local structure. Avoid requiring every new record to modify corpus-wide files such as `ADR-INDEX.md`, `NOTES-INDEX.md`, or `DECISIONS-INDEX.md`. Such files create recurring merge conflicts across branches and worktrees.

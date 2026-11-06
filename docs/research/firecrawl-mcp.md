@@ -40,7 +40,9 @@ Known URLs should normally be read directly. Search is useful when sources must 
 
 Site collection also needs paths, page limits, and depth. A long-running task can initially return a job identifier. The assistant should retain it and check status; an identifier alone is not a completed collection.
 
-Before browser interaction, local-file upload, provider execution, or another conditional operation, the assistant follows the [operation-specific reading routes](../../skills/research/firecrawl-mcp/SKILL.md#read-before-conditional-operations). Ordinary search and page reading do not require loading every workflow.
+Before Search, the assistant reads [Search requests](../../skills/research/firecrawl-mcp/references/workflows.md#search-requests). Page-specific answers and named-field extraction use [Targeted extraction](../../skills/research/firecrawl-mcp/references/workflows.md#targeted-extraction). An ordinary Markdown page read uses the main instructions without loading those examples.
+
+Before browser interaction, local-file upload, provider execution, or another conditional operation, the assistant follows the [operation-specific reading routes](../../skills/research/firecrawl-mcp/SKILL.md#read-before-conditional-operations). Each route loads only the matching workflow.
 
 Numbers need association with their actual plan, currency, and billing period. Generated summaries or answers require source checking before being presented as exact quotations.
 

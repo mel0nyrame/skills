@@ -4,13 +4,13 @@ English | [简体中文](README.zh.md) · [Installation](../README.md#install)
 
 These skills guide how an AI assistant investigates, performs, and checks a task. Installation makes instructions callable; external connections and file permissions still come from your agent environment.
 
-Start with the result you need. `clarify` provides a focused clarification round. `project-engineering` implements a project change and preserves useful engineering knowledge. `recap` turns conversations into independent topics. Their file outputs and operational effects differ substantially.
+Start with the result you need. `clarify` checks whether a focused clarification round is needed. `project-engineering` implements a project change and preserves useful engineering knowledge. `recap` turns conversations into independent topics. Their file outputs and operational effects differ substantially.
 
 ## Tasks and actual deliverables
 
 | Skill and detailed guide | Suitable task | Typical result |
 | --- | --- | --- |
-| [clarify](thinking/clarify.md) | Establish the problem that needs solving | A question and later solution in chat, without a default file |
+| [clarify](thinking/clarify.md) | Establish the problem that needs solving | One question when needed, otherwise a direct answer; no default file |
 | [karpathy-guidelines](thinking/karpathy-guidelines.md) | Keep scope, assumptions, and verification under control | The original task's code, documents, or answer, with no fixed artifact directory |
 | [project-engineering](engineering/project-engineering.md) | Implement features, fixes, or migrations under project rules | Relevant source and tests, plus engineering knowledge and decision updates when needed |
 | [project-adr](engineering/project-adr.md) | Capture durable proposals and choices, resume topics, and maintain records | Topic records with rejection reasons, open questions, states, and links in the project's ADR location |

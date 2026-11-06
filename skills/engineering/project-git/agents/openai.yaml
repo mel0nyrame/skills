@@ -1,6 +1,6 @@
 interface:
   display_name: "Project Git"
-  short_description: "Set worktree policy, review changes, and deliver Git work"
-  default_prompt: "Use $project-git to establish or follow this repository's worktree preference, review current changes, and perform only the commits or pushes I explicitly request."
+  short_description: "Set worktree policy and deliver authorized Git and PR/MR work"
+  default_prompt: "Use $project-git to follow this repository's worktree preference, review changes, and perform only the Git or hosted PR/MR actions I explicitly request; distinguish body drafting from platform delivery."
 policy:
   allow_implicit_invocation: true

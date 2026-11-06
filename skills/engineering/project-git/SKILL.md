@@ -1,11 +1,11 @@
 ---
 name: project-git
-description: Use for repository worktree setup, Git change review, commits, and pushes. Route PR/MR requests to the external pr skill.
+description: Use for repository worktree setup, Git change review, commits, and pushes. Coordinate PR/MR body drafting and explicitly requested platform delivery after Git checks.
 ---
 
 # Project Git
 
-Handle the working tree, commits, and pushes within the user's authorization. A commit request does not authorize a push. A push request does not authorize creating or updating a PR/MR or changing an external tracker. Route PR/MR requests to the external [pr skill](https://github.com/mattpocock/skills/tree/main/skills/engineering/pr). If it is unavailable, report that dependency rather than treating a push as a completed PR/MR.
+Handle the working tree, commits, and pushes within the user's authorization. A commit request does not authorize a push. A push request does not authorize creating or updating a PR/MR or changing an external tracker. For PR/MR requests, follow the writing and platform-delivery responsibilities below.
 
 ## Establish the working context
 
@@ -37,3 +37,11 @@ When repository delivery rules require local issues, specifications, or changelo
 Push only when the user explicitly requests it. Read and follow the repository's pre-push policy. Confirm the remote, target branch, upstream, and outgoing commits. Establish a normal upstream on the first push. Reuse validation that still covers the outgoing diff unless project policy requires another run.
 
 Preserve hooks. Force pushes, history rewrites, and remote ref deletion require explicit authorization matching the target and scope. On failure, leave a recoverable state and report completed actions, sanitized errors, and the smallest repair recommendation.
+
+## PR/MR writing and platform delivery
+
+Use the external [pr skill](https://github.com/mattpocock/skills/tree/main/skills/engineering/pr) for the body, following the project's template and terminology. Follow project conventions for the title. If the writing skill is unavailable, report that dependency and the incomplete writing step.
+
+For explicitly requested creation or updates, use the available hosting-platform tools with the authorized repository, base, head, and scope. If the required platform capability is unavailable, retain the draft and report the delivery gap. A writing skill does not supply platform access or authorize publication.
+
+Verify the platform result before reporting completion or a PR/MR URL. A successful push or completed body alone does not mean a hosted request was created or updated. Comments and other tracker changes remain separate actions within the user's explicit request.

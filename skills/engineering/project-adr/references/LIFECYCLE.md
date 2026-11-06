@@ -17,6 +17,8 @@ A topic's status describes its current choice, not every candidate within it. Re
 
 Move `proposed` to `accepted` when an authorized choice is made, and to `implemented` only after checking implementation evidence. If the choice is already implemented when first recorded, start at `implemented`; intermediate files are unnecessary. Partial implementation remains `accepted`, with completed scope and remaining work stated. Record reconsideration when changed conditions reopen a choice. Lifecycle labels record facts rather than authorize further actions.
 
+When an `accepted` or `implemented` choice is replaced, apply [the record replacement rules](../SKILL.md#maintain-current-facts-and-decisions). Preserve the earlier choice and its reasons, and maintain replacement links. Reopening a choice for evaluation alone does not establish a replacement.
+
 Completion and age do not automatically justify archive. Consider archive when only one-time implementation details, a closed local fix, or low-value history already obvious from current owners remain. When uncertain, preserve the record and state the judgment boundary. Avoid age, length, or count quotas.
 
 ## Archive or delete
