@@ -90,7 +90,7 @@ class SearchTests(unittest.TestCase):
 
     def test_snippet_prefers_explanation_and_preserves_original_line_number(self):
         path = self.topic("scope.md", "并发控制", "## 原理\n\n并发控制需要取得锁。\n锁可防止同时覆盖。")
-        original_lines = path.read_text().splitlines()
+        original_lines = path.read_text(encoding='utf-8').splitlines()
         for fallback in (False, True):
             result = self.results("并发控制", fallback)[0]
             self.assertTrue(result["snippet"].startswith("并发控制需要取得锁。"))
@@ -101,8 +101,8 @@ class SearchTests(unittest.TestCase):
         for fallback in (False, True):
             result = self.results("Atomicity", fallback)[0]
             self.assertNotIn('"aliases"', result["snippet"])
-            self.assertIn(result["snippet"].splitlines()[0], path.read_text().splitlines())
-            self.assertGreaterEqual(result["line"], path.read_text().splitlines().index("# 更新规则") + 1)
+            self.assertIn(result["snippet"].splitlines()[0], path.read_text(encoding='utf-8').splitlines())
+            self.assertGreaterEqual(result["line"], path.read_text(encoding='utf-8').splitlines().index("# 更新规则") + 1)
 
     def test_long_snippet_keeps_match_in_view(self):
         for prefix in ("x ", "ß "):
@@ -134,7 +134,12 @@ class SearchTests(unittest.TestCase):
         for name in ("sources", "drafts", ".history"):
             (self.root / name).mkdir()
             (self.root / name / "secret.md").write_text("excludedmarker")
-        (self.root / "topics/link.md").symlink_to(self.root / "sources/secret.md")
+        try:
+            (self.root / "topics/link.md").symlink_to(self.root / "sources/secret.md")
+        except OSError as exc:
+            if getattr(exc, 'winerror', None) != 1314:
+                raise
+            self.skipTest('Windows account lacks symbolic-link privilege')
         for fallback in (False, True):
             self.assertEqual(self.paths("excludedmarker", fallback), [])
             self.assertEqual(self.paths("retrievalmarker", fallback), ["topics/scope.md"])
@@ -212,7 +217,7 @@ class SearchTests(unittest.TestCase):
                     hit = self.results("并发安全", fallback)[0]
                     self.assertIn(phrase, hit["snippet"])
                     self.assertLessEqual(len(hit["snippet"]), 350)
-                    self.assertIn(phrase, path.read_text().splitlines()[hit["line"] - 1])
+                    self.assertIn(phrase, path.read_text(encoding='utf-8').splitlines()[hit["line"] - 1])
 
     def test_snippet_anchors_actual_identifier_after_a_similar_prefix(self):
         self.topic("long.md", "Long example",
@@ -226,7 +231,7 @@ class SearchTests(unittest.TestCase):
         for fallback in (False, True):
             hit = self.results("并发安全", fallback)[0]
             self.assertIn("并发\n安全", hit["snippet"])
-            self.assertEqual(path.read_text().splitlines()[hit["line"] - 1], "并发")
+            self.assertEqual(path.read_text(encoding='utf-8').splitlines()[hit["line"] - 1], "并发")
 
     def test_link_projection_keeps_long_snippet_source_offsets(self):
         self.topic("long.md", "Long example",

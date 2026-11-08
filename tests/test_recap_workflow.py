@@ -90,7 +90,7 @@ class MaintenanceTests(unittest.TestCase):
         self.assertEqual(integrated["status"], "ready")
         self.assertFalse(integrated["review_required"])
         self.assertNotEqual(integrated["approval_sha256"], result["approval_sha256"])
-        content = (Path(integrated["worktree"]) / "index.md").read_text()
+        content = (Path(integrated["worktree"]) / "index.md").read_text(encoding='utf-8')
         self.assertIn("topics/second.md", content)
         self.assertIn("Choose the newest relevant topic.", content)
         with self.assertRaisesRegex(KnowledgeError, "explicit user approval"):
@@ -139,11 +139,11 @@ class MaintenanceTests(unittest.TestCase):
     def test_guide_suffix_is_preserved_and_malformed_markers_are_rejected(self):
         self.publish_topic("first")
         guide = self.root / "index.md"
-        guide.write_text(guide.read_text() + "\nKeep this trailing note.\n")
+        guide.write_text(guide.read_text(encoding='utf-8') + "\nKeep this trailing note.\n", encoding='utf-8')
         git(self.root, "add", "--", "index.md")
         git(self.root, "commit", "-m", "Fixture trailing note")
         result = workflow.inspect(self.root, self.guide("route", "# Route\n\nRead a topic.\n"))
-        self.assertTrue((Path(result["worktree"]) / "index.md").read_text().endswith("Keep this trailing note.\n"))
+        self.assertTrue((Path(result["worktree"]) / "index.md").read_text(encoding='utf-8').endswith("Keep this trailing note.\n"))
         with self.assertRaises(KnowledgeError):
             workflow.guide_parts("<!-- recap:topics:end --><!-- recap:topics:start -->")
 
@@ -333,7 +333,12 @@ class MaintenanceTests(unittest.TestCase):
         workflow.begin(self.root, "route", "writer")
         staging = Path(self.temp.name) / "staging"
         staging.mkdir()
-        (staging / "index.md").symlink_to(self.root / "index.md")
+        try:
+            (staging / "index.md").symlink_to(self.root / "index.md")
+        except OSError as exc:
+            if getattr(exc, 'winerror', None) != 1314:
+                raise
+            self.skipTest('Windows account lacks symbolic-link privilege')
         item = {"path": "index.md", "kind": "update", "reason": "Refresh", "evidence": ["reviewed route"]}
         manifest = staging / "changes.json"
         manifest.write_bytes(json_bytes({"changes": [item]}))

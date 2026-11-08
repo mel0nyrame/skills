@@ -126,6 +126,8 @@ $skills:recap
 python3 -B skills/knowledge/recap/scripts/knowledge.py --root /path/to/my-knowledge doctor
 ```
 
+报告包含 `portability.ok`，并按行指出已知的默认编码和 Git 路径比较回归。发现这些错误时退出码为 2，不初始化或写入知识库；静态检查通过不代表完整健康检查通过。Windows 路径按解析后的路径对象比较，知识文本始终按 UTF-8 读取，不依赖系统默认编码。
+
 已有内容的目录不能直接当作空库初始化，需要先检查迁移方案。相关步骤见[发布、迁移和恢复](../../skills/knowledge/recap/references/operations.md)。
 
 ## 怎样维护导读和查找待处理操作
@@ -143,6 +145,8 @@ $skills:recap
 某条操作记录损坏时，汇总仍保留其他操作和恢复信息。损坏条目包含错误，汇总标记 `complete: false`。即使命令成功退出，也要检查这个字段。知识库元数据或恢复事务记录损坏时，命令仍会报错。`worktree_exists` 只表示目录存在，不代表 Git 身份有效或候选可以发布。
 
 导读维护只修改生成清单之前的介绍文字。它采用与专题相同的候选、集成和发布流程，并要求用户批准当前候选哈希。两次操作同时修改导读时，需要独立审查。仅生成清单更新不会触发这项要求。维护导读不需要直接修改正式文件。[导读维护决策](../agents/adr/0005--recap-guide-maintenance.md)说明了这项边界的原因。
+
+新空库可按[首次捕获步骤](../../skills/knowledge/recap/references/checklist.md#first-capture)操作。输入示例把专题、来源和检查点放在同一变更包中。本地正文链接必须是留在库根内的相对路径，不能使用本机绝对路径；对应分支见[正文链接](../../skills/knowledge/recap/references/formats.md#body-links)和[捕获检查点](../../skills/knowledge/recap/references/formats.md#capture-cursor)。检查失败可能使候选文件变脏，而正式库尚未改变；应保留并调查该候选，而不是重置正式库。
 
 普通发布可先读[命令清单](../../skills/knowledge/recap/references/checklist.md)。`knowledge.py packet OP --from-dir DIR` 从操作基准版本计算哈希，把明确列出的专题、来源和回执转换为变更包。作者仍需填写修改理由、证据和真实覆盖范围。生成命令不会执行 `inspect` 或发布候选。输入结构见[输入目录格式](../../skills/knowledge/recap/references/formats.md#packet-input-directory)。
 

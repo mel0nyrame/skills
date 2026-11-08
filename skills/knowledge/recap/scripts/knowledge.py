@@ -2,6 +2,7 @@
 """Capture/query knowledge through bounded reads and reviewed Git worktree publication."""
 from __future__ import annotations
 import argparse
+import ast
 from bisect import bisect_right
 import json
 import os
@@ -34,13 +35,35 @@ def fts_available():
         connection.close()
 
 
+def workflow_portability():
+    """Check the two known portability patterns without opening or changing a library."""
+    tree = ast.parse(Path(workflow.__file__).read_text(encoding='utf-8'))
+    errors = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr == 'read_text':
+            encoding = next((item.value for item in node.keywords if item.arg == 'encoding'), None)
+            if not isinstance(encoding, ast.Constant) or encoding.value not in ('utf-8', 'utf8'):
+                errors.append(f'workflow.py:{node.lineno}: read_text requires explicit UTF-8')
+        if not isinstance(node, ast.Compare):
+            continue
+        has_git_root = any(isinstance(call, ast.Call) and isinstance(call.func, ast.Name)
+                           and call.func.id == 'git_text' and any(isinstance(arg, ast.Constant)
+                           and arg.value == '--show-toplevel' for arg in call.args)
+                           for call in ast.walk(node))
+        if has_git_root and not all(isinstance(value, ast.Call) and isinstance(value.func, ast.Attribute)
+                                    and value.func.attr == 'resolve' for value in [node.left, *node.comparators]):
+            errors.append(f'workflow.py:{node.lineno}: compare resolved paths, not Git/native path strings')
+    return {'ok': not errors, 'errors': sorted(errors)}
+
+
 def doctor(root):
     marker = safe_path(root, '.state/library.json')
     migrated = marker.exists() and load_json(marker).get('schema') == 'recap-library/v2'
     return {'root': str(root), 'exists': root.is_dir(), 'fts5': fts_available(),
             'git': shutil.which('git') is not None,
             'migration_required': root.is_dir() and not migrated,
-            'default_scope': 'topics/**/*.md', 'creates_files': False}
+            'default_scope': 'topics/**/*.md', 'creates_files': False,
+            'portability': workflow_portability()}
 
 CJK = r"\u3400-\u9fff\uf900-\ufaff\U00020000-\U0002ffff"
 IDENTIFIER = r"[A-Za-z0-9_]+(?:(?:\.|::)[A-Za-z0-9_]+)*"
@@ -487,7 +510,7 @@ def main(argv=None):
         elif args.command == 'migration-plan': result = workflow.migration_plan(root, Path(args.overrides) if args.overrides else None)
         else: result = workflow.migrate(root, Path(args.plan), args.approved_sha256)
         print(json.dumps(result, ensure_ascii=False, indent=2))
-        return 0
+        return 2 if args.command == 'doctor' and not result['portability']['ok'] else 0
     except (KnowledgeError, OSError, ValueError, TypeError, sqlite3.DatabaseError) as exc:
         print(json.dumps({'error': str(exc)}, ensure_ascii=False), file=sys.stderr)
         return 2
