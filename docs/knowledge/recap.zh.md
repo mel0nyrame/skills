@@ -146,7 +146,7 @@ $skills:recap
 
 导读维护只修改生成清单之前的介绍文字。它采用与专题相同的候选、集成和发布流程，并要求用户批准当前候选哈希。两次操作同时修改导读时，需要独立审查。仅生成清单更新不会触发这项要求。维护导读不需要直接修改正式文件。[导读维护决策](../agents/adr/0005--recap-guide-maintenance.md)说明了这项边界的原因。
 
-新空库可按[首次捕获步骤](../../skills/knowledge/recap/references/checklist.md#first-capture)操作。输入示例把专题、来源和检查点放在同一变更包中。本地正文链接必须是留在库根内的相对路径，不能使用本机绝对路径；对应分支见[正文链接](../../skills/knowledge/recap/references/formats.md#body-links)和[捕获检查点](../../skills/knowledge/recap/references/formats.md#capture-cursor)。检查失败可能使候选文件变脏，而正式库尚未改变；应保留并调查该候选，而不是重置正式库。
+新空库按[首次捕获准备](../../skills/knowledge/recap/references/checklist.md#first-capture)初始化。确认来源覆盖、形成专题并选定写作指导后，首次与后续捕获使用同一份[发布命令表](../../skills/knowledge/recap/references/checklist.md#publication-commands)。输入示例把专题、来源和检查点放在同一变更包中。本地正文链接必须是留在库根内的相对路径，不能使用本机绝对路径；对应分支见[正文链接](../../skills/knowledge/recap/references/formats.md#body-links)和[捕获检查点](../../skills/knowledge/recap/references/formats.md#capture-cursor)。检查失败可能使候选文件变脏，而正式库尚未改变；应保留并调查该候选，而不是重置正式库。
 
 普通发布可先读[命令清单](../../skills/knowledge/recap/references/checklist.md)。`knowledge.py packet OP --from-dir DIR` 从操作基准版本计算哈希，把明确列出的专题、来源和回执转换为变更包。作者仍需填写修改理由、证据和真实覆盖范围。生成命令不会执行 `inspect` 或发布候选。输入结构见[输入目录格式](../../skills/knowledge/recap/references/formats.md#packet-input-directory)。
 

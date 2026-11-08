@@ -14,7 +14,7 @@ Resolve helpers relative to this file. The root is explicit `--root`, then `RECA
 
 Default retrieval covers **formal `topics/**/*.md` only**. Use bounded helper reads/search. Read the guide for routes, the changelog for changes, and a source only through the exact link in its owning topic. Open drafts, operation state, Git history or candidate worktrees only for the selected capture, review or recovery. These cooperative rules do not revoke an agent's filesystem permissions.
 
-New empty libraries use `init`. Existing libraries use the reviewed baseline/migration workflow in [operations](references/operations.md#migrate-an-existing-library); preserve existing prose, dates and sources. If Python or Git is unavailable, retain a draft rather than bypassing the publisher. FTS5 absence permits an explicit topics-only text-search fallback.
+For a new empty library, follow [first-capture setup](references/checklist.md#first-capture). Existing libraries use the reviewed baseline/migration workflow in [operations](references/operations.md#migrate-an-existing-library); preserve existing prose, dates and sources. If Python or Git is unavailable, retain a draft rather than bypassing the publisher. FTS5 absence permits an explicit topics-only text-search fallback.
 
 ## Capture
 
@@ -38,7 +38,7 @@ Complete when applicable guidance is selected, with evidence, coverage and machi
 
 ### 4. Prepare a candidate
 
-For a new library's first capture, follow the [first-capture sequence](references/checklist.md#first-capture). Before authoring topic metadata, source records or capture cursors, read the [input-directory contract](references/formats.md#packet-input-directory) and its branch-specific links. Use the [command checklist](references/checklist.md) for subsequent publication.
+Use the [publication commands](references/checklist.md#publication-commands) for both first and repeated capture. Before authoring topic metadata, source records or capture cursors, read the [input-directory contract](references/formats.md#packet-input-directory) and its branch-specific links.
 
 - Create one operation-owned worktree. Generate the packet with `packet OP --from-dir DIR`, or author its structured envelope directly.
 - Let the helper own timestamps, guide entries, changelog appends and publication records. Supply reasons, evidence and coverage. Ordinary capture leaves reader/publisher rules unchanged.
