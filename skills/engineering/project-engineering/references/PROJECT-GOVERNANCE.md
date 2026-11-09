@@ -9,7 +9,9 @@ Read when creating or extending instructions, engineering documents, capability 
 - Decision records preserve reasons, alternatives, and consequences.
 - Code, configuration, and tests establish implementation and executable guarantees.
 
-Give an explanation one owner; retain only necessary consumer contracts and links elsewhere. Document architecture conventions before mechanical style. For ongoing decision maintenance, use `project-adr`'s integration workflow: project instructions expose retrieval, discussion capture, and synchronization; the decision directory owns the detailed contract.
+Give an explanation one owner; retain only necessary consumer contracts and links elsewhere. Document architecture conventions before mechanical style.
+
+For requested ongoing decision maintenance, or the first decision in a project whose existing instruction entry point lacks maintenance rules, read [project integration](../../project-adr/references/PROJECT-INTEGRATION.md). It owns standing triggers, directory contracts, and the authorization boundary for wiring checks.
 
 When no existing owner or project storage convention fits useful findings, use `docs/engineering/ENGINEERING.md` for architecture, reusable capabilities, editing entry points, checks, and open questions. Use `docs/engineering/DATA.md` for persistent-data knowledge. Create only files and sections with actual content.
 

@@ -28,6 +28,8 @@ The assistant first reads instructions applying to the target paths, contributio
 
 During design, it uses `project-adr` to preserve meaningful constraints, evaluated alternatives, and substantial proposals, including when implementation is deferred. It follows the project's decision rules and reuses the existing topic owner. The main instructions cover context, editing boundaries, implementation, and verification. [Knowledge governance](../../skills/engineering/project-engineering/references/PROJECT-GOVERNANCE.md) is loaded when creating or extending project knowledge; generated-artifact and persistent-data details have their own conditional routes.
 
+For the first decision in a project whose existing instructions lack maintenance rules, or for requested ongoing maintenance, it reads [project integration](../../skills/engineering/project-adr/references/PROJECT-INTEGRATION.md). That workflow defines standing triggers, directory contracts, and authorization for wiring checks.
+
 It then follows relevant calls to find the change entry point. An existing shared export service needs a suitability check. A generated client normally requires changing its schema and regenerating. One example of a coding pattern is a lead for investigation, not evidence of a repository-wide rule.
 
 Persistent-data changes require understanding ownership, retention, deletion, and rebuild behavior. A page-only button does not by itself justify new database-governance documents.
