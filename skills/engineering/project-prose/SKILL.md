@@ -1,6 +1,6 @@
 ---
 name: project-prose
-description: Use when writing or reviewing technical documentation, comments, decision records, agent instructions, prompts, or diagnostics.
+description: Use when writing, editing, or reviewing technical documents, comments, decision records, agent instructions, prompts, or diagnostics for factual accuracy, complete contracts, and independence from private conversation, review, or draft context.
 ---
 
 # Project Prose

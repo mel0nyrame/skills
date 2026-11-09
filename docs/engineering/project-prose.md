@@ -4,7 +4,7 @@ English | [简体中文](project-prose.zh.md) · [All guides](../README.md)
 
 `project-prose` checks whether technical prose remains understandable without the author's private conversation. It verifies claims against implementation, preserves necessary conditions, checks accessible references, and improves wording. It applies to READMEs, engineering documents, comments, API descriptions, decisions, and agent instructions.
 
-The workflow checks claims, edits the explanation's owner, preserves the contract, and verifies the finished text. Its direct output is usually the document or comment you named. Required conditions, failure behavior, and responsibilities remain intact.
+The workflow checks claims, edits the explanation's owner, preserves the contract, and verifies the finished text. Its direct output is usually the document or comment you named. Rewrites must preserve required conditions, failure behavior, and responsibilities.
 
 ## Name the document and reader
 
