@@ -57,6 +57,102 @@ class MaintenanceTests(unittest.TestCase):
         workflow.publish(self.root, identifier, result["approval_sha256"])
         return result
 
+    def cursor_packet(self, identifier):
+        changes = []
+        for session in ('old', 'new'):
+            source = doc.render({"schema": "recap-source/v2", "host": "export", "session_id": session,
+                "acquired": "2026-11-09", "locator": "fixture", "cutoff": "message 1",
+                "coverage": {"status": "complete", "scope": "fixture", "inspected": ["message 1"], "gaps": []}},
+                "# Source\n\nAn inspected fixture.\n")
+            changes.append({"path": f"sources/{session}.md", "expected_sha256": None, "kind": "add",
+                "reason": "Retain fixture evidence", "evidence": ["fixture message 1"], "content": source})
+        changes.append({"path": "topics/Example.md", "expected_sha256": None, "kind": "add",
+            "reason": "Explain the fixture", "evidence": ["fixture message 1"],
+            "document": {"title": "Example", "type": "concept", "acquired": "2026-11-09",
+                "sources": ["../sources/new.md"], "summary": "Fixture scope and explanation",
+                "body": "# Example\n\nAn independent explanation.\n\n[Source](../sources/new.md)\n"}})
+        receipt = {"schema": "recap-session-receipt/v1", "host": "export", "session_id": "new",
+            "captured_at": "2026-11-09T00:00:00+00:00", "status": "complete",
+            "source": {"locator": "fixture", "prefix_sha256": "a" * 64},
+            "range": {"after": 0, "through": 1}, "missing": [],
+            "represented_by": {"topics": ["topics/Example.md"], "sources": ["sources/new.md"]}}
+        changes.append({"path": ".state/cursors/new.json", "expected_sha256": None, "kind": "add",
+            "reason": "Record captured knowledge", "evidence": ["fixture message 1"],
+            "content": json.dumps(receipt)})
+        return self.packet(identifier, changes)
+
+    def test_inspect_cursor_failure_is_clean_and_corrected_packet_can_publish(self):
+        packet = self.cursor_packet('capture')
+        payload = json.loads(packet.read_text())
+        topic = payload['changes'][2]['document']
+        topic['sources'] = ['../sources/old.md']
+        topic['body'] = topic['body'].replace('new.md', 'old.md')
+        packet.write_bytes(json_bytes(payload))
+        workflow.begin(self.root, 'capture', 'writer')
+        tree = self.root / '.worktree/capture'
+        formal_before, candidate_before = workflow.library_files(self.root), workflow.library_files(tree)
+        state_before = (self.root / '.state/operations/capture.json').read_bytes()
+        candidate_head = head(tree)
+        for _ in range(2):
+            with self.assertRaisesRegex(KnowledgeError, 'Represented topic must cite a represented source'):
+                workflow.inspect(self.root, packet)
+            self.assertEqual(git(tree, 'status', '--porcelain').stdout, b'')
+            self.assertEqual(workflow.library_files(tree), candidate_before)
+            self.assertEqual(head(tree), candidate_head)
+            self.assertEqual((self.root / '.state/operations/capture.json').read_bytes(), state_before)
+            self.assertEqual(workflow.library_files(self.root), formal_before)
+        topic['sources'] = ['../sources/new.md']
+        topic['body'] = topic['body'].replace('old.md', 'new.md')
+        packet.write_bytes(json_bytes(payload))
+        result = workflow.inspect(self.root, packet)
+        self.assertEqual(result['status'], 'ready')
+        self.assertEqual(workflow.library_files(self.root), formal_before)
+        self.assertEqual(git(tree, 'status', '--porcelain').stdout, b'')
+        self.assertEqual(workflow.inspect(self.root, packet)['approval_sha256'], result['approval_sha256'])
+        workflow.publish(self.root, 'capture', result['approval_sha256'])
+        self.assertEqual((self.root / '.state/cursors/new.json').read_text(), payload['changes'][3]['content'])
+        self.assertIn('../sources/new.md', (self.root / 'topics/Example.md').read_text())
+
+    def test_inspect_rejects_cursor_relationship_errors_before_writing_candidate(self):
+        for identifier, error in [('unused', 'Represented sources must support'),
+                                  ('identity', 'Cursor session identity differs'),
+                                  ('batch', 'same batch'),
+                                  ('duplicate', 'Duplicate JSON field')]:
+            with self.subTest(identifier=identifier):
+                packet = self.cursor_packet(identifier)
+                payload = json.loads(packet.read_text())
+                receipt = json.loads(payload['changes'][3]['content'])
+                if identifier == 'unused':
+                    receipt['represented_by']['sources'].append('sources/old.md')
+                elif identifier == 'identity':
+                    receipt['session_id'] = 'different'
+                elif identifier == 'batch':
+                    receipt['represented_by']['topics'].append('topics/Absent.md')
+                payload['changes'][3]['content'] = json.dumps(receipt)
+                if identifier == 'duplicate':
+                    payload['changes'][3]['content'] = payload['changes'][3]['content'].replace(
+                        '"session_id": "new"', '"session_id": "new", "session_id": "new"')
+                packet.write_bytes(json_bytes(payload))
+                workflow.begin(self.root, identifier, 'writer')
+                tree = self.root / '.worktree' / identifier
+                before = workflow.library_files(tree)
+                with self.assertRaisesRegex(KnowledgeError, error):
+                    workflow.inspect(self.root, packet)
+                self.assertEqual(git(tree, 'status', '--porcelain').stdout, b'')
+                self.assertEqual(workflow.library_files(tree), before)
+
+    def test_inspect_preserves_external_candidate_edits(self):
+        packet = self.cursor_packet('capture')
+        workflow.begin(self.root, 'capture', 'writer')
+        tree = self.root / '.worktree/capture'
+        (tree / 'index.md').write_text('# Knowledge\n\nExternal edit.\n')
+        (tree / 'topics').mkdir()
+        (tree / 'topics/external.md').write_bytes(b'Preserve this untracked file.\n')
+        before = workflow.library_files(tree)
+        with self.assertRaisesRegex(KnowledgeError, 'External/uncommitted'):
+            workflow.inspect(self.root, packet)
+        self.assertEqual(workflow.library_files(tree), before)
+
     def test_guide_update_uses_candidate_and_requires_exact_user_approval(self):
         original = (self.root / "index.md").read_bytes()
         result = workflow.inspect(self.root, self.guide("route", "# Reading route\n\nStart with the current topics.\n\n"))
