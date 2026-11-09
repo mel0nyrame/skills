@@ -153,3 +153,26 @@ The evaluated `project-adr` instruction hashes are below. These identify the sup
 | `references/PROJECT-INTEGRATION.md` | `d1987f9f5074ffacbbd995480d986fe9edb759178ae64ab6533dba81254a1165` |
 
 The partial-implementation fixture also used `project-engineering/SKILL.md` with SHA-256 `75c8cafddcfa6ae50301c882c077920925e4f75fe576301b0b3794eaf29fd2f0`, including the explicit project-rule-precedence clarification. This is a joint fixture using both supplied skills, not an isolated evaluation of either installation. For the external scenario, all five files were retrieved from the pinned reproduction source above and matched its recorded hashes before execution. Fixture directories were not Git repositories; Git status checks were unavailable. No implementation changes by the evaluated agents, real knowledge-library writes, commits, pushes, or external messages were performed.
+
+### 2026-11-09 instruction-refactor run
+
+Four forward scenarios passed with the revised skill in isolated Git fixtures. Each producer received only its project, supplied instructions, and a realistic request; resumption used a separate fresh agent. The parent inspected outputs against the scenarios above.
+
+| Scenario | Observed result |
+| --- | --- |
+| Unresolved attachment storage | One `proposed` topic retained offline access, the 20 MiB snapshot bound, a possible 100 MiB attachment, both rejection reasons, the pending local directory, unselected encryption, and quota/cleanup questions. No icon record or implementation. |
+| Resume from files | A fresh agent recovered those conclusions and reasons, kept the choice unresolved, and asked about the duration of the offline guarantee. No duplicate topic. |
+| Replace an accepted choice | The unimplemented remote-backup predecessor became `superseded`; a linked removable-drive successor was `accepted`. Offline-policy change, original reasons, and open key questions were preserved. |
+| Custom format | The existing single-paragraph record became `State: chosen` under its custom directory and vocabulary. Actual rejection reasons and open issues remained; no default ADR directory was created. |
+
+Default-format fixtures passed the supplied checker; the custom-format fixture passed a targeted format/content check. Producer tasks authorized documentation only, with no implementation, commits, pushes, or external messages. The custom-format run invoked this collection's skill directly; it did not rerun the pinned external interview workflow.
+
+The supplied instruction hashes are below. This finite run does not measure automatic skill selection or retrieval recall.
+
+| File | SHA-256 |
+| --- | --- |
+| `SKILL.md` | `e66a2bb7b7564e3da5fe28b7d1bb6e2a624673d1253ec3c9a6bc3aa51b751b7d` |
+| `references/RECORDS.md` | `80a4cc3ce2fe2379bf19c12f5b5d39ffe0a57a2d2192472212dc8f71253a77d9` |
+| `references/DISCUSSIONS.md` | `ed444d78a73f40e8825d9297fb58f737cb2be9ebb4b24880c5db24aaef695342` |
+| `references/LIFECYCLE.md` | `2ba83c2aa20dca7044aff4a5ce3229579c3bdd0a955f196c68816ace22fb1872` |
+| `references/PROJECT-INTEGRATION.md` | `8334bce963c5d78729c1d1a0c1e289d5d28a7e75192630b923faa447f539378a` |
