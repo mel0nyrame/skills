@@ -13,7 +13,8 @@ import tempfile
 import documents as doc
 from storage import (KnowledgeError, allowed_path, assert_clean, assert_no_pending,
                      atomic_write, digest, git, git_content, git_text, head, json_bytes,
-                     library_files, load_json, locked, operation_id, pending, private_mkdir, safe_path)
+                     library_files, load_json, locked, operation_id, pending, private_mkdir, safe_path,
+                     unique_object)
 
 
 GUIDE = '''# Knowledge reading boundaries
@@ -250,12 +251,14 @@ def validate_cursor(receipt):
     exclude_raw(receipt)
 
 
-def check_cursors(tree, state):
+def check_cursors(tree, state, rendered=None):
+    rendered = rendered or {}
     authored = set(state['authored'])
     for path in authored:
         if not path.startswith('.state/cursors/'):
             continue
-        receipt = load_json(safe_path(tree, path))
+        receipt = (json.loads(rendered[path], object_pairs_hook=unique_object) if path in rendered
+                   else load_json(safe_path(tree, path)))
         validate_cursor(receipt)
         represented = receipt['represented_by']
         if not set(represented['topics'] + represented['sources']) <= authored:
@@ -263,7 +266,8 @@ def check_cursors(tree, state):
         matched = False
         used_sources = set()
         for topic in represented['topics']:
-            metadata, _ = doc.validate_topic(safe_path(tree, topic).read_text())
+            content = rendered[topic].decode() if topic in rendered else safe_path(tree, topic).read_text()
+            metadata, _ = doc.validate_topic(content)
             linked = {doc.local_target(topic, reference) for reference in metadata['sources']}
             related = linked & set(represented['sources'])
             if not related:
@@ -272,7 +276,8 @@ def check_cursors(tree, state):
         if used_sources != set(represented['sources']):
             raise KnowledgeError('Represented sources must support the represented topics')
         for source in represented['sources']:
-            metadata, _ = doc.validate_source(safe_path(tree, source).read_text())
+            content = rendered[source].decode() if source in rendered else safe_path(tree, source).read_text()
+            metadata, _ = doc.validate_source(content)
             matched = matched or (metadata['host'] == receipt['host'] and metadata['session_id'] == receipt['session_id'])
         if not matched:
             raise KnowledgeError('Cursor session identity differs from its represented source records')
@@ -412,6 +417,7 @@ def inspect(root, filename):
         files.update({p: b.decode() for p, b in rendered.items() if p.endswith('.md')})
         doc.validate_library(files)
         state.update(packet=packet, packet_sha256=packet_sha, authored=sorted(seen))
+        check_cursors(tree, state, rendered)
         for relative, data in rendered.items():
             atomic_write(safe_path(tree, relative), data)
         catalogs(tree, state)

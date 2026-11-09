@@ -20,13 +20,13 @@ New empty libraries use `init`. Existing libraries use the reviewed baseline/mig
 
 ### 1. Establish coverage
 
-Read [sessions](references/sessions.md). Pin the exact host, conversation, branch and cutoff. Recover originals when current context is incomplete. Give long sources to a worker in ordered chunks, or inspect the chunks sequentially.
+Pin the host, conversation, branch and cutoff using [source selection](references/sessions.md#choose-a-bounded-source). For local recovery, follow [helper extraction](references/sessions.md#helper-extraction); for repeated capture, check [continuity](references/sessions.md#completeness-and-incrementality). Give long sources to a worker in ordered chunks, or inspect the chunks sequentially.
 
 Complete when every significant theme/correction and every source interval is accounted for, including gaps and unread attachments. Unaccepted partial sources support drafts, not formal updates or successful-capture cursors.
 
 ### 2. Develop topics
 
-Read [knowledge](references/knowledge.md). Search and read relevant current topics before merging. Match by the understanding question and applicability. Verify central, volatile or disputed external claims against inspected primary evidence or actual tests.
+Search current topics and use [library routes](references/knowledge.md#library-shape) to select relevant topics by question and applicability. Read their bodies before merging. Apply the [writing contract](references/knowledge.md#built-in-writing-contract) and [evidence rules](references/knowledge.md#evidence-and-scope). Verify central, volatile or disputed external claims against inspected primary evidence or actual tests.
 
 Complete when proposed topics distinguish supported claims, synthesis and pending claims. A newer chat or user agreement does not establish truth.
 
@@ -38,7 +38,7 @@ Complete when applicable guidance is selected, with evidence, coverage and machi
 
 ### 4. Prepare a candidate
 
-Use the [command checklist](references/checklist.md) for the ordinary command sequence and [formats](references/formats.md#packet-input-directory) for authoring inputs.
+Use the [command checklist](references/checklist.md) for the ordinary sequence and the contract sections needed by each input or error.
 
 - Create one operation-owned worktree. Generate the packet with `packet OP --from-dir DIR`, or author its structured envelope directly.
 - Let the helper own timestamps, guide entries, changelog appends and publication records. Supply reasons, evidence and coverage. Ordinary capture leaves reader/publisher rules unchanged.
@@ -70,10 +70,10 @@ Search with short terms derived from the question. Whitespace and punctuation ou
 
 ## Maintain or recover
 
-Use [operations](references/operations.md) for the selected branch. Inspect only requested/affected topics and links.
+Follow the matching branch below. Inspect only requested/affected topics and links.
 
-- **Retained work:** start with `status --all`. Investigate missing candidates and old `ready` records; preserve unpublished work rather than deleting it automatically.
-- **Guide maintenance:** update the `index.md` introduction through a candidate with exact user approval. Its generated catalog remains helper-owned.
+- **Retained work:** use the [operation inventory](references/operations.md#locate-retained-operations) to investigate missing candidates and old `ready` records; preserve unpublished work.
+- **Guide maintenance:** update the [guide introduction](references/formats.md#guide-introduction) through a candidate with exact user approval. Its generated catalog remains helper-owned.
 - **Research navigation:** for an explicitly selected external directory, [research inventory](references/operations.md#research-inventory) prints navigation without inferring capture status.
 - **Evidence maintenance:** review dates trigger checking, not automatic invalidation. Reconcile evidence without erasing unresolved disagreement.
-- **Recovery:** recover interrupted publication before further library reads/writes. Successful historical corrections become new candidates and commits, preserving later valid work. Git records versions; it neither verifies prose nor makes unrestricted external file reads transactional.
+- **Recovery:** follow [interrupted publication](references/operations.md#publication-and-interrupted-recovery) before further library reads/writes. Successful historical corrections become new candidates and commits, preserving later valid work. Git records versions; it neither verifies prose nor makes unrestricted external file reads transactional.
