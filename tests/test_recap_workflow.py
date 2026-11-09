@@ -83,7 +83,7 @@ class MaintenanceTests(unittest.TestCase):
 
     def test_inspect_cursor_failure_is_clean_and_corrected_packet_can_publish(self):
         packet = self.cursor_packet('capture')
-        payload = json.loads(packet.read_text())
+        payload = json.loads(packet.read_text(encoding='utf-8'))
         topic = payload['changes'][2]['document']
         topic['sources'] = ['../sources/old.md']
         topic['body'] = topic['body'].replace('new.md', 'old.md')
@@ -110,8 +110,8 @@ class MaintenanceTests(unittest.TestCase):
         self.assertEqual(git(tree, 'status', '--porcelain').stdout, b'')
         self.assertEqual(workflow.inspect(self.root, packet)['approval_sha256'], result['approval_sha256'])
         workflow.publish(self.root, 'capture', result['approval_sha256'])
-        self.assertEqual((self.root / '.state/cursors/new.json').read_text(), payload['changes'][3]['content'])
-        self.assertIn('../sources/new.md', (self.root / 'topics/Example.md').read_text())
+        self.assertEqual((self.root / '.state/cursors/new.json').read_text(encoding='utf-8'), payload['changes'][3]['content'])
+        self.assertIn('../sources/new.md', (self.root / 'topics/Example.md').read_text(encoding='utf-8'))
 
     def test_inspect_rejects_cursor_relationship_errors_before_writing_candidate(self):
         for identifier, error in [('unused', 'Represented sources must support'),
@@ -120,7 +120,7 @@ class MaintenanceTests(unittest.TestCase):
                                   ('duplicate', 'Duplicate JSON field')]:
             with self.subTest(identifier=identifier):
                 packet = self.cursor_packet(identifier)
-                payload = json.loads(packet.read_text())
+                payload = json.loads(packet.read_text(encoding='utf-8'))
                 receipt = json.loads(payload['changes'][3]['content'])
                 if identifier == 'unused':
                     receipt['represented_by']['sources'].append('sources/old.md')
@@ -145,7 +145,7 @@ class MaintenanceTests(unittest.TestCase):
         packet = self.cursor_packet('capture')
         workflow.begin(self.root, 'capture', 'writer')
         tree = self.root / '.worktree/capture'
-        (tree / 'index.md').write_text('# Knowledge\n\nExternal edit.\n')
+        (tree / 'index.md').write_text('# Knowledge\n\nExternal edit.\n', encoding='utf-8')
         (tree / 'topics').mkdir()
         (tree / 'topics/external.md').write_bytes(b'Preserve this untracked file.\n')
         before = workflow.library_files(tree)
@@ -159,12 +159,12 @@ class MaintenanceTests(unittest.TestCase):
         self.assertEqual((self.root / "index.md").read_bytes(), original)
         self.assertTrue(result["reserved_reasons"])
         tree = Path(result["worktree"])
-        self.assertIn("<!-- recap:topics:start -->", (tree / "index.md").read_text())
+        self.assertIn("<!-- recap:topics:start -->", (tree / "index.md").read_text(encoding='utf-8'))
         with self.assertRaisesRegex(KnowledgeError, "explicit user approval"):
             workflow.publish(self.root, "route", result["approval_sha256"])
         self.approve("route", result["approval_sha256"])
         workflow.publish(self.root, "route", result["approval_sha256"])
-        self.assertIn("Start with the current topics.", (self.root / "index.md").read_text())
+        self.assertIn("Start with the current topics.", (self.root / "index.md").read_text(encoding='utf-8'))
         workflow.cleanup(self.root, "route")
 
     def test_guide_packet_cannot_replace_generated_catalog_or_publisher_rules(self):
@@ -226,7 +226,7 @@ class MaintenanceTests(unittest.TestCase):
         integrated = workflow.integrate(self.root, 'two')
         self.assertEqual(integrated['status'], 'needs-review')
         self.assertEqual(integrated['conflicts'], [])
-        content = (Path(integrated['worktree']) / 'index.md').read_text()
+        content = (Path(integrated['worktree']) / 'index.md').read_text(encoding='utf-8')
         self.assertIn('Updated first route.', content)
         self.assertIn('Updated last route.', content)
         with self.assertRaises(KnowledgeError):
@@ -271,7 +271,7 @@ class MaintenanceTests(unittest.TestCase):
         workflow.begin(self.root, 'valid', 'writer')
         workflow.begin(self.root, 'broken', 'writer')
         broken = self.root / '.state/operations/broken.json'
-        broken.write_text('{')
+        broken.write_text('{', encoding='utf-8')
         transactions = self.root / '.state/transactions'
         transactions.mkdir()
         (transactions / 'interrupted.json').write_bytes(json_bytes({'id': 'interrupted', 'status': 'prepared'}))
@@ -285,7 +285,7 @@ class MaintenanceTests(unittest.TestCase):
         self.assertEqual(entries['valid']['status'], 'editing')
         self.assertIn('Invalid JSON', entries['broken']['error'])
         self.assertNotIn('status', entries['broken'])
-        self.assertEqual(broken.read_text(), '{')
+        self.assertEqual(broken.read_text(encoding='utf-8'), '{')
         with self.assertRaises(KnowledgeError):
             workflow.status(self.root, 'broken')
 
@@ -302,12 +302,12 @@ class MaintenanceTests(unittest.TestCase):
         for identifier in ('retained', 'missing', 'broken'):
             workflow.begin(self.root, identifier, 'writer')
         git(self.root, 'worktree', 'remove', str(self.root / '.worktree/missing'))
-        (self.root / '.state/operations/broken.json').write_text('{')
+        (self.root / '.state/operations/broken.json').write_text('{', encoding='utf-8')
         transactions = self.root / '.state/transactions'
         transactions.mkdir()
         (transactions / 'interrupted.json').write_bytes(json_bytes({'id': 'interrupted', 'status': 'prepared'}))
         result = subprocess.run([sys.executable, '-B', str(SCRIPTS / 'knowledge.py'), '--root', str(self.root),
-            'status', '--all', '--summary'], capture_output=True, text=True)
+            'status', '--all', '--summary'], capture_output=True, encoding='utf-8')
         self.assertEqual(result.returncode, 0, result.stderr)
         summary = json.loads(result.stdout)
         full = workflow.status(self.root)
@@ -320,21 +320,21 @@ class MaintenanceTests(unittest.TestCase):
         self.assertIn('Invalid JSON', entries['broken']['error'])
         self.assertNotIn('approval_sha256', entries['retained'])
         self.assertLess(len(result.stdout), len(json.dumps(full, ensure_ascii=False, indent=2)))
-        self.assertEqual((self.root / '.state/operations/broken.json').read_text(), '{')
+        self.assertEqual((self.root / '.state/operations/broken.json').read_text(encoding='utf-8'), '{')
 
     def test_status_summary_requires_inventory_and_keeps_recovery_errors_strict(self):
         workflow.begin(self.root, 'retained', 'writer')
         for arguments in (['status', '--summary'], ['status', 'retained', '--summary']):
             with self.subTest(arguments=arguments):
                 result = subprocess.run([sys.executable, '-B', str(SCRIPTS / 'knowledge.py'),
-                    '--root', str(self.root), *arguments], capture_output=True, text=True)
+                    '--root', str(self.root), *arguments], capture_output=True, encoding='utf-8')
                 self.assertEqual(result.returncode, 2)
                 self.assertIn('--summary requires --all', result.stderr)
         transactions = self.root / '.state/transactions'
         transactions.mkdir()
-        (transactions / 'broken.json').write_text('{')
+        (transactions / 'broken.json').write_text('{', encoding='utf-8')
         result = subprocess.run([sys.executable, '-B', str(SCRIPTS / 'knowledge.py'), '--root', str(self.root),
-            'status', '--all', '--summary'], capture_output=True, text=True)
+            'status', '--all', '--summary'], capture_output=True, encoding='utf-8')
         self.assertEqual(result.returncode, 2)
         self.assertEqual(result.stdout, '')
         self.assertIn('Invalid JSON', json.loads(result.stderr)['error'])
@@ -351,7 +351,7 @@ class MaintenanceTests(unittest.TestCase):
         transactions = self.root / '.state/transactions'
         transactions.mkdir()
         journal = transactions / 'broken.json'
-        journal.write_text('{')
+        journal.write_text('{', encoding='utf-8')
         output, errors = io.StringIO(), io.StringIO()
         with redirect_stdout(output), redirect_stderr(errors):
             code = knowledge.main(['--root', str(self.root), 'status', '--all'])
@@ -359,7 +359,7 @@ class MaintenanceTests(unittest.TestCase):
         self.assertEqual(output.getvalue(), '')
         self.assertIn('Invalid JSON', json.loads(errors.getvalue())['error'])
         journal.write_bytes(json_bytes({'id': 'broken', 'status': 'complete'}))
-        (self.root / '.state/library.json').write_text('{')
+        (self.root / '.state/library.json').write_text('{', encoding='utf-8')
         with self.assertRaises(KnowledgeError):
             workflow.status(self.root)
 
@@ -377,7 +377,7 @@ class MaintenanceTests(unittest.TestCase):
         workflow.begin(self.root, identifier, 'writer')
         staging = Path(self.temp.name) / 'input'
         staging.mkdir()
-        (staging / 'index.md').write_text('# Route\n\nRead the relevant topic.\n')
+        (staging / 'index.md').write_text('# Route\n\nRead the relevant topic.\n', encoding='utf-8')
         (staging / 'changes.json').write_bytes(json_bytes({'changes': [{
             'path': 'index.md', 'kind': 'update', 'reason': 'Maintain the route', 'evidence': ['fixture review']}]}))
         return staging
@@ -385,7 +385,7 @@ class MaintenanceTests(unittest.TestCase):
     def test_packet_rejects_dirty_formal_root_without_adopting_or_overwriting_it(self):
         staging = self.packet_inputs()
         formal = self.root / 'index.md'
-        formal.write_text('# Knowledge\n\nExternal edit.\n')
+        formal.write_text('# Knowledge\n\nExternal edit.\n', encoding='utf-8')
         before = formal.read_bytes()
         state = (self.root / '.state/operations/selected.json').read_bytes()
         with self.assertRaisesRegex(KnowledgeError, 'External/uncommitted'):
@@ -412,7 +412,7 @@ class MaintenanceTests(unittest.TestCase):
     def test_packet_rejects_dirty_candidate_and_keeps_external_bytes(self):
         staging = self.packet_inputs()
         candidate = self.root / '.worktree/selected/index.md'
-        candidate.write_text('# Knowledge\n\nCandidate edit.\n')
+        candidate.write_text('# Knowledge\n\nCandidate edit.\n', encoding='utf-8')
         before = candidate.read_bytes()
         with self.assertRaisesRegex(KnowledgeError, 'External/uncommitted'):
             workflow.build_packet(self.root, 'selected', staging)
@@ -422,7 +422,7 @@ class MaintenanceTests(unittest.TestCase):
         workflow.begin(self.root, "route", "writer")
         staging = Path(self.temp.name) / "staging"
         staging.mkdir()
-        (staging / "index.md").write_text("# Reading route\n\nChoose a topic below.\n")
+        (staging / "index.md").write_text("# Reading route\n\nChoose a topic below.\n", encoding='utf-8')
         (staging / "changes.json").write_bytes(json_bytes({"changes": [{"path": "index.md", "kind": "update",
             "reason": "Refresh the route", "evidence": ["reviewed current topics"]}]}))
         base_hash = digest((self.root / "index.md").read_bytes())
@@ -434,7 +434,7 @@ class MaintenanceTests(unittest.TestCase):
         packet = json.loads(output.getvalue())
         self.assertEqual(packet["changes"][0]["expected_sha256"], base_hash)
         self.assertNotEqual(base_hash, digest((self.root / "index.md").read_bytes()))
-        self.assertEqual(packet["changes"][0]["document"]["body"], (staging / "index.md").read_text())
+        self.assertEqual(packet["changes"][0]["document"]["body"], (staging / "index.md").read_text(encoding='utf-8'))
         self.assertEqual(workflow.get_state(self.root, "route")["status"], "editing")
         self.assertEqual(head(self.root), original_head)
 
@@ -444,8 +444,8 @@ class MaintenanceTests(unittest.TestCase):
         staging = Path(self.temp.name) / "staging"
         (staging / "topics").mkdir(parents=True)
         path = "topics/first.md"
-        content = (self.root / path).read_text().replace("An independent explanation.", "An expanded explanation.")
-        (staging / path).write_text(content)
+        content = (self.root / path).read_text(encoding='utf-8').replace("An independent explanation.", "An expanded explanation.")
+        (staging / path).write_text(content, encoding='utf-8')
         declarations = {"changes": [{"path": path, "kind": "update", "reason": "Explain the condition",
                                      "evidence": ["inspected fixture correction"]}]}
         (staging / "sources").mkdir()
@@ -482,7 +482,7 @@ class MaintenanceTests(unittest.TestCase):
         with self.assertRaises(KnowledgeError):
             workflow.build_packet(self.root, "route", staging)
         (staging / "index.md").unlink()
-        (staging / "index.md").write_text("# Route\n\nRead a topic.\n")
+        (staging / "index.md").write_text("# Route\n\nRead a topic.\n", encoding='utf-8')
         manifest.write_bytes(json_bytes({"changes": [item, item]}))
         with self.assertRaisesRegex(KnowledgeError, "Duplicate"):
             workflow.build_packet(self.root, "route", staging)
@@ -494,7 +494,7 @@ class MaintenanceTests(unittest.TestCase):
     def test_invalid_edit_purpose_gives_actionable_error_without_creating_library(self):
         absent = Path(self.temp.name) / 'absent'
         result = subprocess.run([sys.executable, '-B', str(SCRIPTS / 'knowledge.py'), '--root', str(absent),
-            'read', 'topics/example.md', '--purpose', 'edit'], capture_output=True, text=True)
+            'read', 'topics/example.md', '--purpose', 'edit'], capture_output=True, encoding='utf-8')
         self.assertEqual(result.returncode, 2)
         self.assertIn('Use --purpose topic', result.stderr)
         self.assertFalse(absent.exists())
@@ -504,7 +504,7 @@ class MaintenanceTests(unittest.TestCase):
         for arguments in (['status'], ['status', 'retained', '--all']):
             with self.subTest(arguments=arguments):
                 result = subprocess.run([sys.executable, '-B', str(SCRIPTS / 'knowledge.py'), '--root', str(self.root),
-                    *arguments], capture_output=True, text=True)
+                    *arguments], capture_output=True, encoding='utf-8')
                 self.assertEqual(result.returncode, 2)
         output = io.StringIO()
         with redirect_stdout(output):

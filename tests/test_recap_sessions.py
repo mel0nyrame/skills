@@ -50,7 +50,7 @@ class OpenCodeSnapshotTests(unittest.TestCase):
         self.assertEqual(receipt["range"]["through"], 7)
         self.assertEqual(receipt["source"]["first_persisted_seq"], 4)
         self.assertEqual(receipt["source"]["sequence_gaps"]["count"], 1)
-        records = [json.loads(line) for line in (self.root / "extract-0/records.jsonl").read_text().splitlines()]
+        records = [json.loads(line) for line in (self.root / "extract-0/records.jsonl").read_text(encoding='utf-8').splitlines()]
         self.assertEqual([r["locator"] for r in records], ["seq:4", "seq:7"])
 
     def test_missing_or_future_cutoff_remains_partial(self):

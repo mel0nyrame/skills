@@ -24,6 +24,19 @@ class SearchTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         (self.root / "topics").mkdir()
         (self.root / ".state").mkdir()
+        # Exercise UTF-8 fixtures under a non-UTF-8 file default on every runner.
+        original_read, original_write = Path.read_text, Path.write_text
+
+        def gbk_read(path, encoding=None, errors=None, **kwargs):
+            return original_read(path, encoding=encoding or 'gbk', errors=errors, **kwargs)
+
+        def gbk_write(path, data, encoding=None, errors=None, **kwargs):
+            return original_write(path, data, encoding=encoding or 'gbk', errors=errors, **kwargs)
+
+        for method, replacement in (('read_text', gbk_read), ('write_text', gbk_write)):
+            patcher = patch.object(Path, method, replacement)
+            patcher.start()
+            self.addCleanup(patcher.stop)
 
     def topic(self, name, title, body, aliases=None, summary=None, status="formal"):
         meta = {
@@ -133,7 +146,7 @@ class SearchTests(unittest.TestCase):
         self.topic(".hidden.md", "Hidden", "excludedmarker")
         for name in ("sources", "drafts", ".history"):
             (self.root / name).mkdir()
-            (self.root / name / "secret.md").write_text("excludedmarker")
+            (self.root / name / "secret.md").write_text("excludedmarker", encoding='utf-8')
         try:
             (self.root / "topics/link.md").symlink_to(self.root / "sources/secret.md")
         except OSError as exc:
@@ -145,15 +158,15 @@ class SearchTests(unittest.TestCase):
             self.assertEqual(self.paths("retrievalmarker", fallback), ["topics/scope.md"])
 
     def test_cache_updates_rename_delete_archive_and_corruption(self):
-        path = self.topic("scope.md", "Current", "firstmarker")
+        path = self.topic("scope.md", "当前专题", "firstmarker")
         self.assertEqual(self.paths("firstmarker"), ["topics/scope.md"])
-        path.write_text(path.read_text().replace("firstmarker", "secondmarker"))
+        path.write_text(path.read_text(encoding='utf-8').replace("firstmarker", "secondmarker"), encoding='utf-8')
         self.assertEqual(self.paths("firstmarker"), [])
         self.assertEqual(self.paths("secondmarker"), ["topics/scope.md"])
         renamed = path.with_name("renamed.md")
         path.rename(renamed)
         self.assertEqual(self.paths("secondmarker"), ["topics/renamed.md"])
-        renamed.write_text(renamed.read_text().replace('"formal"', '"archived"'))
+        renamed.write_text(renamed.read_text(encoding='utf-8').replace('"formal"', '"archived"'), encoding='utf-8')
         self.assertEqual(self.paths("secondmarker"), [])
         renamed.unlink()
         (self.root / ".state/index.sqlite").write_bytes(b"corrupt cache")
@@ -186,7 +199,7 @@ class SearchTests(unittest.TestCase):
     def test_plain_markdown_and_reference_links_remain_searchable(self):
         (self.root / "topics/plain.md").write_text(
             "# Older note\n\nUse session.prompt. [Visible label][ref]\n\n"
-            "[ref]: ../sources/destinationmarker.md\n"
+            "[ref]: ../sources/destinationmarker.md\n", encoding='utf-8'
         )
         for fallback in (False, True):
             for query in ("session.prompt", "Visible"):
@@ -264,7 +277,7 @@ class SearchTests(unittest.TestCase):
 
     def test_public_search_and_read_keep_revision_checks(self):
         knowledge.initialize(self.root)
-        path = self.topic("scope.md", "Current", "session.prompt sends input.")
+        path = self.topic("scope.md", "当前专题", "session.prompt sends input.")
         knowledge.git(self.root, "add", "--", "topics/scope.md")
         knowledge.git(self.root, "commit", "-m", "Add search fixture")
         available = knowledge.fts_available()
@@ -277,7 +290,7 @@ class SearchTests(unittest.TestCase):
                                             expected_revision=result["revision"])
             self.assertIn("session.prompt", saved["content"])
         revision = result["revision"]
-        path.write_text(path.read_text().replace("sends input", "sends another input"))
+        path.write_text(path.read_text(encoding='utf-8').replace("sends input", "sends another input"), encoding='utf-8')
         knowledge.git(self.root, "add", "--", "topics/scope.md")
         knowledge.git(self.root, "commit", "-m", "Update search fixture")
         with self.assertRaisesRegex(knowledge.KnowledgeError, "revision changed"):
@@ -288,24 +301,25 @@ class SearchTests(unittest.TestCase):
     def test_pending_recovery_blocks_both_public_search_engines(self):
         transactions = self.root / ".state/transactions"
         transactions.mkdir()
-        (transactions / "pending.json").write_text(json.dumps({"id": "pending", "status": "prepared"}))
+        (transactions / "pending.json").write_text(json.dumps({"id": "pending", "status": "prepared"}), encoding='utf-8')
         for fallback in (False, True):
             with patch.object(knowledge, "fts_available", return_value=not fallback):
                 with self.assertRaisesRegex(knowledge.KnowledgeError, "Recovery required"):
                     knowledge.search(self.root, "anything")
 
     def test_command_line_search_returns_body_location_and_revision(self):
-        path = self.topic("scope.md", "Selected call", "session.prompt sends input.")
+        path = self.topic("scope.md", "选定调用", "session.prompt sends input.")
         result = subprocess.run(
             [sys.executable, "-B", str(SCRIPTS / "knowledge.py"), "--root", str(self.root),
-             "search", "session.prompt"], capture_output=True, text=True
+             "search", "session.prompt"], capture_output=True, encoding='utf-8'
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         payload = json.loads(result.stdout)
         self.assertIn("revision", payload)
         hit = payload["results"][0]
         self.assertEqual(hit["path"], "topics/scope.md")
-        self.assertEqual(path.read_text().splitlines()[hit["line"] - 1], "session.prompt sends input.")
+        self.assertEqual(hit["title"], "选定调用")
+        self.assertEqual(path.read_text(encoding='utf-8').splitlines()[hit["line"] - 1], "session.prompt sends input.")
 
 
 if __name__ == "__main__":

@@ -17,11 +17,11 @@ class ResearchIndexTests(unittest.TestCase):
             root = Path(temporary)
             (root / '2026-11-04').mkdir()
             report = root / '2026-11-04/a b.md'
-            report.write_text('# A | B\n\nA concrete finding.\nContinued explanation.\n')
+            report.write_text('# A | B\n\nA concrete finding.\nContinued explanation.\n', encoding='utf-8')
             for name in ('_raw', '.private'):
                 (root / name).mkdir()
-                (root / name / 'hidden.md').write_text('# Hidden\n\nDo not index.\n')
-            (root / 'INDEX.md').write_text('existing index')
+                (root / name / 'hidden.md').write_text('# Hidden\n\nDo not index.\n', encoding='utf-8')
+            (root / 'INDEX.md').write_text('existing index', encoding='utf-8')
             try:
                 (root / 'link.md').symlink_to(report)
                 (root / 'linked-directory').symlink_to(root / '2026-11-04', target_is_directory=True)
