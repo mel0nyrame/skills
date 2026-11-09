@@ -1,6 +1,6 @@
 ---
 name: project-git
-description: Use when reviewing Git changes, committing, pushing, or delivering explicitly requested PR/MR updates.
+description: Use when reviewing Git changes, committing, pushing, recording Git delivery, or delivering explicitly requested PR/MR updates.
 ---
 
 # Project Git
@@ -11,7 +11,9 @@ Perform the authorized delivery stages. Commits, pushes, PR/MR publication, and 
 
 Read applicable repository, subtree, contribution, and Git rules. Inspect `git status --short --branch`, unstaged changes, and staged changes. Identify this task's changes and preserve other work.
 
-Resolve title format and language through [naming conventions](references/CONVENTIONS.md#select-conventions). Reuse validation that still covers the current diff; run focused checks when evidence is missing or invalidated. For changed prose or lasting decisions, use `project-prose` or `project-adr` when available; project checks still apply without them.
+Resolve title format and language through [naming conventions](references/CONVENTIONS.md#select-conventions). Reuse validation that still covers the current diff; run focused checks when evidence is missing or invalidated. Report only checks actually run and their results.
+
+Check changed prose against current repository facts and references, and affected decisions against their rationale and implementation. Use `project-prose` or `project-adr` for deeper review when available; these checks and required project checks still apply without them.
 
 ## 2. Commit the requested changes
 

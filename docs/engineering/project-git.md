@@ -19,7 +19,9 @@ For this round, do not edit files, stage, commit, or push.
 
 This uses the collection's Codex plugin. Use `$project-git` standalone or `/skills:project-git` in Claude Code. The assistant needs Git and access to applicable repository rules.
 
-The instructions separate inspection, commits, pushes, and PR/MR delivery. Each stage uses the authorized scope. Inspection distinguishes this task's changes from other work; pushing additionally verifies remotes, the target branch, upstream tracking, and outgoing commits. Reuse validation only while it covers the current diff.
+The instructions separate inspection, commits, pushes, and PR/MR delivery. Each stage uses the authorized scope. Inspection distinguishes this task's changes from other work; pushing additionally verifies remotes, the target branch, upstream tracking, and outgoing commits. Reuse validation only while it covers the current diff; report only checks actually run and their results.
+
+Inspection also checks changed prose against repository facts and references, and affected decisions against their rationale and implementation. These checks still apply when `project-prose` or `project-adr` is unavailable.
 
 ## Authorize a commit after review
 
