@@ -1,94 +1,61 @@
 ---
 name: project-prose
-description: Use when writing, editing, or reviewing technical documents, code comments/JSDoc, decision records, agent instructions, prompts, or diagnostics. Verify current facts, explanation ownership, and complete contracts. Remove reliance on private conversation, review, or draft context.
+description: Use when writing, editing, or reviewing technical documents, comments, decision records, agent instructions, prompts, or diagnostics for factual accuracy, complete contracts, and independence from private conversation, review, or draft context.
 ---
 
 # Project Prose
 
-Ground technical prose in the project's current state. Preserve the facts, obligations, constraints, and sources maintainers need. Remove private author workflows, reasoning transcripts, and stale conversational framing. Apply semantic review rather than keyword-based deletion.
+Write technical prose a reader can use and verify from the current project. Preserve its facts, obligations, and necessary conditions.
 
-## The HEAD-only test
+## 1. Check the text against the project
 
 For each questionable passage, ask:
 
-> Can a reader with only the current repository resolve every reference and verify every claim?
+> Can a reader with only the current repository resolve the references and verify the claims?
 
-If not, restate the facts that remain true from the current project state and remove inaccessible context. Even a resolvable reference may be unsuitable for current-state documentation when it describes the editing process instead of a system guarantee.
+Inspect the relevant code, configuration, tests, and authoritative documents. Replace private conversation or review references with the actual contract. Qualify unresolved facts instead of inventing behavior. A resolvable link earns its place when it helps readers understand or maintain the system.
 
-## Detect context leakage
+Look for these problems and apply the corresponding repair:
 
-Check each category and judge its meaning:
+| Problem | Repair |
+| --- | --- |
+| Private draft numbers, phase labels, review rounds, or “as discussed” | State the relevant fact and cite an accessible owner |
+| PR/commit narratives or stale “now,” “previously,” and “legacy” framing | Describe current behavior; retain history when it explains a necessary constraint |
+| Arguments addressed to an imagined reviewer | State the actual reason, type guarantee, or ownership boundary |
+| Obvious control-flow transcripts or code proofs | Keep the non-obvious contract, ordering, race, or failure semantics |
+| Vague qualifiers or unowned plans | Specify evidence limits or a real issue/TODO and owner |
+| Draft markers or inconsistent prose language | Remove residue while preserving technical tokens |
 
-1. **Unstable internal references:** temporary decision numbers, audit codes, draft sections, phase labels, or private design ledgers. Replace them with committed authoritative sources. Remove a reference when the fact stands independently.
-2. **Review and commit-stack framing:** “this PR,” “the previous commit,” “a later change,” “the reviewer confirmed,” or draft rounds. Describe the current mechanism, current limitation, or a real issue that owns follow-up work.
-3. **Change narratives and stale version language:** “previously,” “no longer,” “legacy,” “this change,” or “now” used to narrate history. State current behavior. When necessary, use a present-tense counterfactual to explain what a constraint protects.
-4. **Arguments addressed to an imagined reviewer:** explanations defending a conversion, branch, or implementation. State the constraints, type guarantees, ownership rules, or safety reasons that make it valid. Remove explanations already obvious from the code.
-5. **Control-flow and derivation transcripts:** step-by-step restatements of obvious branches, test execution, or code proofs. Keep non-obvious contracts, ordering, races, and failure semantics.
-6. **Vague qualifiers and unowned plans:** “maybe,” “should be enough,” “for now,” or work without a marker and owner. Replace them with measurement boundaries, explicit limitations, or a real TODO/issue. Remove unsupported claims.
-7. **Writing residue:** language inconsistent with surrounding documents, private separators, or draft markers. Preserve technical tokens and translate or remove the remaining residue.
+Judge meaning rather than deleting keywords. Stable issues, standards, incident evidence, alternatives, suppression reasons, and measurement boundaries can remain when they help future maintenance.
 
-## Preserve useful context
+## 2. Edit the explanation's owner
 
-History and alternatives are not automatically leakage. Keep stable, resolvable references with maintenance value, including:
+Keep each explanation in its authoritative location:
 
-- Real issues, owners, and follow-up work.
-- External standards, specifications, and stable design documents.
-- Merged changes or incidents cited in evidence-based documents.
-- Reasons required by tools for suppressions, coverage exclusions, or empty error handling.
-- Measurement boundaries and their evidence.
-- Runtime lifecycle states.
-- Alternatives and rejection reasons that prevent repeated debate.
+| Information | Owner |
+| --- | --- |
+| Current behavior and implementation facts | Code, configuration, tests, and current documentation |
+| Consumer contracts | The README, API documentation, JSDoc, or diagnostic consumers read |
+| Lasting rationale, tradeoffs, and rejected alternatives | The active decision record |
+| Incident and migration narratives | The project's history document or postmortem |
 
-Judge whether a reference helps future maintainers verify or safely change the system, rather than whether its wording refers to the past.
+Elsewhere, retain the summary and links readers need. Update an existing engineering or data document before creating a parallel explanation. Leave directly discoverable directory, API, and field inventories to their source unless readers need a maintained projection.
 
-## Preserve complete propositions
+Edit sources before derived artifacts: source comments before generated documentation, schemas before generated types. Regenerate through the supported process and inspect the result. Modify vendor files, fixtures, and snapshots only when an authorized source change requires regeneration. Keep frozen archive bodies unchanged; archived decisions explain history, while current sources establish current behavior.
 
-Before editing, separate a passage into factual clauses. Preserve every clause expressing:
+## 3. Rewrite without losing the contract
 
-- Preconditions and postconditions.
-- Invariants and compatibility promises.
-- Ownership and lifecycle responsibility.
-- Timing, cancellation, ordering, and races.
-- Security and trust assumptions.
-- Failure and recovery behavior.
-- Persistence, wire protocols, or user-visible semantics.
-- Evidence that calibrates a limitation.
+Identify factual clauses before editing. Preserve:
 
-Rewrite with direct present-tense statements, explicit actors, and one main action per sentence. Preserve the strength of obligations, keep assumptions distinct from implemented behavior, and retain sources that make limitations credible.
+- Preconditions, postconditions, invariants, and compatibility promises.
+- Ownership, lifecycle, timing, cancellation, ordering, and races.
+- Security assumptions, failure/recovery behavior, persistence, and wire semantics.
+- User-visible behavior and evidence that calibrates limitations.
 
-## Give each explanation one owner
+Use direct present-tense statements, explicit actors, and one main action per sentence. Keep obligation strength, applicability, and the distinction between assumptions and implemented behavior. Remove repeated caveats and explanations already supplied by the owning source.
 
-Classify the information, then edit its owning source:
+## 4. Verify the finished text
 
-- **Current behavior and implementation details:** code, configuration, tests, and current-state documentation.
-- **Consumer contracts:** the README, API documentation, JSDoc, or diagnostic surface consumers actually read.
-- **Lasting rationale, tradeoffs, constraints, and rejected alternatives:** the active durable decision record.
-- **Incidents and historical narratives:** a postmortem or the project's designated history document.
+Read the complete document without the old passage or chat. Check related passages, resolve retained references, and inspect the diff for lost obligations, duplicated reasons, or unsupported claims. Run the documentation, generation, translation, lint, and behavior checks applicable to the changed surface.
 
-Elsewhere, repeat only the contract consumers need locally and link to its owner. A README may state a current constraint and link to its decision without copying the full rationale. A decision should leave current directories, data dictionaries, and operating procedures to engineering documentation.
-
-## Edit the owner first
-
-Edit the owning source before generated or derived artifacts. Trace generated directories, copied API descriptions, language variants, snapshots, and rendered pages to their owners. Regenerate through the project's supported process. For example, edit source JSDoc before generating a catalog, edit the schema before generating types, and update canonical documentation before its website projection. Place comments near the code they explain. Put lasting design reasons in an active durable decision.
-
-When `ENGINEERING.md`, `DATA.md`, ADRs, or other architecture documents already own an explanation, update and link that owner first. Keep only the necessary summary and stable links in READMEs, comments, other skills, and PR/MR text. Avoid copying file structures, APIs, or field lists that code already expresses directly. Document reasons, boundaries, ownership, prohibited actions, maintenance entry points, and lasting constraints that code cannot express well.
-
-Respect task scope and exclusions. Modify vendor code, frozen archives, recorded fixtures, and snapshots only when an owning-source change requires regeneration.
-
-## Separate current state from history
-
-READMEs, ordinary docs, JSDoc, and comments describe the current system by default. Durable decisions, postmortems, or dedicated history documents own past design reasons, rejected alternatives, migration narratives, and incidents. Keep brief history in current-state prose only when consumers need it to understand the current contract, and link its owner.
-
-An active durable decision owns rationale, tradeoffs, and lasting constraints; it is not the general authority for current behavior. Support current behavior with code, configuration, tests, and current-state documentation. Archived decisions explain history, cannot establish current behavior, and keep their bodies frozen.
-
-## Verify semantics
-
-After editing:
-
-1. Read the complete updated document without comparing it to the old passage.
-2. Search for related leakage patterns and manually review near matches.
-3. Confirm every retained reference resolves from the current repository or a declared external source.
-4. Run the documentation, generation, translation, lint, and behavior checks that own the affected surface.
-5. Review the diff for lost obligations, invented behavior, duplicated reasons, or unsupported claims.
-
-Report the review scope, explicit deletions or rewrites, context deliberately retained, deferred items, and checks actually run. A keyword search with no matches cannot alone establish accuracy or completeness.
+Report the edits, checks actually run, and unresolved facts or deferred work. A keyword search alone does not establish semantic correctness.
