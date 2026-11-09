@@ -134,6 +134,8 @@ npx skills@latest add https://github.com/mel0nyrame/skills/tree/v0.1.0
 
 ### 仓库维护
 
+仓库贡献者可使用[维护检查](docs/maintaining.zh.md)和[评审标准](CODING_STANDARDS.md)。它们覆盖文档、PR 正文结构和可重建的前向场景输入。
+
 上游子模块设置 `update = none`，正常初始化时不检出内容。`git submodule status` 中开头的 `-` 是预期状态。显式检出这些目录可能让递归扫描发现上游的其他 Skill。需要使用指定 Skill 时，按指南单独安装。[子模块决策](docs/agents/adr/0002--upstream-submodule-references.md) 说明了这个边界。
 
 Skill 指令使用英文。同步维护本文件与 [README.md](README.md)。每个 Skill 只有一个源目录。改名时同步修改 frontmatter、展示信息、默认提示词和相互引用。新增分类时，也要更新 Claude 的 Skill 路径。
