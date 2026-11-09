@@ -30,7 +30,7 @@ The project-level [recording convention](README.md) provides one contract for or
 
 ### Implementation scope
 
-`project-adr` supplies capture and resumption triggers, lifecycle guidance, project-integration instructions, and invocation metadata. `project-engineering` supplies discussion-time capture and task-entry retrieval. The default checker accepts the selected lifecycle vocabulary while preserving existing states. Project-specific formats remain subject to their own checks. The affected English and Chinese usage guides and repository standing rules expose the same responsibilities.
+`project-adr` supplies capture and resumption triggers, lifecycle guidance, project-integration instructions, and invocation metadata. Its [record reference](../../../skills/engineering/project-adr/references/RECORDS.md) owns writing criteria and same-topic maintenance; the main file routes to those details when editing records. `project-engineering` supplies discussion-time capture and task-entry retrieval. The default checker accepts the selected lifecycle vocabulary while preserving existing states. Project-specific formats remain subject to their own checks. The affected English and Chinese usage guides and repository standing rules expose the same responsibilities.
 
 The external discussion skills remain unchanged. Existing records do not require a bulk rewrite merely to adopt the new defaults. Installing or refreshing global skill copies is outside this design's implementation scope.
 

@@ -1,35 +1,37 @@
-# Decision lifecycle branches
+# Decision lifecycle
 
-Project lifecycle rules take precedence. Read default states only when the project lacks a convention; read the retirement protocol before archive or deletion.
+Project lifecycle rules take precedence.
 
 ## Default states
 
-When no state convention exists and the default structure is used, choose one value:
+When the project lacks a convention and uses the default format, choose:
 
-- **proposed:** still evaluating the choice. Record meaningful constraints, recommendations, pending candidates, and open questions without implying acceptance.
-- **accepted:** explicitly selected, with implementation incomplete or not started. State who selected it and the basis: user confirmation or an agent's choice within existing task authorization. A recommendation alone remains `proposed`. Acceptance does not grant execution permission.
-- **implemented:** implementation is complete, supported by code, configuration, tests, or other applicable evidence, and the choice still guides future changes. Describe delivered reality and keep references accurate as facts change, preserving the original decision.
-- **rejected:** retain only while the wrong approach remains tempting and the record prevents repeated debate. Deletion is allowed when the record is stale, misleading, replaced, or no longer preventive.
-- **superseded:** fully replaced, with an explicit replacement-record link. A partly replaced record keeps its still-valid state and identifies the replaced scope.
-- **archived:** a frozen historical snapshot. Preserve its wording, facts, and outbound links. It cannot establish current behavior.
+| State | Meaning |
+| --- | --- |
+| `proposed` | Choice under evaluation; constraints, recommendations, candidates, and questions may already be recorded |
+| `accepted` | Explicitly selected by the user or an agent within task authorization, with implementation incomplete; state who selected it and on what basis |
+| `implemented` | Completed with code, configuration, tests, or other applicable evidence; still guides future work |
+| `rejected` | Declined proposal or independently useful rejected choice retained to prevent a tempting mistake |
+| `superseded` | Fully replaced, with a replacement-record link |
+| `archived` | Frozen historical snapshot; current sources establish current behavior |
 
-A topic's status describes its current choice, not every candidate within it. Rejected candidates may remain in the alternatives of a `proposed`, `accepted`, or `implemented` topic. Use `rejected` for a declined proposal or an independently valuable rejected choice.
+A topic's state describes its choice, not every candidate. Rejected candidates can remain inside an active topic's alternatives. A recommendation remains `proposed`; acceptance grants no execution permission.
 
-Move `proposed` to `accepted` when an authorized choice is made, and to `implemented` only after checking implementation evidence. If the choice is already implemented when first recorded, start at `implemented`; intermediate files are unnecessary. Partial implementation remains `accepted`, with completed scope and remaining work stated. Record reconsideration when changed conditions reopen a choice. Lifecycle labels record facts rather than authorize further actions.
+Move to `accepted` on authorized selection and to `implemented` after checking completion evidence. Start at `implemented` when already complete; partial implementation stays `accepted`, with completed and remaining scope stated. Preserve existing project representation, including formats without a state field, and express replacement relationships in that format.
 
-When an `accepted` or `implemented` choice is replaced, apply [the record replacement rules](../SKILL.md#maintain-current-facts-and-decisions). Preserve the earlier choice and its reasons, and maintain replacement links. Reopening a choice for evaluation alone does not establish a replacement.
+For replacement, follow [record maintenance](RECORDS.md#maintain-a-record). Partial replacement retains the old record's still-valid state and identifies the replaced scope. Reopened evaluation alone does not establish replacement.
 
-Completion and age do not automatically justify archive. Consider archive when only one-time implementation details, a closed local fix, or low-value history already obvious from current owners remain. When uncertain, preserve the record and state the judgment boundary. Avoid age, length, or count quotas.
+Retain rejected records while their reasons prevent repeated mistakes. Consider retirement when only closed local details or low-value history recoverable from current owners remain. Age, completion, length, or count alone does not justify retirement. Preserve uncertain cases and report the judgment boundary.
 
 ## Archive or delete
 
-Follow the repository's complete protocol. Handle language variants, metadata, manifests, signatures, and hashes together. Before moving or deleting:
+Default archive location: `docs/adr/archive/`. Follow the project's protocol and task authorization. Before moving or deleting:
 
-1. Enumerate unique propositions and confirm an owner for everything that needs preserving.
-2. Search filenames, titles, symbols, configuration keys, and links to identify dependents.
-3. Repair inbound links from active content so the old path no longer acts as current authority.
-4. Use recoverable, reviewable changes permitted by the repository.
+1. Identify unique propositions and preserve every still-useful reason with an owner.
+2. Search filenames, titles, symbols, configuration keys, and links for dependents.
+3. Repair active inbound links so the retired path stops acting as current authority.
+4. Make recoverable, reviewable changes, handling language variants and required metadata, manifests, signatures, and hashes together.
 
-An archive operation changes only the state, location, and mechanical metadata permitted by repository protocol. After archive, the body remains permanently frozen.
+Archive changes only the state, location, and mechanical metadata permitted by project protocol. Its body, facts, wording, and outbound links then remain frozen.
 
-Completion requires preserved unique reasons, repaired active dependents, and passing project lifecycle/link checks. Report changes, gaps, and actions outside authorization through the skill's validation and reporting step.
+Complete when unique reasons are preserved, active dependencies are repaired, and lifecycle/link checks pass. Report gaps and pending actions.
