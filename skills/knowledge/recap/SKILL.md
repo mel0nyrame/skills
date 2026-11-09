@@ -75,5 +75,7 @@ Follow the matching branch below. Inspect only requested/affected topics and lin
 - **Retained work:** use the [operation inventory](references/operations.md#locate-retained-operations) to investigate missing candidates and old `ready` records; preserve unpublished work.
 - **Guide maintenance:** update the [guide introduction](references/formats.md#guide-introduction) through a candidate with exact user approval. Its generated catalog remains helper-owned.
 - **Research navigation:** for an explicitly selected external directory, [research inventory](references/operations.md#research-inventory) prints navigation without inferring capture status.
+- **Read-only audit:** follow [bounded maintenance audit](references/operations.md#bounded-maintenance-audit) to inspect a selected scope and report findings without preparing or publishing changes.
+- **Retrieval evaluation:** follow [retrieval baseline](references/search.md#retrieval-baseline) for an explicitly selected question set; report measured results separately from untested suggestions.
 - **Evidence maintenance:** review dates trigger checking, not automatic invalidation. Reconcile evidence without erasing unresolved disagreement.
 - **Recovery:** follow [interrupted publication](references/operations.md#publication-and-interrupted-recovery) before further library reads/writes. Successful historical corrections become new candidates and commits, preserving later valid work. Git records versions; it neither verifies prose nor makes unrestricted external file reads transactional.

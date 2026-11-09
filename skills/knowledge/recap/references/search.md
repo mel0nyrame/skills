@@ -16,6 +16,16 @@ Snippets come from the Markdown body. The helper uses the same normalized query 
 
 When only a title, alias or summary matches, the snippet starts at the first visible body line. It need not contain the matching alias or establish the answer. Read the current topic using the returned revision before answering. Source reads still require the owning topic's exact link. Search scope, publication locks and revision checks are unchanged.
 
+## Retrieval baseline
+
+When the user requests retrieval evaluation, select 10–20 representative questions with them, or report the smaller available sample. Establish expected current formal topic paths by reading the relevant topics, independently of search ranking. Allow multiple acceptable topics per question. Keep deliberately unanswerable questions separate from the retrieval denominator. Use actual reader questions when available; label invented fixtures as synthetic rather than real-library quality evidence.
+
+For each question, record the short first query derived from it before seeing results. Keep one pinned library revision within each run. Use the same helper mode and result limit (at least three) across the baseline and comparison. Report the fraction of answerable questions with at least one expected topic in the top 1 and top 3 as hit@1 and hit@3. For multi-topic questions these are hit rates, not full-answer recall. Record sample size, mode, revision, expected paths and misses. FTS5 ranking and path-ordered fallback are different conditions; report them separately.
+
+Keep first-query results separate from results after alias/alternate-term retries. Read returned topics to confirm relevance; retrieval success does not verify the answer's truth. After authorized maintenance, rerun the same questions and query strings, stating the new revision and any changed expected paths. Report regressions as well as improvements; do not tune the question set silently.
+
+This is a manual health check, not a `knowledge.py eval` command or a publication gate. Keep questions and results in the reply unless the user authorizes an exact saved destination; queries may contain private information. No query logging is added. An unrun evaluation remains a proposal, not a passing result.
+
 ## Cache ownership and compatibility
 
 Markdown remains authoritative. `.state/index.sqlite` is a disposable local cache, excluded from publication. Index schema 3 stores structured fields and encoded tokens so SQLite cannot reinterpret identifier punctuation or accents. Projection changes also require a new index schema version so unchanged topics cannot retain obsolete searchable text. The helper rebuilds caches with missing or different schema versions from the current allowed topics, including unchanged files. Corruption also triggers reconstruction. This changes neither topic schema nor formal Git history and requires no knowledge migration.

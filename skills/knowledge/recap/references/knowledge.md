@@ -10,6 +10,8 @@ When representative queries miss a relevant topic, consider precise aliases that
 
 ## Built-in writing contract
 
+Before writing, identify the future reader's question and what a new or updated topic adds beyond the source and existing topics: explanation, conditions, a reusable procedure or synthesis. A single source can justify a topic when the explanation makes it independently useful. Reuse a matching topic where appropriate; account for material with no lasting value in the coverage assessment rather than manufacturing a thin topic or a successful-capture cursor. This judgment needs no separate plan file.
+
 Choose a structure from the material rather than filling every heading. Start by identifying the subject, question and scope. Explain necessary terms, project identities and chapter labels on first use. Keep essential background in the topic; sources supply provenance. Follow the reader's next questions, preserving reasons and examples. A project-specific explanation is valid when its case and version are explicit.
 
 Conceptual topics often need mechanism, relationships, misconceptions, and applicability. Separate general principles from a particular implementation's names and behavior. Research needs findings, evidence, competing explanations, and gaps. Procedures need target/environment, required starting state, affected paths, ordered actions, visible results, and failure/recovery boundaries; verify local changes before destructive steps. Preserve the conditions behind a past observation when deriving an action rule. Decisions need alternatives and reasons. Combine as needed; tables or diagrams support explanation rather than replacing it.
@@ -42,4 +44,4 @@ Persist successful machine checkpoints in `.state/` with the represented knowled
 
 ## Changelog
 
-For each substantive operation, record date, topic link, kind, what changed, why, and supporting evidence. Explain old/new differences for corrections, and linked topics still needing work. Group cosmetic edits. Keep private raw residue out. Git versions and the interrupted-publication journal, not the changelog, provide recovery.
+For each substantive operation, record date, topic link, kind, what changed, why, and supporting evidence. Explain old/new differences for corrections, and linked topics still needing work. When a mistaken inference could recur, preserve its decisive evidence, why it failed and the conditions for applying the corrected rule. Keep this reasoning beside the corrected claim when needed for understanding; no fixed correction template or raw transcript is required. Group cosmetic edits. Keep private raw residue out. Git versions and the interrupted-publication journal, not the changelog, provide recovery.
