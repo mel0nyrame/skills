@@ -134,7 +134,7 @@ From this collection's root, this capability check does not create the library. 
 python3 -B skills/knowledge/recap/scripts/knowledge.py --root /path/to/my-knowledge doctor
 ```
 
-The report includes `portability.ok` and line-specific errors for known default-encoding and Git-path comparison regressions. Such errors exit 2 without initializing or writing the library; a passing static check is not a full health check. Windows paths are compared as resolved paths and knowledge text is read as UTF-8, independently of the locale.
+The report includes `portability.ok` and line-specific errors. This static check covers only explicit UTF-8 `read_text()` calls and resolved Git-root comparisons in `workflow.py`; it does not inspect other files or `bytes.decode()` calls. Such errors exit 2 without initializing or writing the library; a passing static check is not a full health check. Windows paths are compared as resolved paths and knowledge text is read as UTF-8, independently of the locale.
 
 An existing populated directory needs migration review rather than empty-library initialization. See [publication, migration, and recovery](../../skills/knowledge/recap/references/operations.md).
 

@@ -130,7 +130,7 @@ $skills:recap
 python3 -B skills/knowledge/recap/scripts/knowledge.py --root /path/to/my-knowledge doctor
 ```
 
-报告包含 `portability.ok`，并按行指出已知的默认编码和 Git 路径比较回归。发现这些错误时退出码为 2，不初始化或写入知识库；静态检查通过不代表完整健康检查通过。Windows 路径按解析后的路径对象比较，知识文本始终按 UTF-8 读取，不依赖系统默认编码。
+报告包含 `portability.ok`，并按行指出错误。这个静态检查仅覆盖 `workflow.py` 中显式使用 UTF-8 的 `read_text()` 调用和解析后的 Git 根路径比较，不检查其他文件或 `bytes.decode()` 调用。发现这些错误时退出码为 2，不初始化或写入知识库；静态检查通过不代表完整健康检查通过。Windows 路径按解析后的路径对象比较，知识文本始终按 UTF-8 读取，不依赖系统默认编码。
 
 已有内容的目录不能直接当作空库初始化，需要先检查迁移方案。相关步骤见[发布、迁移和恢复](../../skills/knowledge/recap/references/operations.md)。
 
