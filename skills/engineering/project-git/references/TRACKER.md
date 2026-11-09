@@ -1,7 +1,7 @@
-# Git Delivery Records
+# Git delivery records
 
-Read this reference only when the target repository requires delivery records or the user explicitly requests changes to a linked tracker. Identify whether the project uses repository Markdown, hosting-platform issues, another platform, or no tracker. Follow its rules and use real tickets.
+Read when project policy requires delivery records or the user requests a tracker change. Follow the actual repository/platform convention; use real tickets.
 
-Repository records may include actual commit ranges, base/head, validation results, risks, and real PR/MR URLs. Preserve history and human-written content. Append verifiable facts. Close a status only when acceptance criteria are met and evidence is sufficient. Creating or merging a PR/MR does not itself prove the business goal is complete.
+Record verified commit ranges, branches, validation, risks, and confirmed PR/MR URLs as needed. Preserve human content and history. Create records for delivery needs rather than merely to hold a link. Close a status only when acceptance criteria have evidence; merging alone does not prove the business goal.
 
-Writing external issues, comments, labels, milestones, or statuses is a separate action requiring an explicit user request. Record a PR/MR URL only after the platform confirms successful creation. Subsequent documentation commits and pushes remain subject to their own authorization scope.
+External issues, comments, labels, milestones, statuses, and subsequent commits/pushes remain within the user's explicitly requested scope.

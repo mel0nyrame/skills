@@ -49,3 +49,9 @@ Keep external `pr` and `context7-mcp` submodules unchecked out under their `upda
 Use focused commits and follow the [Git naming defaults](skills/engineering/project-git/references/CONVENTIONS.md) unless explicitly overridden.
 
 Commit, push, and platform publication require explicit authorization. Preserve unrelated staged and unstaged work. PR descriptions should explain behavior, scope, validation actually performed, and remaining limitations. Include representative prompt examples for changed skill behavior and link relevant existing issues.
+
+## Parallel Worktree Preference
+
+- Enabled for this repository. Reuse this task's worktree or create an isolated worktree before implementation.
+- Default location: the primary worktree's `.worktree/` directory. Honor an explicit task location.
+- Preserve existing changes and task worktrees. Reuse this preference without asking again.

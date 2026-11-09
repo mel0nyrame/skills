@@ -1,47 +1,35 @@
-# Git Naming and Commit Splitting
-
-Resolve the target project's conventions first. The defaults below apply only to aspects left unspecified.
+# Git naming and commit groups
 
 ## Select conventions
 
-Before drafting commit titles:
+Resolve title format and description language separately, in this order:
 
-1. Apply explicit task instructions about naming format or description language.
-2. Read applicable repository and subtree instructions, contribution guides, and commit-tool configuration such as commitlint. Written project requirements take precedence over historical examples.
-3. Where written rules are silent, inspect relevant recent non-merge commits. Follow a consistent, structured naming pattern and its description language. Isolated examples or loose titles such as `fix xxx`, `add xxx`, `修复了xxx`, and `加入xxx` do not establish a naming convention.
-4. Resolve format and language separately. Keep each requirement found above; use the defaults below only for unspecified aspects.
+1. Explicit task instructions.
+2. Applicable repository/subtree rules, contribution guides, and commit-tool configuration such as commitlint.
+3. Where written rules are silent, consistent structured conventions in relevant recent non-merge commits.
+4. Defaults below for unresolved aspects.
 
-For example, a documented requirement or consistent history of `fix(auth): handle expired tokens` calls for English descriptions. An explicit English-only requirement with no title format keeps the default `<type>(<scope>):` structure and uses English descriptions. Unstructured history alone leaves the Chinese default in effect.
+Isolated or loose titles such as `fix xxx`, `add xxx`, `修复了xxx`, and `加入xxx` do not establish a convention. A consistent `fix(auth): handle expired tokens` history establishes format and English descriptions. An English-only rule without a format uses the default structure with English descriptions.
 
 ## Branches
 
-Format:
+Default:
 
 ```text
 <type>/<english-kebab-topic>
 ```
 
-Common types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `build`, `ci`, `perf`, `revert`.
-
-Examples:
-
-- `feat/memory-system`
-- `fix/oauth-refresh`
-- `docs/agent-workflow`
-
-Use a short, recognizable English kebab-case topic. Rename pushed or shared branches only after explicit coordination.
+Use a short recognizable topic, for example `feat/memory-system` or `fix/oauth-refresh`. Common types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `build`, `ci`, `perf`, `revert`. Coordinate renaming pushed or shared branches explicitly.
 
 ## Commit titles
 
-Default format:
+Default:
 
 ```text
 <type>(<scope>): <Chinese description>
 ```
 
-The optional `scope` uses short English kebab-case. Use an ASCII colon followed by one space. When convention selection leaves the description language unspecified, write it in Chinese. Make the title understandable without the conversation. The skill's English instruction language does not determine the commit language.
-
-Examples:
+Scope is optional and uses short English kebab-case. Use an ASCII colon and one following space. The skill's instruction language does not determine the commit language. Write a title understandable without the conversation:
 
 - `feat(memory): 增加分层记忆检索`
 - `fix(auth): 修复令牌刷新后会话丢失问题`
@@ -49,12 +37,6 @@ Examples:
 
 ## Logical groups
 
-Split by intentions that can be reviewed and reverted independently, rather than by file count or size:
+Split intentions that can be reviewed and reverted independently. One title should explain the full staged diff; file or line counts are review signals, not splitting rules.
 
-- Split when one title cannot accurately describe the whole staged diff.
-- Separate unrelated features, incidental refactors, and independent documentation work.
-- Regroup a commit spanning several top-level modules when they share no acceptance criterion.
-- Keep tests with the implementation they verify. Independent test infrastructure can have its own commit.
-- Keep migrations, dependency upgrades, or generated files together when they are necessary for the feature to work. Explain the coupling in the commit body.
-
-Large file or line counts are review signals. Each resulting commit should remain explainable and, where possible, buildable and verifiable. Preserve an indivisible change rather than creating incomplete commits.
+Separate unrelated features, incidental refactors, independent documentation, and modules without a shared acceptance criterion. Keep tests with their implementation. Keep migrations, dependency upgrades, lockfiles, and generated outputs together when required for the feature to work; explain non-obvious coupling. Independent test infrastructure may have its own commit. Preserve an indivisible change so each commit remains verifiable where possible.

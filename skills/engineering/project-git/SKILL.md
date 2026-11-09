@@ -1,41 +1,38 @@
 ---
 name: project-git
-description: Use when reviewing a Git working tree, splitting or creating commits, pushing branches, or recording Git delivery. Coordinate PR/MR body drafting and explicitly requested platform delivery after Git checks.
+description: Use when reviewing Git changes, committing, pushing, or delivering explicitly requested PR/MR updates.
 ---
 
 # Project Git
 
-Handle the working tree, commits, and pushes within the user's authorization. A commit request does not authorize a push. A push request does not authorize creating or updating a PR/MR or changing an external tracker. For PR/MR requests, follow the writing and platform-delivery responsibilities below.
+Perform the authorized delivery stages. Commits, pushes, PR/MR publication, and external tracker edits have separate scopes; a request for one stage does not authorize later stages.
 
-## Confirm scope
+## 1. Inspect scope and evidence
 
-- Read repository and subtree instructions, contribution rules, and Git rules for the current stage. Before drafting commit titles, resolve the project's format and language using [the convention selection rules](references/CONVENTIONS.md#select-conventions).
-- Inspect `git status --short --branch`, unstaged changes, and staged changes. Separate this task's changes from other work. Check remotes, upstream tracking, and outgoing commits when a push is requested.
-- Identify required validation and existing results. Reuse checks from the current task that still cover the same changes. Run focused checks when evidence is missing or invalidated by later edits. Report only commands actually run and their results.
-- For changes to technical prose, confirm that facts and references make sense from the current repository. For lasting engineering decisions, check affected records and their reasons. Use `project-prose` or `project-adr` for deeper review when available. Required repository checks still apply when those skills are absent.
+Read applicable repository, subtree, contribution, and Git rules. Inspect `git status --short --branch`, unstaged changes, and staged changes. Identify this task's changes and preserve other work.
 
-## Create commits
+Resolve title format and language through [naming conventions](references/CONVENTIONS.md#select-conventions). Reuse validation that still covers the current diff; run focused checks when evidence is missing or invalidated. For changed prose or lasting decisions, use `project-prose` or `project-adr` when available; project checks still apply without them.
 
-Split changes by intentions that can be explained and reverted independently. Keep tests, lockfiles, and generated files with the source changes they verify or derive from. Use the resolved project naming conventions, with [defaults](references/CONVENTIONS.md) for unspecified aspects. In an ordinary project, switch to a compliant work branch before committing on the default branch. Rename pushed or shared branches only after explicit coordination.
+## 2. Commit the requested changes
 
-For each logical group:
+Group changes by intentions that can be explained and reverted independently. Keep tests, lockfiles, migrations, and generated outputs with the source they support. Before committing on an ordinary project's default branch, switch to a compliant work branch. Coordinate renaming pushed or shared branches explicitly.
 
-1. Stage explicit paths or interactive hunks, preserving unrelated changes.
-2. Review `git diff --cached --stat` and `git diff --cached`. Confirm one intention and check for sensitive information, debugging leftovers, conflict markers, and accidental artifacts. Verify that the commit title matches the selected format and language.
-3. Commit without bypassing hooks. Inspect the commit summary and remaining working tree.
+For each group:
 
-When repository delivery rules require local issues, specifications, or changelogs, commit them with the implementation they describe. Create records for actual delivery needs, rather than solely to hold a link. Read [the recording conventions](references/TRACKER.md) when linking delivery records or external trackers. If the user requested only a commit, report the commit, validation results, and remaining changes, then stop.
+1. Stage explicit paths or interactive hunks.
+2. Review the staged stat and full diff. Confirm one intention, the resolved title convention, and absence of secrets, debug residue, conflict markers, or accidental artifacts.
+3. Commit with hooks enabled; inspect the commit and remaining working tree.
 
-## Push
+Include repository-required delivery records with their implementation. Read [recording conventions](references/TRACKER.md) when linking delivery records or changing an authorized tracker. A commit-only request ends with the commit result, validation, and remaining changes.
 
-Push only when the user explicitly requests it. Read and follow the repository's pre-push policy. Confirm the remote, target branch, upstream, and outgoing commits. Establish a normal upstream on the first push. Reuse validation that still covers the outgoing diff unless project policy requires another run.
+## 3. Push the requested commits
 
-Preserve hooks. Force pushes, history rewrites, and remote ref deletion require explicit authorization matching the target and scope. On failure, leave a recoverable state and report completed actions, sanitized errors, and the smallest repair recommendation.
+Follow pre-push rules. Verify remote, target branch, upstream, and outgoing commits; establish the normal upstream on the first push. Reuse still-valid checks unless policy requires another run.
 
-## PR/MR writing and platform delivery
+Keep hooks enabled. Force pushes, history rewrites, and remote-ref deletion need explicit target-and-scope authorization. On failure, preserve a recoverable state and report completed actions, sanitized errors, and the smallest repair.
 
-Use the external [pr skill](https://github.com/mattpocock/skills/tree/main/skills/engineering/pr) for the body, following the project's template and terminology. Follow project conventions for the title. If the writing skill is unavailable, report that dependency and the incomplete writing step.
+## 4. Deliver requested PR/MR changes
 
-For explicitly requested creation or updates, use the available hosting-platform tools with the authorized repository, base, head, and scope. If the required platform capability is unavailable, retain the draft and report the delivery gap. A writing skill does not supply platform access or authorize publication.
+Use the external [pr skill](https://github.com/mattpocock/skills/tree/main/skills/engineering/pr) for the body and project conventions for the title. Report a missing writing dependency as an incomplete step.
 
-Verify the platform result before reporting completion or a PR/MR URL. A successful push or completed body alone does not mean a hosted request was created or updated. Comments and other tracker changes remain separate actions within the user's explicit request.
+Create or update the request through available platform tools using the authorized repository, base, head, and scope. If platform access is unavailable, retain the draft and report the gap. Verify the hosted result before reporting completion or a PR/MR URL. Comments and other tracker writes require their own explicit scope.
