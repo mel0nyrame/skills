@@ -16,6 +16,23 @@ The helper waits at most 30 seconds for the main library lock. Authoring, resear
 
 Guide text is preserved unless an explicitly approved candidate updates its [introduction](formats.md#guide-introduction). The helper regenerates the topic catalog and appends the current operation to the latest changelog. Packets cannot replace the catalog, trailing guide prose, `CHANGELOG.md`, `AGENTS.md`, Git metadata or publication rules. Integration merges only authored introduction text, retains the latest catalog/trailing prose, then regenerates entries. Concurrent introduction changes require independent review; generated entries alone do not. Integration changes the candidate hash, so approval of an earlier candidate is insufficient.
 
+## Bounded maintenance audit
+
+This is an agent workflow, not a `knowledge.py audit` command. On an explicit audit request, establish the selected topics/group or exact reading route and the questions to check. If the request is unbounded, agree a scope before inspecting the library; do not infer permission for a whole-library scan. Follow the root's reader rules, recovery barrier and bounded helper reads. Pin related reads to the returned revision; refresh if it changes.
+
+Review the selected material for:
+
+- **Evidence:** whether decisive evidence supports central, volatile or disputed claims within their stated scope. Prioritize consequential claims likely to change. An old verification date calls for checking, not automatic invalidation.
+- **Structure:** broken local targets, overlapping explanations and missing prerequisite/next-reading routes. An incoming-link absence alone does not make a topic useless. Publication already checks target existence; audit can expose later external damage or semantic gaps. Anchor checks require reading the target heading.
+- **Guide:** summary/body consistency and whether the selected reading route still helps. The guide is read on demand, not an automatically injected memory layer. Size measurements are observations, not a 200-line/25-KB validity threshold.
+- **Gaps:** unanswered questions or contradictions in the selected material. Separate missing evidence from demonstrated errors; a source without a topic does not by itself justify creating one.
+
+Open sources only through their owning topic's exact links. Do not search raw transcripts, drafts, candidates or operation state to discover more findings; retained-operation investigation is a separate selected branch. External verification stays within the requested scope and available access. Mark unavailable evidence as unverified rather than treating it as false.
+
+Return scope and revision, checks performed, findings with exact locators and supporting evidence, proposed actions, and uninspected items/access limits. Separate mechanical failures from semantic judgments. A clean report means only that no issue was found in the checked scope. Keep the report in the reply unless the user authorizes saving it to an exact destination.
+
+Audit makes no formal edits, candidates, approvals, publications or automatic deletions. Ordinary helper reads/search may create locks or caches; this is not a zero-write filesystem guarantee. If strict zero-write access is required, establish a suitable access method before running helpers. Repairs require a separately authorized maintenance candidate and the normal inspection, approval and review rules. `doctor` remains a capability/portability report, not this content audit.
+
 ## Locate retained operations
 
 Start with `status --all --summary` when locating retained work or interrupted transactions. It keeps every operation, error and recovery journal while omitting hashes and worktree paths. Read `complete` and `recovery_required`, then use `status OP` and `diff OP` for the selected operation. A new capture uses `begin OP`; it needs no full historical inventory. The compact form reduces output, not inventory work or validation.

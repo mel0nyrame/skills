@@ -166,6 +166,22 @@ OpenCode message sequences represent event positions and can begin after 1 or co
 
 For an external research directory, `research_index.py /path/to/research` prints a Markdown inventory to stdout. It does not write an index or edit a knowledge library. Capture status stays unmarked until separately checked; opening excerpts are navigation aids. Saving the inventory and adding external configuration pointers are separate authorized writes. Read [research inventory](../../skills/knowledge/recap/references/operations.md#research-inventory) before replacing an existing annotated index.
 
+## Request a bounded audit or retrieval baseline
+
+```text
+$skills:recap
+Audit only the export-permission topics and their index reading route.
+Report unsupported claims, stale applicability, duplicate explanations and
+broken reading links, with evidence and unchecked items. Do not prepare repairs,
+publish changes or save the report. Preserve unpublished work.
+```
+
+This is an agent-led [bounded audit](../../skills/knowledge/recap/references/operations.md#bounded-maintenance-audit), not a new CLI command or an automatic whole-library scan. Sources remain accessible only through their owning topics' exact links. A report distinguishes mechanical failures from semantic judgments and states its scope and revision. Old dates alone do not disprove a claim. The guide is read on demand; Claude Code's injected-memory size limit is not a recap validity threshold. Repairs need separate authorization and the existing candidate workflow. Helpers can still create locks/caches; request strict zero-write access before running them if needed.
+
+For a [retrieval baseline](../../skills/knowledge/recap/references/search.md#retrieval-baseline), ask: “Use these 10 reader questions and their expected topics to measure first-query hit@1 and hit@3. Report misses separately from alternate-wording retries. Do not save queries or change topics.” A hit means at least one expected topic appeared in the first one or three results; it does not establish full-answer recall or truth. Use the same questions, query strings and search mode before and after maintenance. This is a manual health check, not an `eval` command, query log or publication gate. Label synthetic fixtures and unrun evaluations honestly.
+
+Before capture, identify what each topic adds for a future reader. Useful single-source explanations remain valid; skip transient material rather than forcing a thin topic or claiming an unsupported successful cursor. When a correction could prevent a recurring mistake, retain why the old inference failed and the corrected rule's conditions without imposing a fixed template.
+
 ## Decide whether useful knowledge was preserved
 
 Open a topic independently. Its question, applicability, and supporting evidence should make sense without the chat. Search for it using different wording and check that it can be found.
