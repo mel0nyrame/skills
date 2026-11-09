@@ -298,6 +298,47 @@ class MaintenanceTests(unittest.TestCase):
         self.assertFalse(result['complete'])
         self.assertIn('base', result['operations'][0]['error'])
 
+    def test_status_summary_preserves_missing_candidates_errors_and_recovery(self):
+        for identifier in ('retained', 'missing', 'broken'):
+            workflow.begin(self.root, identifier, 'writer')
+        git(self.root, 'worktree', 'remove', str(self.root / '.worktree/missing'))
+        (self.root / '.state/operations/broken.json').write_text('{')
+        transactions = self.root / '.state/transactions'
+        transactions.mkdir()
+        (transactions / 'interrupted.json').write_bytes(json_bytes({'id': 'interrupted', 'status': 'prepared'}))
+        result = subprocess.run([sys.executable, '-B', str(SCRIPTS / 'knowledge.py'), '--root', str(self.root),
+            'status', '--all', '--summary'], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        summary = json.loads(result.stdout)
+        full = workflow.status(self.root)
+        self.assertFalse(summary['complete'])
+        self.assertEqual(summary['recovery_required'], ['interrupted'])
+        entries = {entry['id']: entry for entry in summary['operations']}
+        self.assertFalse(entries['missing']['worktree_exists'])
+        self.assertTrue(entries['retained']['worktree_exists'])
+        self.assertFalse(entries['retained']['publication_record_exists'])
+        self.assertIn('Invalid JSON', entries['broken']['error'])
+        self.assertNotIn('approval_sha256', entries['retained'])
+        self.assertLess(len(result.stdout), len(json.dumps(full, ensure_ascii=False, indent=2)))
+        self.assertEqual((self.root / '.state/operations/broken.json').read_text(), '{')
+
+    def test_status_summary_requires_inventory_and_keeps_recovery_errors_strict(self):
+        workflow.begin(self.root, 'retained', 'writer')
+        for arguments in (['status', '--summary'], ['status', 'retained', '--summary']):
+            with self.subTest(arguments=arguments):
+                result = subprocess.run([sys.executable, '-B', str(SCRIPTS / 'knowledge.py'),
+                    '--root', str(self.root), *arguments], capture_output=True, text=True)
+                self.assertEqual(result.returncode, 2)
+                self.assertIn('--summary requires --all', result.stderr)
+        transactions = self.root / '.state/transactions'
+        transactions.mkdir()
+        (transactions / 'broken.json').write_text('{')
+        result = subprocess.run([sys.executable, '-B', str(SCRIPTS / 'knowledge.py'), '--root', str(self.root),
+            'status', '--all', '--summary'], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(result.stdout, '')
+        self.assertIn('Invalid JSON', json.loads(result.stderr)['error'])
+
     def test_status_all_is_complete_without_optional_fingerprint(self):
         workflow.begin(self.root, 'editing', 'writer')
         self.assertNotIn('fingerprint', workflow.get_state(self.root, 'editing'))

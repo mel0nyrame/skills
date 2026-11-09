@@ -627,6 +627,35 @@ def extract(args) -> dict[str, Any]:
     return receipt
 
 
+def show_chunk(path: Path, ordinal: int | None = None) -> str:
+    """Render one selected extraction chunk; inserted wraps are display-only."""
+    lines = []
+    for number, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        try:
+            record = json.loads(raw)
+        except ValueError as exc:
+            raise SessionError(f"Invalid chunk JSON at line {number}") from exc
+        if (not isinstance(record, dict) or record.get("role") not in ("user", "assistant", "evidence")
+                or not isinstance(record.get("text"), str) or not isinstance(record.get("locator"), str)
+                or not record["locator"] or type(record.get("ordinal")) is not int
+                or type(record.get("text_offset")) is not int or type(record.get("text_length")) is not int
+                or not 0 <= record["text_offset"] <= record["text_length"] - len(record["text"])):
+            raise SessionError(f"Invalid chunk record at line {number}")
+        if ordinal is not None and record["ordinal"] != ordinal:
+            continue
+        lines.append(f'--- {record["role"]} | locator={dump(record["locator"])} | ordinal={record["ordinal"]}'
+                     f' | offset={record["text_offset"]}/{record["text_length"]} ---')
+        for line in record["text"].split("\n"):
+            if line:
+                lines.extend(line[start:start + 160] for start in range(0, len(line), 160))
+            else:
+                lines.append("")
+        lines.append("")
+    if not lines:
+        raise SessionError("No chunk fragments match the selected ordinal" if ordinal is not None else "Chunk is empty")
+    return "\n".join(lines) + "\n"
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -643,10 +672,16 @@ def main() -> int:
     command.add_argument("--prior-receipt", help="Previous receipt used to verify unchanged prefix before a delta")
     command.add_argument("--include-tools", action="store_true", help="Include original tool-output evidence; examine it only when relevant")
     command.add_argument("--knowledge-root", help="Knowledge root whose only raw-text temporary area is .state/tmp/<new-operation>")
+    command = sub.add_parser("show", help="Display one extracted JSONL chunk as wrapped text with original locators")
+    command.add_argument("chunk", help="Exact extracted chunk file; display does not establish source coverage")
+    command.add_argument("--ordinal", type=int, help="Show only this original ordinal within the selected chunk")
     args = parser.parse_args()
     try:
+        if args.command == "show":
+            print(show_chunk(Path(args.chunk).expanduser(), args.ordinal), end="")
+            return 0
         receipt = extract(args)
-    except (SessionError, OSError) as exc:
+    except (SessionError, OSError, UnicodeError) as exc:
         print(dump({"status": "error", "error": str(exc)}), file=sys.stderr)
         return 2
     print(dump({"status": receipt["status"], "receipt": str(Path(args.output).resolve() / "receipt.json"),
