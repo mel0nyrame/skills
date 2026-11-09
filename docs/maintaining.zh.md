@@ -15,7 +15,9 @@ python3 -B -m scripts.check_pr_body --body-file /tmp/pr-body.md
 
 [CI 工作流](../.github/workflows/tests.yml)在 Ubuntu 和 Windows 上运行回归、ADR 和文档检查。PR 事件还会检查正文。编辑 PR 标题或正文后，只重新检查正文结构，不重复运行完整矩阵。
 
-文档检查器读取 Git 已跟踪和未被忽略的 Markdown。检查范围包括相对路径的行内链接、引用定义、Markdown 锚点、重复标题锚点和显式 HTML 锚点。`docs/` 下的英中文指南和根目录 README 必须配对，并互相链接。`docs/agents/` 下的决策记录不属于翻译指南。`tests/fixtures/` 下的刻意构造输入不参与文档检查。
+文档检查器读取 Git 已跟踪和未被忽略的 Markdown，排除 `tests/fixtures/` 下的刻意构造输入。检查范围包括相对路径的行内链接、引用定义、Markdown 锚点、重复标题锚点和显式 HTML 锚点。
+
+双语配对检查覆盖根目录的 `README.md` / `README.zh.md`，以及 `docs/` 下的所有 Markdown 文件。整个 `docs/agents/` 子树不参与配对检查。范围内每份文件必须有对应语言版本，并互相链接。
 
 代码围栏中的示例、行内代码、注释和远程 URL 不参与链接验证。检查器支持本仓库常用的 Markdown 形式，不负责渲染全部扩展、访问远程链接或判断翻译是否准确。
 

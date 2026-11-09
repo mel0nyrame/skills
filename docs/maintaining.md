@@ -15,7 +15,9 @@ python3 -B -m scripts.check_pr_body --body-file /tmp/pr-body.md
 
 The [CI workflow](../.github/workflows/tests.yml) runs regression, ADR, and documentation checks on Ubuntu and Windows. PR events also validate the body. Editing the PR title or body reruns its structure check without repeating the full matrix.
 
-The documentation checker reads tracked and unignored Markdown. It checks relative inline and reference-definition targets, local Markdown fragments, duplicate heading slugs, and explicit HTML anchors. English/Chinese guides under `docs/` and the root README need a paired file and reciprocal links. Decision records under `docs/agents/` are not translated guides. Intentional inputs under `tests/fixtures/` are excluded.
+The documentation checker reads tracked and unignored Markdown, excluding intentional inputs under `tests/fixtures/`. It checks relative inline and reference-definition targets, local Markdown fragments, duplicate heading slugs, and explicit HTML anchors.
+
+Bilingual pairing covers root `README.md` / `README.zh.md` and every Markdown file under `docs/`. The entire `docs/agents/` subtree is excluded from pairing. Each file in scope needs its language counterpart and a reciprocal link.
 
 Fenced examples, inline code, comments, and remote URLs are excluded from link validation. The checker covers the repository's common Markdown forms; it does not render every Markdown extension, fetch remote links, or establish translation accuracy.
 
