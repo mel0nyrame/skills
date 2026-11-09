@@ -1,6 +1,18 @@
 # Routine publication checklist
 
-Use `python3 "$SKILL_DIR/scripts/knowledge.py" --root "$ROOT" COMMAND`. Global options precede the command. Resolve these paths from the selected skill and library. Read the root's reader rules, then run `doctor` once to check capabilities. A new capture starts with `begin`; query `status OP` when its state is needed. Use the [inventory](operations.md#locate-retained-operations) when locating retained work or recovery journals.
+Use `python3 "$SKILL_DIR/scripts/knowledge.py" --root "$ROOT" COMMAND`. Global options precede the command. Resolve these paths from the selected skill and library. Read the root's reader rules, then run `doctor` once to check capabilities and known portability patterns without initialization. It statically checks `workflow.py` for explicit UTF-8 reads and resolved Git path comparisons. `portability.ok: false` includes line-specific errors and exits 2; success is not an end-to-end library health guarantee.
+
+## First capture
+
+After `doctor` passes, initialize only a new empty root with `init`, then read its generated `AGENTS.md`. Existing populated roots require [migration](operations.md#migrate-an-existing-library).
+
+Complete when the library is initialized and its reader rules have been read.
+
+## Publication commands
+
+Start after source coverage and topic development are complete and writing guidance is selected. First and repeated captures use the same sequence. Set a unique `OP`, the actual writer `ID`, a separate `INPUT` directory and a `PACKET` file outside formal paths. The [input-directory example](formats.md#packet-input-directory) supplies the initial topic/source/cursor batch.
+
+A new operation starts with `begin`; query `status OP` when its state is needed. Use the [inventory](operations.md#locate-retained-operations) when locating retained work or recovery journals.
 
 | Order | Command | Completion criterion |
 | --- | --- | --- |
@@ -27,7 +39,9 @@ Inspect substantive prose with the [standalone reading check](knowledge.md#built
 
 Group independent reads of these selected sections, the extraction receipt and current topic summaries in one host tool request. Keep source inspection, candidate review and publication as decision points. After a context summary, reopen only material whose required details were lost. Small sources use the same coverage, evidence and publication checks; their size does not determine merge complexity.
 
-Common corrections:
+## Common corrections
+
+If `inspect` fails after writing candidate material, retain that operation and inspect its status/diff before retrying. The candidate may be dirty even though nothing was published. Do not reset or clean the formal root to repair a candidate.
 
 - Read a topic with `--purpose topic`, including before editing it.
 - Check `complete` and per-entry errors in `status --all`; directory presence does not prove candidate validity.

@@ -10,11 +10,11 @@ Respond to the current user's explicit capture, query or maintenance request. A 
 
 ## Open the library
 
-Resolve helpers relative to this file. The root is explicit `--root`, then `RECAP_KNOWLEDGE_ROOT`, then `~/.agents/knowledge`. Read the root's `AGENTS.md` before accessing its contents. Use Python 3 and Git; installation requires separate authorization. `knowledge.py doctor` reports capabilities without initializing. Use `--help` for command syntax.
+Resolve helpers relative to this file. The root is explicit `--root`, then `RECAP_KNOWLEDGE_ROOT`, then `~/.agents/knowledge`. Read the root's `AGENTS.md` before accessing its contents. Use Python 3 and Git; installation requires separate authorization. `knowledge.py doctor` reports capabilities and checks known path/encoding patterns without initializing; stop on reported portability errors. Use `--help` for command syntax.
 
 Default retrieval covers **formal `topics/**/*.md` only**. Use bounded helper reads/search. Read the guide for routes, the changelog for changes, and a source only through the exact link in its owning topic. Open drafts, operation state, Git history or candidate worktrees only for the selected capture, review or recovery. These cooperative rules do not revoke an agent's filesystem permissions.
 
-New empty libraries use `init`. Existing libraries use the reviewed baseline/migration workflow in [operations](references/operations.md#migrate-an-existing-library); preserve existing prose, dates and sources. If Python or Git is unavailable, retain a draft rather than bypassing the publisher. FTS5 absence permits an explicit topics-only text-search fallback.
+For a new empty library, follow [first-capture setup](references/checklist.md#first-capture). Existing libraries use the reviewed baseline/migration workflow in [operations](references/operations.md#migrate-an-existing-library); preserve existing prose, dates and sources. If Python or Git is unavailable, retain a draft rather than bypassing the publisher. FTS5 absence permits an explicit topics-only text-search fallback.
 
 ## Capture
 
@@ -38,7 +38,7 @@ Complete when applicable guidance is selected, with evidence, coverage and machi
 
 ### 4. Prepare a candidate
 
-Use the [command checklist](references/checklist.md) for the ordinary sequence and the contract sections needed by each input or error.
+Use the [publication commands](references/checklist.md#publication-commands) for both first and repeated capture, with their step-specific contract links. Before authoring topic metadata, source records or capture cursors, read the [input-directory contract](references/formats.md#packet-input-directory) and its branch-specific links.
 
 - Create one operation-owned worktree. Generate the packet with `packet OP --from-dir DIR`, or author its structured envelope directly.
 - Let the helper own timestamps, guide entries, changelog appends and publication records. Supply reasons, evidence and coverage. Ordinary capture leaves reader/publisher rules unchanged.

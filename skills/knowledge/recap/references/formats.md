@@ -19,6 +19,10 @@ Optional fields are `aliases` (unique string array), `status` (`formal` or `arch
 
 Stored headers additionally contain `schema: recap-topic/v2`, `created` and `updated`. The helper preserves creation/acquisition and sets the edit date; a format-only migration preserves all original dates. Status controls document lifecycle, not factual certainty. Archived topics leave the default index. Partial capture drafts stay under `drafts/`, outside publication; preserve them without a formal publish/cursor update until the user accepts the gap or it is repaired.
 
+## Body links
+
+Local body links must be relative to their owning document, use forward slashes and remain inside the knowledge root. Absolute local paths (including Windows drive paths and `file:` URLs), backslashes and root-escaping `..` are rejected. Link fragments are allowed; the helper checks the target file, not its heading anchor. Topic links may target only topics, sources or `index.md`, not management material. External link schemes are limited to `http`, `https` and `mailto`. A path needed as an operational example can appear as code rather than as a clickable local link.
+
 ## Body templates
 
 Select a type from the reader's question. These specify information to cover, not mandatory literal headings:
@@ -85,7 +89,32 @@ Remove unrelated identities, secrets, private paths and raw chat residue. Prefix
 
 This illustrates one item, not a complete first capture: the referenced source must exist in the candidate or be supplied in the same packet. For sources and capture cursors, use `content` instead of `document`. Each item has the same `path`, `expected_sha256`, `kind`, `reason`, `evidence` envelope. Reasons/evidence are nonempty single-line values. Kinds are `add`, `update`, `correct`, `archive`. `null` expects a new path; updates require the hash from the operation's base. No delete operation is provided. Metadata, source and local-link checks run before formal publication.
 
+### Capture cursor
+
 Capture cursors are exact `.state/cursors/NAME.json` files containing a complete `recap-session-receipt/v1`: host, session ID, captured_at, source locator/prefix SHA-256, ordered integer range, and status complete, without unresolved gaps or raw message arrays. Add `represented_by` with nonempty `topics` and `sources` arrays naming related paths authored in this same publication; source session identity must match. They represent only successfully accounted material, not a later unrelated bookkeeping commit. Receipts are caller declarations and do not substitute for inspecting the source.
+
+- Every represented topic must cite at least one represented source; every represented source must be cited by a represented topic.
+- At least one represented source must match the cursor's host and exact session ID. Keep all declared identities, cutoffs and ranges consistent with the inspected material.
+- Range bounds are integers: `after >= -1`, `through >= 0`, and `through >= after`. Prefix hashes are 64 lowercase hexadecimal characters.
+
+A minimal illustrative cursor for `.state/cursors/exact-id.json` is:
+
+```json
+{
+  "schema": "recap-session-receipt/v1",
+  "host": "export",
+  "session_id": "exact-id",
+  "captured_at": "2026-10-28T00:00:00Z",
+  "status": "complete",
+  "source": {"locator": "host-relative original locator", "prefix_sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+  "range": {"after": -1, "through": 12},
+  "represented_by": {"topics": ["topics/Example.md"], "sources": ["sources/export-exact-id.md"]}
+}
+```
+
+Replace the illustrative identity, timestamp, locator, hash and range with the inspected extraction receipt. Preserve its gaps/warnings rather than inventing completeness. Copy a complete receipt into the input directory and add its represented paths only after those source intervals have been accounted for.
+
+### Risk and resolution
 
 Optional packet `risk: reserved` requests explicit user preview/approval; routine is the default. Mechanical checks do not discover every judgment-changing edit, so the writer must classify those correctly.
 
@@ -107,16 +136,51 @@ After `begin OP --writer-id ID`, prepare a separate input directory containing `
       "kind": "add",
       "reason": "Explain the mechanism and its limits",
       "evidence": ["exact inspected source locator"]
+    },
+    {
+      "path": "sources/export-exact-id.md",
+      "kind": "add",
+      "reason": "Preserve inspected evidence",
+      "evidence": ["exact inspected source locator"]
+    },
+    {
+      "path": ".state/cursors/exact-id.json",
+      "kind": "add",
+      "reason": "Record the represented capture range",
+      "evidence": ["inspected extraction receipt"]
     }
   ]
 }
 ```
 
+This first-capture example declares a topic, its source and its successful cursor together. Omit the cursor only when not claiming a saved incremental checkpoint. Repeated capture updates existing paths instead of reusing these `add` declarations.
+
 Run `packet OP --from-dir DIR`. Save stdout to a separate packet file, then inspect it. The operation must still be `editing`; prepared candidates use `resolve` instead. Optional manifest `risk` is `routine` or `reserved`. Reasons/evidence are required declarations, not generated filler. Paths are explicit; unlisted files are never added and symlinks/traversal are rejected.
 
-- A topic input is Markdown with JSON frontmatter containing the structured `document` fields except `body`; the Markdown body supplies `body`. A full existing `recap-topic/v2` document is also accepted; helper-owned `schema`, `created` and `updated` are removed from the packet input. Other metadata, including aliases and verification scope, is retained. New topic dates still come from the helper at inspection.
-- A source or capture cursor contains its complete `content`. The author supplies honest coverage and represented paths. Generation cannot certify source inspection or invent acceptance.
+- A topic input follows [topic fields](#topic-input), [body templates](#body-templates) and [body links](#body-links). It is Markdown with JSON frontmatter containing the structured `document` fields except `body`; the Markdown body supplies `body`. A full existing `recap-topic/v2` document is also accepted; helper-owned `schema`, `created` and `updated` are removed from the packet input. Other metadata, including aliases and verification scope, is retained. New topic dates still come from the helper at inspection.
+- A source contains its complete [source record](#source-record): JSON frontmatter including `schema: recap-source/v2`, then a nonempty Markdown body with a level-one title, inspected ranges and evidence. A cursor contains complete JSON following [capture cursor](#capture-cursor), including `represented_by`. Generation cannot certify source inspection or invent acceptance.
 - `index.md` contains only the [guide introduction](#guide-introduction).
+
+For `topics/Example.md`, a minimal input file is:
+
+```markdown
+---
+{
+  "title": "Example",
+  "type": "concept",
+  "acquired": "2026-10-28",
+  "sources": ["../sources/export-exact-id.md"],
+  "summary": "What this explanation helps the reader understand"
+}
+---
+# Example
+
+A supported explanation with conditions.
+
+[Source](../sources/export-exact-id.md)
+```
+
+These are format examples, not evidence or default acquisition dates. Supply the source header/body and cursor described above; writing only this topic file leaves a broken source link.
 
 The generator checks preparation conditions under the library lock before reading declared documents: no unfinished publication, a clean formal root, an editing operation, and an existing clean candidate with matching repository/branch identity. It preserves external edits and fails without repairing or adopting them. A newer clean formal revision is permitted; `expected_sha256` still comes from the operation's frozen base.
 

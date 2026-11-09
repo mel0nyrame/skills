@@ -134,6 +134,8 @@ From this collection's root, this capability check does not create the library. 
 python3 -B skills/knowledge/recap/scripts/knowledge.py --root /path/to/my-knowledge doctor
 ```
 
+The report includes `portability.ok` and line-specific errors. This static check covers only explicit UTF-8 `read_text()` calls and resolved Git-root comparisons in `workflow.py`; it does not inspect other files or `bytes.decode()` calls. Such errors exit 2 without initializing or writing the library; a passing static check is not a full health check. Windows paths are compared as resolved paths and knowledge text is read as UTF-8, independently of the locale.
+
 An existing populated directory needs migration review rather than empty-library initialization. See [publication, migration, and recovery](../../skills/knowledge/recap/references/operations.md).
 
 ## Maintain routes and locate pending work
@@ -153,6 +155,8 @@ For retained work, start with `status --all --summary`. It omits hashes and work
 The summary retains other operations and recovery information when one operation record is damaged. That entry contains an error and the summary sets `complete: false`; check this field even when the inventory command exits successfully. Library metadata and recovery-journal errors still stop the command. `worktree_exists` reports directory presence only, not valid Git identity or publication readiness.
 
 Guide maintenance changes only the introduction before the generated topic catalog. It uses the same candidate, integration and publication flow as topic changes, with explicit approval of the current candidate hash. Concurrent introduction changes require independent review; a newer generated catalog alone does not. No direct formal-guide edit is necessary. The [guide-maintenance decision](../agents/adr/0005--recap-guide-maintenance.md) explains the boundary.
+
+Initialize a new empty library through [first-capture setup](../../skills/knowledge/recap/references/checklist.md#first-capture). Once coverage, topics and writing guidance are ready, first and repeated captures use the same [publication commands](../../skills/knowledge/recap/references/checklist.md#publication-commands). The input example declares the topic, source and cursor together. Local body links must be root-contained relative paths, not absolute machine paths; [body links](../../skills/knowledge/recap/references/formats.md#body-links) and [capture cursors](../../skills/knowledge/recap/references/formats.md#capture-cursor) define those branches. Failed inspection can leave candidate files dirty without changing the formal library; preserve and investigate that candidate instead of resetting the root.
 
 Use the [command checklist](../../skills/knowledge/recap/references/checklist.md) for ordinary publication. `knowledge.py packet OP --from-dir DIR` computes hashes from the operation base and converts declared topic/source/cursor inputs into a structured packet. Authors still supply reasons, evidence and honest coverage. Generation does not run `inspect` or publish the candidate. See [input-directory format](../../skills/knowledge/recap/references/formats.md#packet-input-directory).
 

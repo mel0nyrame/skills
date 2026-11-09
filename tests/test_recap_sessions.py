@@ -50,7 +50,7 @@ class OpenCodeSnapshotTests(unittest.TestCase):
         self.assertEqual(receipt["range"]["through"], 7)
         self.assertEqual(receipt["source"]["first_persisted_seq"], 4)
         self.assertEqual(receipt["source"]["sequence_gaps"]["count"], 1)
-        records = [json.loads(line) for line in (self.root / "extract-0/records.jsonl").read_text().splitlines()]
+        records = [json.loads(line) for line in (self.root / "extract-0/records.jsonl").read_text(encoding='utf-8').splitlines()]
         self.assertEqual([r["locator"] for r in records], ["seq:4", "seq:7"])
 
     def test_missing_or_future_cutoff_remains_partial(self):
@@ -103,7 +103,7 @@ class OpenCodeSnapshotTests(unittest.TestCase):
         chunk = self.root / 'extract-0' / receipt['chunks'][0]
         before = {p.name: p.read_bytes() for p in chunk.parent.iterdir()}
         result = subprocess.run([sys.executable, '-B', str(SCRIPTS / 'sessions.py'), 'show', str(chunk)],
-            capture_output=True, text=True)
+            capture_output=True, encoding='utf-8')
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn('seq:12', result.stdout)
         self.assertIn('HEAD ', result.stdout)
@@ -111,7 +111,7 @@ class OpenCodeSnapshotTests(unittest.TestCase):
         self.assertIn('\n    indented code\n', result.stdout)
         self.assertEqual(result.stdout.count('字'), 6000)
         self.assertLessEqual(max(map(len, result.stdout.splitlines())), 160)
-        clipped_json = '\n'.join(line[:2000] for line in chunk.read_text().splitlines())
+        clipped_json = '\n'.join(line[:2000] for line in chunk.read_text(encoding='utf-8').splitlines())
         clipped_text = '\n'.join(line[:2000] for line in result.stdout.splitlines())
         self.assertNotIn('TAIL_SENTINEL', clipped_json)
         self.assertIn('TAIL_SENTINEL', clipped_text)
@@ -123,13 +123,13 @@ class OpenCodeSnapshotTests(unittest.TestCase):
         chunks = [self.root / 'extract-0' / name for name in receipt['chunks']]
         fragments = []
         for chunk in chunks:
-            for record in map(json.loads, chunk.read_text().splitlines()):
+            for record in map(json.loads, chunk.read_text(encoding='utf-8').splitlines()):
                 if record['ordinal'] == 12:
                     fragments.append((chunk, record['text_offset']))
         self.assertEqual([offset for _, offset in fragments], [0, 100, 200])
         for chunk, offset in fragments:
             result = subprocess.run([sys.executable, '-B', str(SCRIPTS / 'sessions.py'), 'show', str(chunk),
-                '--ordinal', '12'], capture_output=True, text=True)
+                '--ordinal', '12'], capture_output=True, encoding='utf-8')
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn(f'offset={offset}/250', result.stdout)
             self.assertNotIn('Explain the rule.', result.stdout)
@@ -137,15 +137,15 @@ class OpenCodeSnapshotTests(unittest.TestCase):
     def test_show_rejects_missing_ordinal_and_malformed_records_without_partial_output(self):
         self.extract()
         chunk = self.root / 'extract-0/chunk-0001.jsonl'
-        for ordinal, content in [(999, None), (None, chunk.read_text() + '{\n'),
+        for ordinal, content in [(999, None), (None, chunk.read_text(encoding='utf-8') + '{\n'),
                                  (None, '{"text": "not a chunk record"}\n')]:
             with self.subTest(ordinal=ordinal, content=content):
                 if content is not None:
-                    chunk.write_text(content)
+                    chunk.write_text(content, encoding='utf-8')
                 args = [sys.executable, '-B', str(SCRIPTS / 'sessions.py'), 'show', str(chunk)]
                 if ordinal is not None:
                     args += ['--ordinal', str(ordinal)]
-                result = subprocess.run(args, capture_output=True, text=True)
+                result = subprocess.run(args, capture_output=True, encoding='utf-8')
                 self.assertEqual(result.returncode, 2)
                 self.assertEqual(result.stdout, '')
                 self.assertIn('error', json.loads(result.stderr))

@@ -49,7 +49,7 @@ IGNORE = '''# Recap publication allowlist; staging is also explicit in the helpe
 
 
 def managed(root, migration=False):
-    if not (root / '.git').is_dir() or git_text(root, 'rev-parse', '--show-toplevel') != str(root.resolve()):
+    if not (root / '.git').is_dir() or Path(git_text(root, 'rev-parse', '--show-toplevel')).resolve() != root.resolve():
         raise KnowledgeError('Initialize/migrate this exact root; linked worktrees are not publication roots')
     marker = safe_path(root, '.state/library.json')
     if not marker.exists():
@@ -81,7 +81,7 @@ def get_state(root, identifier):
 
 def worktree(root, state):
     path = safe_path(root, f'.worktree/{operation_id(state["id"])}')
-    if not path.is_dir() or git_text(path, 'rev-parse', '--show-toplevel') != str(path):
+    if not path.is_dir() or Path(git_text(path, 'rev-parse', '--show-toplevel')).resolve() != path.resolve():
         raise KnowledgeError('Candidate worktree is missing; retain operation state for recovery')
     common = Path(git_text(path, 'rev-parse', '--path-format=absolute', '--git-common-dir')).resolve()
     if common != (root / '.git').resolve():
@@ -266,7 +266,7 @@ def check_cursors(tree, state, rendered=None):
         matched = False
         used_sources = set()
         for topic in represented['topics']:
-            content = rendered[topic].decode() if topic in rendered else safe_path(tree, topic).read_text()
+            content = rendered[topic].decode('utf-8') if topic in rendered else safe_path(tree, topic).read_text(encoding='utf-8')
             metadata, _ = doc.validate_topic(content)
             linked = {doc.local_target(topic, reference) for reference in metadata['sources']}
             related = linked & set(represented['sources'])
@@ -276,7 +276,7 @@ def check_cursors(tree, state, rendered=None):
         if used_sources != set(represented['sources']):
             raise KnowledgeError('Represented sources must support the represented topics')
         for source in represented['sources']:
-            content = rendered[source].decode() if source in rendered else safe_path(tree, source).read_text()
+            content = rendered[source].decode('utf-8') if source in rendered else safe_path(tree, source).read_text(encoding='utf-8')
             metadata, _ = doc.validate_source(content)
             matched = matched or (metadata['host'] == receipt['host'] and metadata['session_id'] == receipt['session_id'])
         if not matched:
@@ -362,7 +362,7 @@ def reserved_reasons(root, tree, state):
             reasons.append('index.md: changes the reading-route introduction')
         if not path.startswith('topics/'):
             continue
-        new_meta, new_body = doc.validate_topic(safe_path(tree, path).read_text())
+        new_meta, new_body = doc.validate_topic(safe_path(tree, path).read_text(encoding='utf-8'))
         previous = git_content(root, state['base'], path)
         if item['kind'] == 'archive' or new_meta['status'] == 'archived':
             reasons.append(path + ': archive')
@@ -964,7 +964,7 @@ def migration_plan(root, overrides_file=None):
         assert_no_pending(root)
         existing = library_files(root)
         if (root / '.git').exists():
-            if not (root / '.git').is_dir() or git_text(root, 'rev-parse', '--show-toplevel') != str(root):
+            if not (root / '.git').is_dir() or Path(git_text(root, 'rev-parse', '--show-toplevel')).resolve() != root.resolve():
                 raise KnowledgeError('Migration requires an exact, standalone root')
             if git(root, 'rev-parse', '--verify', 'HEAD', check=False).returncode == 0:
                 assert_clean(root)
@@ -1024,7 +1024,7 @@ def migrate(root, filename, approved_sha256):
                 safe_path(root, path)
                 if not path.startswith(('topics/', 'sources/', '.state/cursors/')) or not allowed_path(path):
                     raise KnowledgeError('Migration can only transform existing topics, sources and capture cursors')
-                original = safe_path(root, path).read_text()
+                original = safe_path(root, path).read_text(encoding='utf-8')
                 if path.startswith('.state/cursors/'):
                     old_cursor, new_cursor = json.loads(original), json.loads(content)
                     validate_cursor(new_cursor)
@@ -1081,7 +1081,7 @@ def migrate(root, filename, approved_sha256):
             config = load_json(safe_path(tree, '.state/library.json'))
             config['schema'] = 'recap-library/v2'
             atomic_write(safe_path(tree, '.state/library.json'), json_bytes(config))
-            old_guide = safe_path(tree, 'AGENTS.md').read_text() if safe_path(tree, 'AGENTS.md').exists() else ''
+            old_guide = safe_path(tree, 'AGENTS.md').read_text(encoding='utf-8') if safe_path(tree, 'AGENTS.md').exists() else ''
             extension = '''## Publication workflow
 
 Search only formal topics; archived topics are outside ordinary retrieval.

@@ -24,6 +24,19 @@ class SearchTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         (self.root / "topics").mkdir()
         (self.root / ".state").mkdir()
+        # Exercise UTF-8 fixtures under a non-UTF-8 file default on every runner.
+        original_read, original_write = Path.read_text, Path.write_text
+
+        def gbk_read(path, encoding=None, errors=None, **kwargs):
+            return original_read(path, encoding=encoding or 'gbk', errors=errors, **kwargs)
+
+        def gbk_write(path, data, encoding=None, errors=None, **kwargs):
+            return original_write(path, data, encoding=encoding or 'gbk', errors=errors, **kwargs)
+
+        for method, replacement in (('read_text', gbk_read), ('write_text', gbk_write)):
+            patcher = patch.object(Path, method, replacement)
+            patcher.start()
+            self.addCleanup(patcher.stop)
 
     def topic(self, name, title, body, aliases=None, summary=None, status="formal"):
         meta = {
@@ -90,7 +103,7 @@ class SearchTests(unittest.TestCase):
 
     def test_snippet_prefers_explanation_and_preserves_original_line_number(self):
         path = self.topic("scope.md", "并发控制", "## 原理\n\n并发控制需要取得锁。\n锁可防止同时覆盖。")
-        original_lines = path.read_text().splitlines()
+        original_lines = path.read_text(encoding='utf-8').splitlines()
         for fallback in (False, True):
             result = self.results("并发控制", fallback)[0]
             self.assertTrue(result["snippet"].startswith("并发控制需要取得锁。"))
@@ -101,8 +114,8 @@ class SearchTests(unittest.TestCase):
         for fallback in (False, True):
             result = self.results("Atomicity", fallback)[0]
             self.assertNotIn('"aliases"', result["snippet"])
-            self.assertIn(result["snippet"].splitlines()[0], path.read_text().splitlines())
-            self.assertGreaterEqual(result["line"], path.read_text().splitlines().index("# 更新规则") + 1)
+            self.assertIn(result["snippet"].splitlines()[0], path.read_text(encoding='utf-8').splitlines())
+            self.assertGreaterEqual(result["line"], path.read_text(encoding='utf-8').splitlines().index("# 更新规则") + 1)
 
     def test_long_snippet_keeps_match_in_view(self):
         for prefix in ("x ", "ß "):
@@ -133,22 +146,27 @@ class SearchTests(unittest.TestCase):
         self.topic(".hidden.md", "Hidden", "excludedmarker")
         for name in ("sources", "drafts", ".history"):
             (self.root / name).mkdir()
-            (self.root / name / "secret.md").write_text("excludedmarker")
-        (self.root / "topics/link.md").symlink_to(self.root / "sources/secret.md")
+            (self.root / name / "secret.md").write_text("excludedmarker", encoding='utf-8')
+        try:
+            (self.root / "topics/link.md").symlink_to(self.root / "sources/secret.md")
+        except OSError as exc:
+            if getattr(exc, 'winerror', None) != 1314:
+                raise
+            self.skipTest('Windows account lacks symbolic-link privilege')
         for fallback in (False, True):
             self.assertEqual(self.paths("excludedmarker", fallback), [])
             self.assertEqual(self.paths("retrievalmarker", fallback), ["topics/scope.md"])
 
     def test_cache_updates_rename_delete_archive_and_corruption(self):
-        path = self.topic("scope.md", "Current", "firstmarker")
+        path = self.topic("scope.md", "当前专题", "firstmarker")
         self.assertEqual(self.paths("firstmarker"), ["topics/scope.md"])
-        path.write_text(path.read_text().replace("firstmarker", "secondmarker"))
+        path.write_text(path.read_text(encoding='utf-8').replace("firstmarker", "secondmarker"), encoding='utf-8')
         self.assertEqual(self.paths("firstmarker"), [])
         self.assertEqual(self.paths("secondmarker"), ["topics/scope.md"])
         renamed = path.with_name("renamed.md")
         path.rename(renamed)
         self.assertEqual(self.paths("secondmarker"), ["topics/renamed.md"])
-        renamed.write_text(renamed.read_text().replace('"formal"', '"archived"'))
+        renamed.write_text(renamed.read_text(encoding='utf-8').replace('"formal"', '"archived"'), encoding='utf-8')
         self.assertEqual(self.paths("secondmarker"), [])
         renamed.unlink()
         (self.root / ".state/index.sqlite").write_bytes(b"corrupt cache")
@@ -181,7 +199,7 @@ class SearchTests(unittest.TestCase):
     def test_plain_markdown_and_reference_links_remain_searchable(self):
         (self.root / "topics/plain.md").write_text(
             "# Older note\n\nUse session.prompt. [Visible label][ref]\n\n"
-            "[ref]: ../sources/destinationmarker.md\n"
+            "[ref]: ../sources/destinationmarker.md\n", encoding='utf-8'
         )
         for fallback in (False, True):
             for query in ("session.prompt", "Visible"):
@@ -212,7 +230,7 @@ class SearchTests(unittest.TestCase):
                     hit = self.results("并发安全", fallback)[0]
                     self.assertIn(phrase, hit["snippet"])
                     self.assertLessEqual(len(hit["snippet"]), 350)
-                    self.assertIn(phrase, path.read_text().splitlines()[hit["line"] - 1])
+                    self.assertIn(phrase, path.read_text(encoding='utf-8').splitlines()[hit["line"] - 1])
 
     def test_snippet_anchors_actual_identifier_after_a_similar_prefix(self):
         self.topic("long.md", "Long example",
@@ -226,7 +244,7 @@ class SearchTests(unittest.TestCase):
         for fallback in (False, True):
             hit = self.results("并发安全", fallback)[0]
             self.assertIn("并发\n安全", hit["snippet"])
-            self.assertEqual(path.read_text().splitlines()[hit["line"] - 1], "并发")
+            self.assertEqual(path.read_text(encoding='utf-8').splitlines()[hit["line"] - 1], "并发")
 
     def test_link_projection_keeps_long_snippet_source_offsets(self):
         self.topic("long.md", "Long example",
@@ -259,7 +277,7 @@ class SearchTests(unittest.TestCase):
 
     def test_public_search_and_read_keep_revision_checks(self):
         knowledge.initialize(self.root)
-        path = self.topic("scope.md", "Current", "session.prompt sends input.")
+        path = self.topic("scope.md", "当前专题", "session.prompt sends input.")
         knowledge.git(self.root, "add", "--", "topics/scope.md")
         knowledge.git(self.root, "commit", "-m", "Add search fixture")
         available = knowledge.fts_available()
@@ -272,7 +290,7 @@ class SearchTests(unittest.TestCase):
                                             expected_revision=result["revision"])
             self.assertIn("session.prompt", saved["content"])
         revision = result["revision"]
-        path.write_text(path.read_text().replace("sends input", "sends another input"))
+        path.write_text(path.read_text(encoding='utf-8').replace("sends input", "sends another input"), encoding='utf-8')
         knowledge.git(self.root, "add", "--", "topics/scope.md")
         knowledge.git(self.root, "commit", "-m", "Update search fixture")
         with self.assertRaisesRegex(knowledge.KnowledgeError, "revision changed"):
@@ -283,24 +301,25 @@ class SearchTests(unittest.TestCase):
     def test_pending_recovery_blocks_both_public_search_engines(self):
         transactions = self.root / ".state/transactions"
         transactions.mkdir()
-        (transactions / "pending.json").write_text(json.dumps({"id": "pending", "status": "prepared"}))
+        (transactions / "pending.json").write_text(json.dumps({"id": "pending", "status": "prepared"}), encoding='utf-8')
         for fallback in (False, True):
             with patch.object(knowledge, "fts_available", return_value=not fallback):
                 with self.assertRaisesRegex(knowledge.KnowledgeError, "Recovery required"):
                     knowledge.search(self.root, "anything")
 
     def test_command_line_search_returns_body_location_and_revision(self):
-        path = self.topic("scope.md", "Selected call", "session.prompt sends input.")
+        path = self.topic("scope.md", "选定调用", "session.prompt sends input.")
         result = subprocess.run(
             [sys.executable, "-B", str(SCRIPTS / "knowledge.py"), "--root", str(self.root),
-             "search", "session.prompt"], capture_output=True, text=True
+             "search", "session.prompt"], capture_output=True, encoding='utf-8'
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         payload = json.loads(result.stdout)
         self.assertIn("revision", payload)
         hit = payload["results"][0]
         self.assertEqual(hit["path"], "topics/scope.md")
-        self.assertEqual(path.read_text().splitlines()[hit["line"] - 1], "session.prompt sends input.")
+        self.assertEqual(hit["title"], "选定调用")
+        self.assertEqual(path.read_text(encoding='utf-8').splitlines()[hit["line"] - 1], "session.prompt sends input.")
 
 
 if __name__ == "__main__":
