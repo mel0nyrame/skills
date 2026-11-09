@@ -17,6 +17,8 @@ Start with the result you need. `clarify` checks whether a focused clarification
 | [project-git](engineering/project-git.md) | Review changes, form commits, and push within authorization | Review findings, local commit hashes, or push results depending on permission |
 | [project-prose](engineering/project-prose.md) | Make technical prose understandable without the chat | Updated target prose or read-only review findings |
 | [pr](engineering/pr.md) | Write a PR body from actual changes and evidence | A chat draft or an explicitly requested file such as `PR.md` |
+| [retro](engineering/retro.md) | Review a coding session's agent environment | Ranked improvement suggestions, without code changes |
+| [writing-for-agents](engineering/writing-for-agents.md) | Write or edit skills and agent instruction documents | Updated target prose or read-only review findings; no fixed artifact directory |
 | [firecrawl-mcp](research/firecrawl-mcp.md) | Read and extract web information | Sourced answers or structured data, saved locally only when requested |
 | [tinyfish-mcp](research/tinyfish-mcp.md) | Read pages and interact with filters or controls when necessary | Extracted data and run status, with optional requested local saving |
 | [context7-mcp](research/context7-mcp.md) | Consult matching library documentation | Documentation evidence, code examples, and explanations without default project edits |
@@ -57,7 +59,7 @@ Once code and prose are ready, `project-git` can review them before you separate
 
 Firecrawl and TinyFish need their corresponding MCP connections. MCP is the tool connection used by an agent; installed instructions cannot replace it. Reading results can stay in chat. CSV or JSON delivery needs an explicit path and local writing capability.
 
-Context7 and PR come from external projects and require separate installation, described in their guides. This collection contains nine bundled skills. Its two submodules are upstream references using `update = none`, normally leaving complete upstream contents unchecked out. GitHub opens a pinned repository root when a submodule is clicked; the guides retain direct skill-directory links.
+Context7, PR, retro, and writing-for-agents come from external projects and require separate installation, described in their guides. This collection contains nine bundled skills. Its four submodules are upstream references using `update = none`, normally leaving complete upstream contents unchecked out. GitHub opens a pinned repository root when a submodule is clicked; the guides retain direct skill-directory links.
 
 `recap` works with a separate knowledge library. Initialization, candidate inspection, and publication can create Git commits. Request an uncommitted draft if you want to inspect content first. Queries can update caches or lock files, so strict read-only tasks need an access-method check.
 

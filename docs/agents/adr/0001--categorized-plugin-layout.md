@@ -26,6 +26,6 @@ The discovery constraint is based on [Codex's manifest-format dispatch](https://
 
 ## Consequences and risks
 
-Adding a category requires updating Claude's declared paths. Changing Codex manifest format requires rechecking discovery, not merely renaming a file. Validate that all nine bundled skills are discovered and that the two external directories are excluded. Schema validity alone does not establish successful runtime discovery.
+Adding a category requires updating Claude's declared paths. Changing Codex manifest format requires rechecking discovery, not merely renaming a file. Validate that all nine bundled skills are discovered and that the external directories are excluded. Schema validity alone does not establish successful runtime discovery.
 
 MCP guidance depends on separately configured services. Plugin installation does not supply service credentials. PR operations depend on the separately installed upstream `pr` skill and retain explicit authorization boundaries.

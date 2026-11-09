@@ -12,6 +12,12 @@ The bundled skill comes from [mel0nyrame's fork](https://github.com/mel0nyrame/a
 
 The source is MIT-licensed, with `Copyright (c) 2026 Matt Pocock` in [its license](https://github.com/mattpocock/skills/blob/main/LICENSE). Its [credits](https://github.com/mattpocock/skills/blob/main/skills/engineering/pr/CREDITS.md) identify material from Dex Horthy's HumanLayer `show-me` skill. [HumanLayer's license](https://github.com/humanlayer/skills/blob/main/LICENSE) is MIT with `Copyright (c) 2026 HumanLayer`.
 
+## Retro and writing-for-agents: upstream submodules
+
+[Matt Pocock's retro skill](https://github.com/mattpocock/skills/tree/main/skills/engineering/retro) and [writing-for-agents skill](https://github.com/mattpocock/skills/tree/main/skills/productivity/writing-for-agents) are represented by the `skills/engineering/retro` and `skills/engineering/writing-for-agents` submodules. Their [retro](docs/engineering/retro.md) and [writing-for-agents](docs/engineering/writing-for-agents.md) guides link to the exact upstream skill directories. No upstream skill instructions are copied into parent-repository files.
+
+Both sources are MIT-licensed, with `Copyright (c) 2026 Matt Pocock` in [the upstream license](https://github.com/mattpocock/skills/blob/main/LICENSE).
+
 ## Context7 MCP: upstream submodule
 
 [Upstash's official Context7 MCP skill](https://github.com/upstash/context7/tree/master/skills/context7-mcp) is represented by the `skills/research/context7-mcp` submodule. The [usage guide](docs/research/context7-mcp.md) links to the exact official skill directory. No upstream skill instructions are copied into parent-repository files.

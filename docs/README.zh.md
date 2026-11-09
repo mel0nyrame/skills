@@ -17,6 +17,8 @@
 | [project-git](engineering/project-git.zh.md) | 审查改动、拆分提交、按授权推送 | 审查说明、本地提交哈希或推送结果，取决于授权 |
 | [project-prose](engineering/project-prose.zh.md) | 让技术说明脱离聊天也能读懂 | 指定文档或注释的更新，或只读审查意见 |
 | [pr](engineering/pr.zh.md) | 根据真实 diff 和验证结果写 PR 正文 | 对话草稿，或你指定的 `PR.md` 等文件 |
+| [retro](engineering/retro.zh.md) | 复盘一次编码会话中的 Agent 环境 | 按严重程度排序的改进建议，不修改代码 |
+| [writing-for-agents](engineering/writing-for-agents.zh.md) | 编写或修改 Skill 与 Agent 说明文档 | 更新后的目标文档，或只读审查意见，没有固定产物目录 |
 | [firecrawl-mcp](research/firecrawl-mcp.zh.md) | 读取和提取网页内容 | 有来源的答案、结构化结果，明确要求后再保存文件 |
 | [tinyfish-mcp](research/tinyfish-mcp.zh.md) | 读取网页，必要时执行筛选和点击 | 提取数据、任务状态，明确要求后再保存文件 |
 | [context7-mcp](research/context7-mcp.zh.md) | 查阅匹配版本的开发文档 | 文档依据、代码示例和解释，查询本身不改项目 |
@@ -58,7 +60,7 @@ $skills:project-engineering
 
 Firecrawl 和 TinyFish 指南依赖相应 MCP 连接。MCP 是 Agent 调用外部工具的连接方式，安装文字指令不能替代连接。读取结果默认可以留在对话里。要求 CSV 或 JSON 时，要明确保存路径，助手也需要能写入本地文件。
 
-Context7 和 PR 来自外部项目，需要单独安装，具体命令在各自指南中。本集合有 9 个内置 Skill，两个子模块只是上游引用。它们设置 `update = none`，正常情况下不检出上游完整内容。在 GitHub 上点击子模块会打开上游仓库的固定提交，指南保留直达具体 Skill 子目录的链接。
+Context7、PR、retro 和 writing-for-agents 来自外部项目，需要单独安装，具体命令在各自指南中。本集合有 9 个内置 Skill，四个子模块只是上游引用。它们设置 `update = none`，正常情况下不检出上游完整内容。在 GitHub 上点击子模块会打开上游仓库的固定提交，指南保留直达具体 Skill 子目录的链接。
 
 `recap` 操作独立知识库。它的初始化、候选检查和正式发布可能创建 Git 提交。只想先看内容时，应明确要求未提交草稿。查询正式知识也可能更新缓存或锁文件，严格只读任务需要先核对访问方式。
 

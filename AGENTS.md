@@ -42,7 +42,7 @@ Before changing manifests or submodule policy, read the [packaging decisions](do
 
 For releases, follow [the version policy](docs/agents/adr/0003--repository-release-versions.md). Keep both plugin versions equal and tag the merged `main` commit as `vX.Y.Z`.
 
-Keep external `pr` and `context7-mcp` submodules unchecked out under their `update = none` policy. Populating upstream collections can alter recursive discovery. Keep credentials outside repository files. Preserve third-party notices and synchronize original-content license copies with root `LICENSE`.
+Keep external upstream submodules unchecked out under their `update = none` policy. Populating upstream collections can alter recursive discovery. Keep credentials outside repository files. Preserve third-party notices and synchronize original-content license copies with root `LICENSE`.
 
 ## Commits and Pull Requests
 

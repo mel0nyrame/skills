@@ -91,7 +91,7 @@ A capture of this collection's packaging discussion could begin with this excerp
 ```markdown
 # Checkout policy for external skill submodules
 
-This topic explains why the collection leaves the external PR and Context7
+This topic explains why the collection leaves external upstream
 repositories unchecked out. It applies to the current packaging layout where
 nine bundled skills share categorized directories.
 
@@ -101,7 +101,7 @@ Complete upstream repositories contain other skills that can affect recursive
 discovery when checked out.
 
 ## Verification
-Confirm both references remain gitlinks and normal initialization skips checkout.
+Confirm the external references remain gitlinks and normal initialization skips checkout.
 Then verify that installer discovery still returns nine bundled skills.
 
 ## Source
