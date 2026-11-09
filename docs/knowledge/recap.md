@@ -40,6 +40,10 @@ It prepares topic bodies and necessary source records. Coverage gaps and unread 
 
 The capture workflow has six stages: establish coverage, develop topics, select writing guidance, prepare a candidate, integrate and review, then publish and verify. Each stage states its completion condition. The [command checklist](../../skills/knowledge/recap/references/checklist.md) supplies the ordinary helper sequence.
 
+References are selected by the current step: source recovery, continuity, topic fields, source fields, approval or recovery. A short source uses the same coverage and publication checks. Topic summaries select relevant reading before the assistant opens full topics.
+
+For local extraction, `sessions.py show CHUNK` displays one chunk as text with original locators and fragment offsets. It wraps long lines for display and leaves the JSONL files unchanged. The assistant reads the receipt and one text view per chunk; targeted rereads remain available for truncation or corrections. Whole-output limits still require bounded reading. See [chunk reading](../../skills/knowledge/recap/references/sessions.md#read-extracted-chunks).
+
 Formal updates use a candidate worktree and checks. Concurrent changes to the same content require independent review. Publication uses the same candidate hash that was inspected and approved. Current task authorization and existing approval rules determine when explicit user approval is required. Saved prose and important retrieval must pass verification before cleanup. Claimed incremental progress must have its cursor published with the represented knowledge. Only this successful operation's eligible temporary material is cleaned; failed or pending work remains available.
 
 ## Know the resulting files
@@ -145,6 +149,8 @@ Preserve unpublished candidates and unrelated local files.
 ```
 
 `knowledge.py status --all` lists operation records, worktree/branch presence, publication-record presence and interrupted transactions. An old `ready` operation is not automatically abandoned. Cleanup remains limited to matching, successfully published candidates.
+
+For retained work, start with `status --all --summary`. It omits hashes and worktree paths while retaining every operation, per-entry error, review/conflict state and interrupted transaction. Open details with `status OP` and `diff OP`. A new capture starts with `begin OP` instead of listing all historical operations. The summary reduces output volume; it performs the same inventory checks.
 
 The summary retains other operations and recovery information when one operation record is damaged. That entry contains an error and the summary sets `complete: false`; check this field even when the inventory command exits successfully. Library metadata and recovery-journal errors still stop the command. `worktree_exists` reports directory presence only, not valid Git identity or publication readiness.
 

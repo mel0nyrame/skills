@@ -468,6 +468,7 @@ def main(argv=None):
     p = sub.add_parser('status', help='Inspect one operation or list all retained operation records')
     p.add_argument('operation', nargs='?')
     p.add_argument('--all', action='store_true')
+    p.add_argument('--summary', action='store_true', help='With --all, omit hashes and worktree paths; keep errors and recovery')
     for name in ['integrate', 'diff', 'recover', 'cleanup']:
         p = sub.add_parser(name)
         p.add_argument('operation')
@@ -484,6 +485,8 @@ def main(argv=None):
     p.add_argument('plan')
     p.add_argument('--approved-sha256', required=True)
     args = parser.parse_args(argv)
+    if args.command == 'status' and args.summary and not args.all:
+        parser.error('--summary requires --all')
     if args.command == 'status' and (bool(args.operation) == args.all):
         parser.error('status requires either OPERATION or --all, not both')
     root = root_path(args.root)
@@ -504,6 +507,11 @@ def main(argv=None):
         elif args.command == 'apply': result = apply_bundle(root, Path(args.packet), args.approved_sha256)
         elif args.command in ('integrate', 'status', 'diff', 'recover', 'cleanup'):
             result = getattr(workflow, args.command)(root, args.operation)
+            if args.command == 'status' and args.summary:
+                fields = {'id', 'status', 'worktree_exists', 'branch_exists',
+                          'publication_record_exists', 'review_required', 'conflicts', 'error'}
+                result['operations'] = [{k: v for k, v in entry.items() if k in fields}
+                                        for entry in result['operations']]
         elif args.command in ('resolve', 'approve'): result = getattr(workflow, args.command)(root, args.operation, Path(args.file))
         elif args.command == 'review': result = workflow.record_review(root, args.operation, Path(args.file))
         elif args.command == 'publish': result = workflow.publish(root, args.operation, args.approved_sha256)
