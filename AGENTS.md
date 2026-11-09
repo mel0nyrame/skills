@@ -13,12 +13,13 @@ There is no build step. Run checks from the repository root:
 ```sh
 python3 -B -m unittest discover -s tests -v
 python3 -B skills/engineering/project-adr/scripts/check_adr.py docs/agents/adr
+python3 -B -m scripts.check_docs
 npx skills@latest add . --list
 claude plugin validate .claude-plugin/plugin.json --strict
 claude plugin validate .claude-plugin/marketplace.json --strict
 ```
 
-These commands run regression tests, validate active decisions, preview skill discovery without installing, and validate Claude manifests.
+These commands run regression tests, validate active decisions and documentation, preview skill discovery without installing, and validate Claude manifests. See [maintenance checks](docs/maintaining.md) for PR-body and forward-fixture commands.
 
 ## Style and Naming
 
@@ -45,6 +46,8 @@ For releases, follow [the version policy](docs/agents/adr/0003--repository-relea
 Keep external `pr` and `context7-mcp` submodules unchecked out under their `update = none` policy. Populating upstream collections can alter recursive discovery. Keep credentials outside repository files. Preserve third-party notices and synchronize original-content license copies with root `LICENSE`.
 
 ## Commits and Pull Requests
+
+For reviews, read [review standards](CODING_STANDARDS.md).
 
 Use focused commits and follow the [Git naming defaults](skills/engineering/project-git/references/CONVENTIONS.md) unless explicitly overridden.
 

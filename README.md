@@ -132,6 +132,8 @@ Keep published tags fixed. Existing installations need a separate update with `n
 
 ### Repository upkeep
 
+Repository contributors can use the [maintenance checks](docs/maintaining.md) and [review standards](CODING_STANDARDS.md). These cover documentation, PR-body structure, and reproducible forward inputs.
+
 The upstream submodules use `update = none`. Normal initialization leaves them unchecked out; a leading `-` in `git submodule status` is expected. Explicitly populating those directories can expose unrelated upstream skills to recursive discovery. Use their separate installation instructions for the desired skill. The [submodule decision](docs/agents/adr/0002--upstream-submodule-references.md) explains this boundary.
 
 Keep instructions in English. Keep this README and [README.zh.md](README.zh.md) synchronized. Give each skill one source directory. When changing names, update frontmatter, UI metadata, prompts, and cross-skill references together. Adding a category also requires updating Claude's skill paths.
