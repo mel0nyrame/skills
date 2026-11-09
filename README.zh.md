@@ -14,7 +14,7 @@
 | --- | --- |
 | [project-engineering](docs/engineering/project-engineering.zh.md) | 实现项目改动，保存工程知识，同步受影响的决策。 |
 | [project-adr](docs/engineering/project-adr.zh.md) | 保存长期设计讨论，维护选择、否决理由、生命周期和替代关系。 |
-| [project-git](docs/engineering/project-git.zh.md) | 审查工作树、拆分提交，并按用户授权推送。 |
+| [project-git](docs/engineering/project-git.zh.md) | 保存并行工作树偏好、审查改动，并按用户授权交付。 |
 | [project-prose](docs/engineering/project-prose.zh.md) | 编写和审查自足的技术文字，保留完整契约。 |
 | [pr ↗](https://github.com/mattpocock/skills/tree/main/skills/engineering/pr) | 外部推荐，指向 Matt Pocock 的上游 PR Skill。[使用指南](docs/engineering/pr.zh.md) · [子模块](skills/engineering/pr)。 |
 
