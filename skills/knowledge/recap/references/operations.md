@@ -18,6 +18,8 @@ Guide text is preserved unless an explicitly approved candidate updates its [int
 
 ## Locate retained operations
 
+Start with `status --all --summary` when locating retained work or interrupted transactions. It keeps every operation, error and recovery journal while omitting hashes and worktree paths. Read `complete` and `recovery_required`, then use `status OP` and `diff OP` for the selected operation. A new capture uses `begin OP`; it needs no full historical inventory. The compact form reduces output, not inventory work or validation.
+
 `status OP` retains its strict single-operation output. `status --all` reads recovery journals first, then reports retained operations, including cleaned/published records, their base/candidate revisions, directory/branch presence and publication-record presence in HEAD. A failed operation read produces an `id`/`error` entry instead of hiding other operations or recovery information. `complete: false` means at least one entry could not be inspected; inspect this field even when the CLI returns 0 for a successful inventory. Invalid library metadata or unreadable recovery journals still fail the command instead of reporting an empty recovery list. Missing optional fingerprints are valid for editing operations.
 
 `worktree_exists` means only that the expected directory exists. It does not verify Git repository/branch identity or readiness for publication; candidate operations perform those checks. Status does not infer that an old `ready` candidate is abandoned or equivalent to a newer operation. Missing worktrees remain visible instead of silently dropping their records. Status uses the library lock and may create a lock file; it is not a zero-write filesystem inventory.
