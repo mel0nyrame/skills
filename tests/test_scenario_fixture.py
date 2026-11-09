@@ -2,11 +2,13 @@
 
 import json
 from pathlib import Path
+import runpy
 import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 from scripts import scenario_fixture as fixture
 
@@ -55,6 +57,18 @@ class ScenarioFixtureTests(unittest.TestCase):
         subprocess.run([sys.executable, '-B', 'generate_docs.py'], cwd=self.destination,
                        check=True, capture_output=True)
         self.assertEqual(fixture.git(self.destination, 'status', '--porcelain'), b'')
+
+    def test_generator_uses_lf_under_windows_text_writes(self):
+        fixture.prepare(self.root, 'prose-generated', self.destination)
+
+        def windows_write(path, text, encoding=None, errors=None, newline=None):
+            if newline is None:
+                text = text.replace('\n', '\r\n')
+            return path.write_bytes(text.encode(encoding or 'utf-8'))
+
+        with mock.patch.object(Path, 'write_text', windows_write):
+            runpy.run_path(str(self.destination / 'generate_docs.py'), run_name='__main__')
+        self.assertNotIn(b'\r\n', (self.destination / 'docs/export.md').read_bytes())
 
     def test_edited_project_output_is_allowed_but_changed_skill_fails(self):
         fixture.prepare(self.root, 'prose-generated', self.destination)

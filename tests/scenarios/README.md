@@ -11,7 +11,7 @@ python3 -B -m scripts.scenario_fixture prepare git-review /tmp/skills-git-run --
 python3 -B -m scripts.scenario_fixture check-source /tmp/skills-git-run
 ```
 
-Preparation copies the named fixture and only its selected skill, initializes a local Git repository, and commits the baseline. `.scenario-source.json` records the source commit and SHA-256 of every supplied file. `check-source` compares those hashes with that commit and checks that supplied skill bytes remain unchanged. Authored project outputs may change. Later changes to this collection's HEAD do not invalidate an earlier record.
+Preparation copies the named fixture and only its selected skill, initializes a local Git repository, and commits the baseline. `.scenario-source.json` records the source commit and SHA-256 of every supplied file. `check-source` compares those hashes with that commit and checks that supplied skill bytes remain unchanged. Authored project outputs may change. Later changes to this collection's HEAD do not invalidate an earlier record. Generated fixture documentation uses UTF-8 and LF on every host.
 
 The source commit must contain these fixtures. In a shallow checkout, fetch the recorded commit before checking historical evidence. Missing or changed dependencies make that attempted run `skipped`; preparation and source validation alone never count as a passed agent scenario.
 
