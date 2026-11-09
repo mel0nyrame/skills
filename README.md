@@ -17,6 +17,8 @@ New to the collection? Start with the [usage guides](docs/README.md) for purpose
 | [project-git](docs/engineering/project-git.md) | Review working trees, split commits, and push within user authorization. |
 | [project-prose](docs/engineering/project-prose.md) | Write and review self-contained technical prose with complete contracts. |
 | [pr ↗](https://github.com/mattpocock/skills/tree/main/skills/engineering/pr) | External recommendation: Matt Pocock's upstream PR skill. [Usage guide](docs/engineering/pr.md) · [Submodule](skills/engineering/pr). |
+| [retro ↗](https://github.com/mattpocock/skills/tree/main/skills/engineering/retro) | External recommendation: Matt Pocock's upstream retrospective skill. [Usage guide](docs/engineering/retro.md) · [Submodule](skills/engineering/retro). |
+| [writing-for-agents ↗](https://github.com/mattpocock/skills/tree/main/skills/productivity/writing-for-agents) | External recommendation: Matt Pocock's upstream skill for agent-facing documents. [Usage guide](docs/engineering/writing-for-agents.md) · [Submodule](skills/engineering/writing-for-agents). |
 
 The four `project-*` skills form a project-engineering suite: implementation and knowledge maintenance, durable decisions, Git delivery, and technical prose. Each can also be used independently.
 
@@ -41,7 +43,7 @@ The four `project-*` skills form a project-engineering suite: implementation and
 | --- | --- |
 | [recap](docs/knowledge/recap.md) | Turn conversations into reusable, traceable topic knowledge. Explicit invocation only. |
 
-The package contains **nine installable skills**. `pr` and `context7-mcp` are upstream Git submodules left unchecked out by default. They are excluded from the plugin and Skills CLI skill inventory. Their guides provide exact upstream links and separate installation instructions.
+The package contains **nine installable skills**. `pr`, `retro`, `writing-for-agents`, and `context7-mcp` are upstream Git submodules left unchecked out by default. They are excluded from the plugin and Skills CLI skill inventory. Their guides provide exact upstream links and separate installation instructions.
 
 ## Install
 

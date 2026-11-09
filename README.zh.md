@@ -17,6 +17,8 @@
 | [project-git](docs/engineering/project-git.zh.md) | 审查工作树、拆分提交，并按用户授权推送。 |
 | [project-prose](docs/engineering/project-prose.zh.md) | 编写和审查自足的技术文字，保留完整契约。 |
 | [pr ↗](https://github.com/mattpocock/skills/tree/main/skills/engineering/pr) | 外部推荐，指向 Matt Pocock 的上游 PR Skill。[使用指南](docs/engineering/pr.zh.md) · [子模块](skills/engineering/pr)。 |
+| [retro ↗](https://github.com/mattpocock/skills/tree/main/skills/engineering/retro) | 外部推荐，指向 Matt Pocock 的上游复盘 Skill。[使用指南](docs/engineering/retro.zh.md) · [子模块](skills/engineering/retro)。 |
+| [writing-for-agents ↗](https://github.com/mattpocock/skills/tree/main/skills/productivity/writing-for-agents) | 外部推荐，指向 Matt Pocock 的上游 Agent 文档写作 Skill。[使用指南](docs/engineering/writing-for-agents.zh.md) · [子模块](skills/engineering/writing-for-agents)。 |
 
 四个 `project-*` Skill 组成一套项目工程工具，分别负责实现与知识维护、长期决策、Git 交付和技术文字。每个 Skill 也可以单独使用。
 
@@ -41,7 +43,7 @@
 | --- | --- |
 | [recap](docs/knowledge/recap.zh.md) | 将会话整理为可复用、可追溯的专题知识。仅由用户显式调用。 |
 
-项目包含 **9 个可安装 Skill**。`pr` 和 `context7-mcp` 使用默认不检出的 Git 子模块，不进入插件和 Skills CLI 的 Skill 清单。对应使用指南提供精确的上游链接和单独安装方法。
+项目包含 **9 个可安装 Skill**。`pr`、`retro`、`writing-for-agents` 和 `context7-mcp` 使用默认不检出的 Git 子模块，不进入插件和 Skills CLI 的 Skill 清单。对应使用指南提供精确的上游链接和单独安装方法。
 
 ## 安装
 

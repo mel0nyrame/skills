@@ -90,15 +90,15 @@ my-knowledge/
 ```markdown
 # 外部 Skill 的子模块检出规则
 
-本文说明本集合为什么默认不检出外部 PR 和 Context7 仓库。
+本文说明本集合为什么默认不检出外部上游仓库。
 适用范围是当前九个内置 Skill 共用分类目录的打包结构。
 
 ## 约定及原因
-两个外部引用使用 Git 子模块，并在 .gitmodules 中设置 update = none。
+外部引用使用 Git 子模块，并在 .gitmodules 中设置 update = none。
 上游完整仓库包含其他 Skill，检出后可能改变递归扫描结果。
 
 ## 怎样核对
-确认两个引用仍是 gitlink，正常初始化会跳过内容检出。
+确认外部引用仍是 gitlink，正常初始化会跳过内容检出。
 再检查安装器发现的内置 Skill 是否仍为九个。
 
 ## 来源

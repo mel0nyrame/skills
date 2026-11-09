@@ -10,9 +10,11 @@ External skill folders should appear as clickable upstream references on GitHub 
 
 ## Decision
 
-Use standard Git submodules for `skills/engineering/pr` and `skills/research/context7-mcp`. Pin each to a verified upstream commit and set `update = none` in `.gitmodules`. Keep them unchecked out during ordinary collection use. The bilingual usage guides retain exact links to the upstream skill subdirectories.
+Use standard Git submodules for the external skill references: `skills/engineering/pr`, `skills/engineering/retro`, `skills/engineering/writing-for-agents`, and `skills/research/context7-mcp`. Pin each to a verified upstream commit and set `update = none` in `.gitmodules`. Keep them unchecked out during ordinary collection use. The bilingual usage guides retain exact links to the upstream skill subdirectories.
 
-The two gitlinks and `.gitmodules` belong in the Git index together. Adding them does not authorize committing or pushing the collection. Upstream instructions are not stored as parent-repository files.
+The `retro` and `writing-for-agents` references reuse `pr`'s upstream repository and pin. Their upstream directories sit in different categories, but this collection places both under `skills/engineering/` to avoid adding a new category.
+
+The gitlinks and `.gitmodules` belong in the Git index together. Adding them does not authorize committing or pushing the collection. Upstream instructions are not stored as parent-repository files.
 
 Human usage guides live in `docs/<category>/<skill>.md` and `<skill>.zh.md`. This repository's own ADRs live in `docs/agents/adr/`, separately from skill source and reader guides.
 
