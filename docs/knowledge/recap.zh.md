@@ -43,7 +43,7 @@ $skills:recap
 
 本地提取后，`sessions.py show CHUNK` 会把一个分块显示为文本，保留原始定位和片段偏移。长行只在显示时换行，JSONL 文件保持原样。助手读取 receipt，并为每个分块选择一种文本视图。出现截断或纠正时，仍可定点补读。工具对整体输出的限制仍需要分段处理。见[分块读取规则](../../skills/knowledge/recap/references/sessions.md#read-extracted-chunks)。
 
-正式保存走候选工作区和检查流程。并发修改同一篇内容时，还需要独立审查。发布时使用已经检查并批准的同一候选哈希。是否需要用户明确批准，仍按当前任务授权和现有审批规则判断。清理前，需要重新打开正文，并检查重要检索。报告增量进度时，对应游标必须与其代表的知识一同发布。只清理本次成功操作中符合条件的临时材料。失败或待审查的工作应保留。
+正式保存走候选工作区和检查流程。并发修改同一篇内容时，还需要独立审查。发布时使用已经检查并批准的同一候选哈希。是否需要用户明确批准，仍按当前任务授权和现有审批规则判断。清理前，需要重新打开正文，并检查重要检索。报告增量进度时，对应游标必须与其代表的知识一同发布。`cleanup` 只删除匹配的已发布工作区和分支。原始提取需要另行删除，范围只能是本次创建的精确目录。如果宿主策略阻止删除，应报告保留位置，不得绕过限制。移动或重命名数据不能证明删除成功。失败或待审查的工作应保留。
 
 ## 具体会生成什么
 
@@ -154,11 +154,15 @@ $skills:recap
 
 新空库按[首次捕获准备](../../skills/knowledge/recap/references/checklist.md#first-capture)初始化。确认来源覆盖、形成专题并选定写作指导后，首次与后续捕获使用同一份[发布命令表](../../skills/knowledge/recap/references/checklist.md#publication-commands)。输入示例把专题、来源和检查点放在同一变更包中。本地正文链接必须是留在库根内的相对路径，不能使用本机绝对路径；对应分支见[正文链接](../../skills/knowledge/recap/references/formats.md#body-links)和[捕获检查点](../../skills/knowledge/recap/references/formats.md#capture-cursor)。检查失败可能使候选文件变脏，而正式库尚未改变；应保留并调查该候选，而不是重置正式库。
 
-普通发布可先读[命令清单](../../skills/knowledge/recap/references/checklist.md)。`knowledge.py packet OP --from-dir DIR` 从操作基准版本计算哈希，把明确列出的专题、来源和回执转换为变更包。作者仍需填写修改理由、证据和真实覆盖范围。生成命令不会执行 `inspect` 或发布候选。输入结构见[输入目录格式](../../skills/knowledge/recap/references/formats.md#packet-input-directory)。
+普通发布可先读[命令清单](../../skills/knowledge/recap/references/checklist.md)。`knowledge.py packet OP --from-dir DIR` 从操作基准版本计算哈希，把明确列出的专题、来源和回执转换为变更包。作者仍需填写修改理由、证据和真实覆盖范围。`reason` 必须是非空单行字符串。`evidence` 必须是非空数组，其中每项都是互不重复的非空单行字符串；只有一个定位时也必须使用数组。重定向保存的 JSON 必须采用 UTF-8，具体方法见[输出说明](../../skills/knowledge/recap/references/operations.md#utf-8-redirected-output)。生成命令不会执行 `inspect` 或发布候选。输入结构见[输入目录格式](../../skills/knowledge/recap/references/formats.md#packet-input-directory)。
 
 生成变更包要求正式库和候选没有未提交修改。候选必须存在、处于编辑状态，并具有匹配的仓库和分支身份。命令在读取声明的文档前报告这些问题，保留外部文件。正式库可以推进到更新的干净版本，哈希仍取自操作基准。单项输入检查不能替代 `inspect` 对整个候选的链接和来源关系验证。
 
-OpenCode 的消息序号表示事件位置，可以从大于 1 的数字开始，也可以跳号。提取器保留原始位置，单独记录数字间隙。完整提取只说明已读取受支持格式的持久化快照，不能证明宿主从未删除或漏存历史。分支、附件、格式或增量前缀确有问题时，仍不能获得完整回执。
+OpenCode 提取必须使用精确的 `session_v2.id`，不能使用工作区目录名。截止位置采用 OpenCode 的 `session_message.seq`，不能直接使用 OpenChamber 缓存序号或界面轮次。需要通过共享消息 ID 或明确的元数据映射坐标。具体边界见[宿主说明](../../skills/knowledge/recap/references/sessions.md#host-notes)。OpenCode 的消息序号表示事件位置，可以从大于 1 的数字开始，也可以跳号。提取器保留原始位置，单独记录数字间隙。完整提取只说明已读取受支持格式的持久化快照，不能证明宿主从未删除或漏存历史。分支、附件、格式或增量前缀确有问题时，仍不能获得完整回执。
+
+提取默认排除工具输出。`--include-tools` 只读取受支持的返回内容，不读取工具输入或外部产物。因此，渲染的 HTML 可能需要另行授权读取。提取内容很少或回执标记为 `complete`，都不能证明工具相关结论已有证据。见[辅助提取](../../skills/knowledge/recap/references/sessions.md#helper-extraction)。
+
+在审查前，生成变更包和渲染游标候选会把 `source.locator` 替换为 `redacted:local-source`，并移除 `incremental.prior_receipt`。原始回执和输入文件保持不变。其他元数据和覆盖检查也保持不变。旧游标与规范化后的游标都可用于验证增量连续性。这项处理只针对两个路径字段，不清除任意秘密或历史 Git 提交。其他元数据和摘录仍需单独检查。具体限制见[游标约定](../../skills/knowledge/recap/references/formats.md#capture-cursor)。
 
 对于外部研究目录，`research_index.py /path/to/research` 只向标准输出打印 Markdown 目录。它不写入索引，也不修改知识库。入库状态保持未标记，直到另行核对。正文开头摘录只用于导航。保存目录和添加外部配置指针，需要对应写入授权。覆盖已有批注的索引前，先读[研究资料目录](../../skills/knowledge/recap/references/operations.md#research-inventory)。
 

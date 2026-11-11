@@ -87,7 +87,7 @@ Remove unrelated identities, secrets, private paths and raw chat residue. Prefix
 }
 ```
 
-This illustrates one item, not a complete first capture: the referenced source must exist in the candidate or be supplied in the same packet. For sources and capture cursors, use `content` instead of `document`. Each item has the same `path`, `expected_sha256`, `kind`, `reason`, `evidence` envelope. Reasons/evidence are nonempty single-line values. Kinds are `add`, `update`, `correct`, `archive`. `null` expects a new path; updates require the hash from the operation's base. No delete operation is provided. Metadata, source and local-link checks run before formal publication.
+This illustrates one item, not a complete first capture: the referenced source must exist in the candidate or be supplied in the same packet. For sources and capture cursors, use `content` instead of `document`. Each item has the same `path`, `expected_sha256`, `kind`, `reason`, `evidence` envelope. `reason` is a nonempty single-line string. `evidence` is a nonempty array of distinct nonempty single-line strings, even for one locator; a bare string is invalid. Kinds are `add`, `update`, `correct`, `archive`. `null` expects a new path; updates require the hash from the operation's base. No delete operation is provided. Metadata, source and local-link checks run before formal publication.
 
 ### Capture cursor
 
@@ -106,13 +106,17 @@ A minimal illustrative cursor for `.state/cursors/exact-id.json` is:
   "session_id": "exact-id",
   "captured_at": "2026-10-28T00:00:00Z",
   "status": "complete",
-  "source": {"locator": "host-relative original locator", "prefix_sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+  "source": {"locator": "redacted:local-source", "prefix_sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
   "range": {"after": -1, "through": 12},
   "represented_by": {"topics": ["topics/Example.md"], "sources": ["sources/export-exact-id.md"]}
 }
 ```
 
-Replace the illustrative identity, timestamp, locator, hash and range with the inspected extraction receipt. Preserve its gaps/warnings rather than inventing completeness. Copy a complete receipt into the input directory and add its represented paths only after those source intervals have been accounted for.
+Replace the illustrative identity, timestamp, hash and range with the inspected extraction receipt. Preserve its gaps/warnings rather than inventing completeness. Copy a complete receipt into the input directory and add its represented paths only after those source intervals have been accounted for.
+
+Before candidate review, packet generation and cursor rendering replace `source.locator` with `redacted:local-source` and omit `incremental.prior_receipt` when present. Reviewed migration plans use the same transformation. The original extraction receipt and input files stay unchanged. All other fields, including warnings and extension metadata, are retained. Publication rejects newly authored cursors that lack this form; it does not silently rewrite reviewed candidates or unrelated historical cursors.
+
+This removes two known local-path fields, not arbitrary secrets. Inspect other metadata, source excerpts and evidence locators before publication. Historical Git commits and retained local artifacts can still contain original paths. Both old and normalized cursors remain valid incremental checkpoints because continuity uses host, session, range and prefix hash, not these paths; supply the selected source separately.
 
 ### Risk and resolution
 
@@ -155,7 +159,7 @@ After `begin OP --writer-id ID`, prepare a separate input directory containing `
 
 This first-capture example declares a topic, its source and its successful cursor together. Omit the cursor only when not claiming a saved incremental checkpoint. Repeated capture updates existing paths instead of reusing these `add` declarations.
 
-Run `packet OP --from-dir DIR`. Save stdout to a separate packet file, then inspect it. The operation must still be `editing`; prepared candidates use `resolve` instead. Optional manifest `risk` is `routine` or `reserved`. Reasons/evidence are required declarations, not generated filler. Paths are explicit; unlisted files are never added and symlinks/traversal are rejected.
+Run `packet OP --from-dir DIR`. Save stdout to a separate UTF-8 packet file, then inspect it. Follow [redirected output](operations.md#utf-8-redirected-output) when the process or shell uses another encoding. The operation must still be `editing`; prepared candidates use `resolve` instead. Optional manifest `risk` is `routine` or `reserved`. Reasons/evidence are required declarations, not generated filler. Paths are explicit; unlisted files are never added and symlinks/traversal are rejected.
 
 - A topic input follows [topic fields](#topic-input), [body templates](#body-templates) and [body links](#body-links). It is Markdown with JSON frontmatter containing the structured `document` fields except `body`; the Markdown body supplies `body`. A full existing `recap-topic/v2` document is also accepted; helper-owned `schema`, `created` and `updated` are removed from the packet input. Other metadata, including aliases and verification scope, is retained. New topic dates still come from the helper at inspection.
 - A source contains its complete [source record](#source-record): JSON frontmatter including `schema: recap-source/v2`, then a nonempty Markdown body with a level-one title, inspected ranges and evidence. A cursor contains complete JSON following [capture cursor](#capture-cursor), including `represented_by`. Generation cannot certify source inspection or invent acceptance.

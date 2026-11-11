@@ -10,11 +10,34 @@ Use `scripts/knowledge.py --root ROOT COMMAND`; global options precede the comma
 4. Run `integrate OP` before publication if the formal revision advanced. Disjoint authored files integrate automatically; both writers changing the same file requires independent review even when Git finds no textual conflict. `status OP` reports state; `diff OP` exposes the candidate diff. If `conflict`, read the exact candidate files and author all reported replacements in a resolution file; run `resolve OP FILE`.
 5. Complete the [standalone reading check](knowledge.md#built-in-writing-contract) for every new or substantively changed topic, then satisfy any independent review below. For a reserved change, show the exact candidate diff to the user, then record its approval with `approve OP FILE`. Program flags include guide-introduction updates, archive, source-contribution removal and removal/rewriting of over 30% of a body of at least 200 characters. This is a conservative mechanical trigger, not a semantic proof. Agent judgment must also flag broad restructuring or changes to the user's non-factual judgment. Approval receipt fields are `candidate_sha256` and a nonempty `evidence_locator` for the user's approval.
 6. Publish with `publish OP --approved-sha256 HASH`, or `apply PACKET --approved-sha256 HASH`. Use the latest candidate hash, not the packet's file hash. A changed main revision requires integration and renewed inspection/review; bypassing the old-version check is not a retry.
-7. Re-read published files, test retrieval with alternate wording, and run `cleanup OP`. It removes only a clean, matching, successfully published worktree and its recorded branch. Remove only the exact raw-extraction directory this operation created. Pending, failed or externally changed worktrees remain available.
+7. Re-read published files, test retrieval with alternate wording, and run `cleanup OP`. It removes only a clean, matching, successfully published worktree and its recorded branch, not the raw extraction. Remove only the exact raw-extraction directory this operation created. Pending, failed or externally changed worktrees remain available. If host policy blocks removal, stop and report the retained location without exposing its contents. Do not switch to Python, Trash or another command to bypass the block. Renaming or moving raw material is retention, not confirmed deletion.
 
 The helper waits at most 30 seconds for the main library lock. Authoring, research and agent review happen outside it. Timeout retains candidates; there is no background queue or infinite retry. Existing uncommitted/staged changes in the formal root pause publication without being staged, committed, stashed or overwritten. Report them to the user. A selected explicit maintenance task can reconcile them separately; capture never silently adopts them.
 
 Guide text is preserved unless an explicitly approved candidate updates its [introduction](formats.md#guide-introduction). The helper regenerates the topic catalog and appends the current operation to the latest changelog. Packets cannot replace the catalog, trailing guide prose, `CHANGELOG.md`, `AGENTS.md`, Git metadata or publication rules. Integration merges only authored introduction text, retains the latest catalog/trailing prose, then regenerates entries. Concurrent introduction changes require independent review; generated entries alone do not. Integration changes the candidate hash, so approval of an earlier candidate is insufficient.
+
+## UTF-8 redirected output
+
+Saved packet and migration JSON must be UTF-8. Set `PYTHONIOENCODING=utf-8` in the Python process environment before redirecting stdout; the system locale may otherwise produce another encoding. For a POSIX shell:
+
+```sh
+PYTHONIOENCODING=utf-8 python3 "$SKILL_DIR/scripts/knowledge.py" --root "$ROOT" packet "$OP" --from-dir "$INPUT" > "$PACKET"
+```
+
+Some shells, including Windows PowerShell, can transcode redirected output. To avoid shell transcoding, use Python with a binary output file. Replace the arguments with the selected paths and operation:
+
+```python
+import os
+import subprocess
+import sys
+
+with open("packet.json", "wb") as output:
+    subprocess.run([sys.executable, "-B", "/path/to/knowledge.py", "--root", "/path/to/library",
+                    "packet", "capture-example", "--from-dir", "/path/to/input"],
+                   env={**os.environ, "PYTHONIOENCODING": "utf-8"}, stdout=output, check=True)
+```
+
+Check command success and parse the saved file as UTF-8 before inspection. Changing the reader's encoding after saving does not repair incorrectly encoded bytes. This setting controls CLI output, not source coverage or host deletion permissions.
 
 ## Locate retained operations
 
@@ -63,7 +86,7 @@ To correct a successfully published version, inspect the selected Git version/di
 
 ## Migrate an existing library
 
-Run `migration-plan --overrides FILE` and save its JSON output for review. It reads only publication material, checks existing dates/links, preserves prose, and proposes explicit metadata transformations. Legacy sources require a v2 metadata override because extraction status and actual inspected coverage differ. Record justified coverage, gaps and original locators; the helper never guesses completeness from a free-form label. Topic overrides map exact paths to one of the four document types. A legacy title that differs from its existing body heading becomes an alias; prose stays unchanged. Existing complete cursors gain explicit represented topic/source paths while preserving their coverage fields.
+Run `migration-plan --overrides FILE` and save its JSON output for review. It reads only publication material, checks existing dates/links, preserves prose, and proposes explicit metadata transformations. Legacy sources require a v2 metadata override because extraction status and actual inspected coverage differ. Record justified coverage, gaps and original locators; the helper never guesses completeness from a free-form label. Topic overrides map exact paths to one of the four document types. A legacy title that differs from its existing body heading becomes an alias; prose stays unchanged. Existing complete cursors gain explicit represented topic/source paths and the [published path form](formats.md#capture-cursor), while preserving all other capture metadata and coverage fields.
 
 After reviewing the plan, run `migrate PLAN --approved-sha256 PLAN_FILE_HASH`. It establishes the original-file baseline, then uses the same recoverable publication flow for a separate format migration commit. It preserves existing creation/update/acquisition dates and source contributions; no verification dates are invented. The migration extends existing reader rules and retains old backups. Unknown legacy dates stop migration instead of being filled with today. Unsupported legacy YAML stops with an actionable error; manually transcribe the supported metadata in a reviewed plan rather than guessing its meaning.
 

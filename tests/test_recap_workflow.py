@@ -81,6 +81,172 @@ class MaintenanceTests(unittest.TestCase):
             "content": json.dumps(receipt)})
         return self.packet(identifier, changes)
 
+    def private_cursor_packet(self, identifier):
+        packet = self.cursor_packet(identifier)
+        payload = json.loads(packet.read_text(encoding='utf-8'))
+        receipt = json.loads(payload['changes'][3]['content'])
+        receipt['source'].update(locator='C:\\private-user\\opencode.db',
+                                 sequence_gaps={'count': 1, 'examples': [[4, 7]]})
+        receipt['incremental'] = {'prior_receipt': '/private-user/previous.json', 'verified_prefix': True}
+        receipt['warnings'] = ['Snapshot coverage is not proof of host persistence.']
+        receipt['extension'] = {'retained': [1, {'value': 'metadata'}]}
+        payload['changes'][3]['content'] = json.dumps(receipt)
+        packet.write_bytes(json_bytes(payload))
+        return packet, payload, receipt
+
+    def expected_public_cursor(self, receipt):
+        expected = json.loads(json.dumps(receipt))
+        expected['source']['locator'] = 'redacted:local-source'
+        expected.get('incremental', {}).pop('prior_receipt', None)
+        return expected
+
+    def test_direct_packet_normalizes_cursor_before_review_and_publication(self):
+        packet, payload, receipt = self.private_cursor_packet('capture')
+        original = packet.read_bytes()
+        result = workflow.inspect(self.root, packet)
+        tree = Path(result['worktree'])
+        expected = self.expected_public_cursor(receipt)
+        candidate = tree / '.state/cursors/new.json'
+        self.assertEqual(json.loads(candidate.read_bytes()), expected)
+        self.assertEqual(packet.read_bytes(), original)
+        # A resolution passes through the same rendering boundary before review.
+        item = payload['changes'][3]
+        self.assertEqual(json.loads(workflow.render_item(item, None, '2026-11-09')), expected)
+        item['content'] = json.dumps(expected)
+        self.assertEqual(json.loads(workflow.render_item(item, None, '2026-11-09')), expected)
+        workflow.publish(self.root, 'capture', result['approval_sha256'])
+        self.assertEqual(json.loads((self.root / item['path']).read_bytes()), expected)
+
+    def test_generated_packet_normalizes_cursor_without_rewriting_inputs(self):
+        _, payload, receipt = self.private_cursor_packet('capture')
+        workflow.begin(self.root, 'capture', 'writer')
+        staging = Path(self.temp.name) / 'input'
+        declarations = []
+        for item in payload['changes']:
+            target = staging / item['path']
+            target.parent.mkdir(parents=True, exist_ok=True)
+            content = (doc.build_topic(item['document'], '2026-11-09')
+                       if 'document' in item else item['content'])
+            target.write_text(content, encoding='utf-8')
+            declarations.append({key: item[key] for key in ('path', 'kind', 'reason', 'evidence')})
+        (staging / 'changes.json').write_bytes(json_bytes({'changes': declarations}))
+        before = {str(p): p.read_bytes() for p in staging.rglob('*') if p.is_file()}
+        packet = workflow.build_packet(self.root, 'capture', staging)
+        self.assertEqual(json.loads(packet['changes'][3]['content']), self.expected_public_cursor(receipt))
+        self.assertEqual({str(p): p.read_bytes() for p in staging.rglob('*') if p.is_file()}, before)
+        result = workflow.inspect(self.root, self.packet('capture', packet['changes']))
+        workflow.publish(self.root, 'capture', result['approval_sha256'])
+        self.assertEqual(json.loads((self.root / '.state/cursors/new.json').read_bytes()),
+                         self.expected_public_cursor(receipt))
+
+    def test_cursor_publication_check_rejects_unsanitized_authored_cursor(self):
+        packet, _, receipt = self.private_cursor_packet('capture')
+        result = workflow.inspect(self.root, packet)
+        tree = Path(result['worktree'])
+        state = workflow.get_state(self.root, 'capture')
+        with self.assertRaisesRegex(KnowledgeError, 'publication-safe'):
+            workflow.check_cursors(tree, state, {'.state/cursors/new.json': json_bytes(receipt)})
+        # Unrelated historical cursors are not a reason to rewrite old commits.
+        (tree / '.state/cursors/historical.json').write_bytes(json_bytes(receipt))
+        workflow.check_cursors(tree, state)
+
+    def test_resolve_normalizes_cursor_and_requires_review_of_new_hash(self):
+        packet, payload, receipt = self.private_cursor_packet('capture')
+        result = workflow.inspect(self.root, packet)
+        state = workflow.get_state(self.root, 'capture')
+        # Model an operation rejected by independent review.
+        state.update(status='needs-revision', review_required=True)
+        workflow.save_state(self.root, state)
+        receipt['warnings'].append('Retain the correction in the reviewed checkpoint.')
+        item = payload['changes'][3]
+        item['content'] = json.dumps(receipt)
+        replacement = Path(self.temp.name) / 'resolution.json'
+        replacement.write_bytes(json_bytes({'changes': [item]}))
+        resolved = workflow.resolve(self.root, 'capture', replacement)
+        self.assertEqual(resolved['status'], 'needs-review')
+        self.assertNotEqual(resolved['approval_sha256'], result['approval_sha256'])
+        tree = Path(resolved['worktree'])
+        self.assertEqual(json.loads((tree / item['path']).read_bytes()), self.expected_public_cursor(receipt))
+        before = head(self.root)
+        with self.assertRaises(KnowledgeError):
+            workflow.publish(self.root, 'capture', result['approval_sha256'])
+        self.assertEqual(head(self.root), before)
+
+    def test_publish_rejects_pre_upgrade_unsafe_candidate_without_rewriting_it(self):
+        packet, _, receipt = self.private_cursor_packet('capture')
+        result = workflow.inspect(self.root, packet)
+        tree = Path(result['worktree'])
+        candidate = tree / '.state/cursors/new.json'
+        # Model bytes and approval state prepared by the previous helper version.
+        original = json_bytes(receipt)
+        candidate.write_bytes(original)
+        state = workflow.get_state(self.root, 'capture')
+        state['candidate'] = workflow.commit_candidate(tree, 'Fixture pre-upgrade candidate')
+        state['fingerprint'] = workflow.fingerprint(tree, state)
+        workflow.save_state(self.root, state)
+        before = head(self.root)
+        with self.assertRaisesRegex(KnowledgeError, 'publication-safe'):
+            workflow.publish(self.root, 'capture', state['fingerprint'])
+        self.assertEqual(head(self.root), before)
+        self.assertEqual(head(tree), state['candidate'])
+        self.assertEqual(candidate.read_bytes(), original)
+        self.assertFalse((tree / '.state/published/capture.json').exists())
+
+    def test_cursor_normalization_keeps_coverage_rejections_before_candidate_writes(self):
+        for field, value in [('status', 'partial'), ('missing', ['unread interval']),
+                             ('unread_attachments', ['image']), ('errors', ['parse failure']),
+                             ('unknown_envelopes', ['unsupported record'])]:
+            with self.subTest(field=field):
+                packet, payload, receipt = self.private_cursor_packet(field)
+                receipt[field] = value
+                payload['changes'][3]['content'] = json.dumps(receipt)
+                packet.write_bytes(json_bytes(payload))
+                workflow.begin(self.root, field, 'writer')
+                tree = self.root / '.worktree' / field
+                before = workflow.library_files(tree)
+                with self.assertRaises(KnowledgeError):
+                    workflow.inspect(self.root, packet)
+                self.assertEqual(workflow.library_files(tree), before)
+                self.assertEqual(git(tree, 'status', '--porcelain').stdout, b'')
+
+    def test_cleanup_leaves_exact_raw_extraction_for_separate_confirmed_removal(self):
+        self.publish_topic('capture')
+        raw = self.root / '.state/tmp/capture/extraction'
+        raw.mkdir(parents=True)
+        marker = raw / 'raw.txt'
+        marker.write_bytes(b'Private fixture transcript')
+        result = workflow.cleanup(self.root, 'capture')
+        self.assertEqual(result['status'], 'cleaned')
+        self.assertFalse((self.root / '.worktree/capture').exists())
+        self.assertEqual(marker.read_bytes(), b'Private fixture transcript')
+        self.assertIn('remove only the exact extraction', result['note'])
+
+    def test_migration_normalizes_only_known_paths_and_preserves_capture_coverage(self):
+        packet, _, receipt = self.private_cursor_packet('capture')
+        result = workflow.inspect(self.root, packet)
+        workflow.publish(self.root, 'capture', result['approval_sha256'])
+        # Model an existing library produced by a helper that committed local paths.
+        cursor = self.root / '.state/cursors/new.json'
+        cursor.write_bytes(json_bytes(receipt))
+        git(self.root, 'add', '--', '.state/cursors/new.json')
+        git(self.root, 'commit', '-m', 'Fixture historical cursor')
+        plan = workflow.migration_plan(self.root)
+        expected = self.expected_public_cursor(receipt)
+        self.assertEqual(json.loads(plan['changes']['.state/cursors/new.json']), expected)
+        filename = Path(self.temp.name) / 'migration.json'
+        original_content = plan['changes']['.state/cursors/new.json']
+        for changed, message in [(receipt, 'publication-safe'),
+                                 ({**expected, 'range': {'after': 0, 'through': 2}}, 'coverage fields')]:
+            plan['changes']['.state/cursors/new.json'] = json.dumps(changed)
+            filename.write_bytes(json_bytes(plan))
+            with self.subTest(message=message), self.assertRaisesRegex(KnowledgeError, message):
+                workflow.migrate(self.root, filename, digest(filename.read_bytes()))
+            self.assertFalse((self.root / '.state/migration.json').exists())
+        plan['changes']['.state/cursors/new.json'] = original_content
+        filename.write_bytes(json_bytes(plan))
+        workflow.migrate(self.root, filename, digest(filename.read_bytes()))
+        self.assertEqual(json.loads(cursor.read_bytes()), expected)
+
     def test_inspect_cursor_failure_is_clean_and_corrected_packet_can_publish(self):
         packet = self.cursor_packet('capture')
         payload = json.loads(packet.read_text(encoding='utf-8'))
@@ -110,7 +276,8 @@ class MaintenanceTests(unittest.TestCase):
         self.assertEqual(git(tree, 'status', '--porcelain').stdout, b'')
         self.assertEqual(workflow.inspect(self.root, packet)['approval_sha256'], result['approval_sha256'])
         workflow.publish(self.root, 'capture', result['approval_sha256'])
-        self.assertEqual((self.root / '.state/cursors/new.json').read_text(encoding='utf-8'), payload['changes'][3]['content'])
+        self.assertEqual(json.loads((self.root / '.state/cursors/new.json').read_bytes()),
+                         self.expected_public_cursor(json.loads(payload['changes'][3]['content'])))
         self.assertIn('../sources/new.md', (self.root / 'topics/Example.md').read_text(encoding='utf-8'))
 
     def test_inspect_rejects_cursor_relationship_errors_before_writing_candidate(self):
@@ -461,10 +628,11 @@ class MaintenanceTests(unittest.TestCase):
         self.assertIn("expanded", item["document"]["body"])
         self.assertIn('content', packet['changes'][1])
         self.assertNotIn('document', packet['changes'][1])
-        declarations["changes"][0]["evidence"] = []
-        (staging / "changes.json").write_bytes(json_bytes(declarations))
-        with self.assertRaises(doc.DocumentError):
-            workflow.build_packet(self.root, "update", staging)
+        for invalid in ([], 'fixture message 1', ['line one\nline two']):
+            declarations["changes"][0]["evidence"] = invalid
+            (staging / "changes.json").write_bytes(json_bytes(declarations))
+            with self.subTest(evidence=invalid), self.assertRaises((doc.DocumentError, KnowledgeError)):
+                workflow.build_packet(self.root, "update", staging)
 
     def test_packet_rejects_symlinks_duplicate_paths_and_missing_reasons(self):
         workflow.begin(self.root, "route", "writer")
