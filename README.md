@@ -144,11 +144,10 @@ Human usage guides live in `docs/<category>/<skill>.md` with a matching `<skill>
 
 Keep Codex's compatibility manifest unless a replacement has been verified to discover categorized skills. See [the packaging decision](docs/agents/adr/0001--categorized-plugin-layout.md) for the discovery constraint and alternatives. Update that record when its decision or supporting facts change. Keep third-party provenance and notices with imported content. The root `LICENSE` owns the license text for original contributions; keep the copies in those skill directories synchronized so standalone installations carry the notice. Karpathy's own license and source notice remain with that skill.
 
-Run focused checks from the repository root:
+Run repository checks from the repository root:
 
 ```sh
-python3 -B -m unittest discover -s tests -v
-python3 -B skills/engineering/project-adr/scripts/check_adr.py docs/agents/adr
+python3 -B -m scripts.check_repository
 npx skills@latest add . --list
 claude plugin validate .claude-plugin/plugin.json --strict
 claude plugin validate .claude-plugin/marketplace.json --strict

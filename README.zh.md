@@ -147,8 +147,7 @@ Skill 指令使用英文。同步维护本文件与 [README.md](README.md)。每
 在仓库根目录运行下面的检查。
 
 ```sh
-python3 -B -m unittest discover -s tests -v
-python3 -B skills/engineering/project-adr/scripts/check_adr.py docs/agents/adr
+python3 -B -m scripts.check_repository
 npx skills@latest add . --list
 claude plugin validate .claude-plugin/plugin.json --strict
 claude plugin validate .claude-plugin/marketplace.json --strict

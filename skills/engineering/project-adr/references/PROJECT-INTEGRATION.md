@@ -34,7 +34,7 @@ Complete when future agents can discover retrieval, capture, and maintenance rul
 Reuse project checks. For the default schema without a checker, copy [check_adr.py](../scripts/check_adr.py) to the project's script directory. It requires Python 3's standard library. Check affected files first:
 
 ```sh
-python3 scripts/check_adr.py docs/adr/0001--storage-choice.md
+python3 scripts/check_adr.py docs/adr/2026-11-12-storage-choice.md
 ```
 
 Use directory-wide checks only after all active records use accepted default schemas:

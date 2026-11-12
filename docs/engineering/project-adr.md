@@ -47,10 +47,12 @@ The assistant discovers project rules and existing topics before writing. It ref
 Without repository conventions, one decision topic occupies one Markdown file, with related candidates and their outcomes together. A separate rejected record needs independent lasting value.
 
 ```text
-docs/adr/NNNN--kebab-title.md
+docs/adr/YYYY-MM-DD-kebab-title.md
 ```
 
-`docs/adr/0001--upload-storage.md` is an example name, not an automatically generated file. The fallback archive directory is `docs/adr/archive/`. This collection follows its explicit `docs/agents/adr/` location instead.
+`docs/adr/2026-11-12-upload-storage.md` is an example name, not an automatically generated file. Use the record's first creation date and keep the filename stable through later edits, state changes, and merge. Dates may repeat; distinct topic slugs distinguish files. Reuse an existing same-topic owner, and make slugs more specific if independent topics collide. Preserve existing numbered filenames and links unless migration is explicitly authorized; project naming rules take precedence.
+
+The fallback archive directory is `docs/adr/archive/`. This collection follows its explicit `docs/agents/adr/` location and uses date-based names for new records while retaining existing numbered files.
 
 The default English structure below uses a hypothetical unresolved storage discussion. Actual reasons and alternatives must come from evidence; pending candidates need no invented rejection reason.
 
