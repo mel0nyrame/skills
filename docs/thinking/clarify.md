@@ -4,7 +4,7 @@ English | [简体中文](clarify.zh.md) · [All guides](../README.md)
 
 `clarify` is useful when you have an idea but have not established the problem you most need to solve. Select it when you want to clarify intent or stress-test the question before receiving a substantive answer. It identifies assumptions and missing information that could affect the answer. If a key gap remains, it asks one decisive question and delivers the solution after your reply.
 
-The initial intent check uses the supplied context without tools or file changes. When a decision-changing gap remains, the first output asks one question and waits. When the context is sufficient, the assistant says so and answers in the same reply.
+The initial intent check uses the supplied context without tools or file changes. When a decision-changing gap remains, the first output asks one question and waits. When the context is sufficient, the assistant answers directly in the same reply, without a sufficiency announcement or clarification headings.
 
 ## Decide whether clarification is useful
 
@@ -22,7 +22,7 @@ I want to build a personal knowledge base. Help identify the actual problem
 first. Do not recommend products or modify files in the first round.
 ```
 
-When clarification is needed, the first reply covers hidden assumptions, critical information gaps, and one question that determines the next direction. It may include one relevant supported mistake or a clearly labeled risk. Depending on context, the final question might resemble this example.
+When clarification is needed, the first reply briefly explains the missing condition and asks one question that determines the next direction. It includes an assumption or risk only when that helps you answer; a fixed multi-section report is unnecessary. Depending on context, the final question might resemble this example.
 
 ```text
 Which problem should we solve first, collecting material or finding what you
@@ -37,8 +37,8 @@ Use `$clarify` standalone or `/skills:clarify` in Claude Code. `$skills:clarify`
 
 | Stage | Visible result | File effects |
 | --- | --- | --- |
-| A key gap remains | Assumptions, gaps, an optional supported mistake/risk, one question | No tools or file changes |
-| Context is sufficient | A brief sufficiency statement and the answer in the same reply | No default output file; later actions follow the task's authorization |
+| A key gap remains | A short explanation and one decisive question; relevant assumptions or risks only as needed | No tools or file changes |
+| Context is sufficient | The answer directly, without clarification framing | No default output file; later actions follow the task's authorization |
 | After your reply | Explanation, recommendation, or plan addressing the original goal | No default output file |
 | A separate request to save the answer | A document at your requested path | Written later within your authorization |
 

@@ -8,7 +8,7 @@ This collection uses a personally maintained adaptation. The [source and license
 
 ## When explicit invocation helps
 
-Use it when the assistant tends to refactor unrelated modules during a fix or says something is fixed without explaining verification. It also applies to research and writing, where supported findings need separation from unverified inference.
+Use it when the assistant tends to refactor unrelated modules during a fix or says something is fixed without explaining verification. Automatic selection targets consequential tradeoffs, unclear requirements, scope creep, or verification gaps, rather than every explanation or writing task. You can still invoke it explicitly for research and writing, where supported findings need separation from unverified inference.
 
 It can accompany a specialized workflow. `project-engineering` establishes project entry points and preserves engineering knowledge; these broader principles help control scope and explanation throughout the work.
 
@@ -32,7 +32,9 @@ The assistant first inspects implementation and constraints to locate the duplic
 
 Each edit should trace to the task. Reuse existing capabilities where adequate. A helper script or visualization can be useful when it serves current understanding or verification, but its purpose should be explicit.
 
-The report separates executed tests from behavior inferred by reading code. One passing failure scenario does not establish that every concurrent case is solved.
+The report accounts for each requirement and separates executed tests from behavior inferred by reading code. Compatibility work distinguishes required behavior, accepted limitations, and user-approved deferrals. One passing failure scenario does not establish that every concurrent case is solved.
+
+For agent instructions, use representative fresh-context behavior scenarios when possible; format and link checks do not establish model behavior. Disclose scenarios that were not run. State a plan only when dependencies or verification points need coordination, not merely because a task has several actions. For nontrivial work, briefly identify the deliverable and change boundary without turning advice or planning into implementation.
 
 ## Files depend on the original task
 
