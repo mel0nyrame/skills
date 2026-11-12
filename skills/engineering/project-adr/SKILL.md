@@ -37,7 +37,7 @@ Before archive or deletion, read [the retirement protocol](references/LIFECYCLE.
 
 ## Write a complete decision
 
-Before drafting, read [record writing](references/RECORDS.md#write-a-record). Preserve valid project templates and existing representations. Without conventions, use one `docs/adr/NNNN--kebab-title.md` per topic, the project's language, and the default four-section format.
+Before drafting, read [record writing](references/RECORDS.md#write-a-record). Preserve valid project templates and existing representations. Without conventions, use one `docs/adr/YYYY-MM-DD-kebab-title.md` per topic, the project's language, and the default four-section format.
 
 When the project lacks a lifecycle convention and uses the default format, read [default states](references/LIFECYCLE.md#default-states) before assigning one. Determine state from selection, implementation evidence, and replacement relationships. A recommendation remains a proposal; acceptance alone grants no execution permission.
 

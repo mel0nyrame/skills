@@ -2,7 +2,7 @@
 
 ## Write a record
 
-Use the format resolved from project rules or consistent comparable records. Preserve valid short templates and existing representations during maintenance. When no reusable convention exists, use the project's language, one `docs/adr/NNNN--kebab-title.md` per topic, and this structure:
+Use the format resolved from project rules or consistent comparable records. Preserve valid short templates and existing representations during maintenance. When no reusable convention exists, use the project's language, one `docs/adr/YYYY-MM-DD-kebab-title.md` per topic, and this structure:
 
 ```markdown
 # Decision title
@@ -14,6 +14,8 @@ Status: proposed
 ## Alternatives
 ## Consequences and risks
 ```
+
+For default filenames, use the record's first creation date in `YYYY-MM-DD` form and a descriptive kebab-case topic slug, separated by one hyphen. Keep the filename stable through edits, acceptance, implementation, and merge. Different topics may share a date; the complete filename identifies the record. Reuse an existing same-topic owner; if independent topics would have the same filename, make their slugs more specific. Preserve existing numbered filenames and links unless migration is explicitly authorized. Project naming rules still take precedence.
 
 Choose the state through [lifecycle rules](LIFECYCLE.md#default-states). The default checker also supports a complete Chinese schema.
 
