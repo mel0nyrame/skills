@@ -11,9 +11,7 @@
 There is no build step. Run checks from the repository root:
 
 ```sh
-python3 -B -m unittest discover -s tests -v
-python3 -B skills/engineering/project-adr/scripts/check_adr.py docs/agents/adr
-python3 -B -m scripts.check_docs
+python3 -B -m scripts.check_repository
 npx skills@latest add . --list
 claude plugin validate .claude-plugin/plugin.json --strict
 claude plugin validate .claude-plugin/marketplace.json --strict
@@ -35,7 +33,7 @@ Packaging changes must still discover nine bundled skills. Verify actual Claude/
 
 ## Decision Maintenance
 
-Before proposing or implementing related work, search active decisions and read relevant proposals, choices, rejection reasons, and open questions. During discussion, preserve durable constraints, evaluated alternatives, and substantial proposals in the existing topic owner. Checkpoint progress before pausing, distinguish selection from implementation, and synchronize records as implementation changes. Follow the [decision rules](docs/agents/adr/README.md) for creation criteria, lifecycle, and checks.
+Use this repository's [project-adr skill](skills/engineering/project-adr/SKILL.md) when creating or maintaining decision records, rather than an installed copy. Before proposing or implementing related work, search active decisions and read relevant proposals, choices, rejection reasons, and open questions. During discussion, preserve durable constraints, evaluated alternatives, and substantial proposals in the existing topic owner. Checkpoint progress before pausing, distinguish selection from implementation, and synchronize records as implementation changes. Follow the [decision rules](docs/agents/adr/README.md) for creation criteria, lifecycle, and checks.
 
 ## Submodules, Decisions, and Licensing
 

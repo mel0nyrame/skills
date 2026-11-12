@@ -7,13 +7,13 @@
 在仓库根目录使用 Python 3 运行：
 
 ```sh
-python3 -B -m unittest discover -s tests -v
-python3 -B skills/engineering/project-adr/scripts/check_adr.py docs/agents/adr
-python3 -B -m scripts.check_docs
+python3 -B -m scripts.check_repository
 python3 -B -m scripts.check_pr_body --body-file /tmp/pr-body.md
 ```
 
-[CI 工作流](../.github/workflows/tests.yml)在 Ubuntu 和 Windows 上运行回归、ADR 和文档检查。PR 事件还会检查正文。编辑 PR 标题或正文后，只重新检查正文结构，不重复运行完整矩阵。
+[共享检查入口](../scripts/check_repository.py)依次运行回归测试、ADR 校验和文档检查，遇到首个非零退出码即停止。各子进程使用调用者的 Python 解释器，以仓库根目录为工作目录，并接收 `PYTHONUTF8=0` 和 `PYTHONIOENCODING=utf-8`：保留依赖系统区域设置的默认编码覆盖，同时让 Python 标准流使用 UTF-8。不修改父进程环境。仍可直接调用单项检查进行定向验证，但不会自动设置共享编码环境。
+
+[CI 工作流](../.github/workflows/tests.yml)在 Ubuntu 和 Windows 上使用同一检查入口。PR 事件还会检查正文。编辑 PR 标题或正文后，只重新检查正文结构，不重复运行完整矩阵。
 
 文档检查器读取 Git 已跟踪和未被忽略的 Markdown，排除 `tests/fixtures/` 下的刻意构造输入。检查范围包括相对路径的行内链接、引用定义、Markdown 锚点、重复标题锚点和显式 HTML 锚点。
 

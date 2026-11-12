@@ -7,13 +7,13 @@ English | [简体中文](maintaining.zh.md)
 Run from the repository root with Python 3:
 
 ```sh
-python3 -B -m unittest discover -s tests -v
-python3 -B skills/engineering/project-adr/scripts/check_adr.py docs/agents/adr
-python3 -B -m scripts.check_docs
+python3 -B -m scripts.check_repository
 python3 -B -m scripts.check_pr_body --body-file /tmp/pr-body.md
 ```
 
-The [CI workflow](../.github/workflows/tests.yml) runs regression, ADR, and documentation checks on Ubuntu and Windows. PR events also validate the body. Editing the PR title or body reruns its structure check without repeating the full matrix.
+The [shared runner](../scripts/check_repository.py) runs regression tests, ADR validation, and documentation checks in order, stopping at the first nonzero exit code. It uses the invoking Python interpreter and the repository root as each child process's working directory. Each child receives `PYTHONUTF8=0` and `PYTHONIOENCODING=utf-8`: locale-dependent defaults remain covered while Python standard streams use UTF-8. The parent environment is unchanged. Direct checker commands remain available for focused work but do not set this shared environment automatically.
+
+The [CI workflow](../.github/workflows/tests.yml) uses the same runner on Ubuntu and Windows. PR events also validate the body. Editing the PR title or body reruns its structure check without repeating the full matrix.
 
 The documentation checker reads tracked and unignored Markdown, excluding intentional inputs under `tests/fixtures/`. It checks relative inline and reference-definition targets, local Markdown fragments, duplicate heading slugs, and explicit HTML anchors.
 
