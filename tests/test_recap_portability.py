@@ -93,6 +93,31 @@ class PortabilityTests(unittest.TestCase):
                 else:
                     self.assertEqual(data['status'], 'ready')
 
+    def test_cli_packet_saved_as_utf8_bytes_can_be_inspected(self):
+        workflow.initialize(self.root)
+        changes = json.loads(self.chinese_packet().read_bytes())['changes']
+        workflow.begin(self.root, 'chinese', 'writer')
+        staging = Path(self.temp.name) / 'input'
+        declarations = []
+        for item in changes:
+            target = staging / item['path']
+            target.parent.mkdir(parents=True, exist_ok=True)
+            content = (doc.build_topic(item['document'], '2026-11-08')
+                       if 'document' in item else item['content'])
+            target.write_text(content, encoding='utf-8')
+            declarations.append({key: item[key] for key in ('path', 'kind', 'reason', 'evidence')})
+        (staging / 'changes.json').write_bytes(json_bytes({'changes': declarations}))
+        saved = Path(self.temp.name) / 'saved-packet.json'
+        environment = {**os.environ, 'PYTHONUTF8': '0', 'PYTHONIOENCODING': 'utf-8'}
+        with saved.open('wb') as output:
+            result = subprocess.run([sys.executable, '-B', str(SCRIPTS / 'knowledge.py'),
+                '--root', str(self.root), 'packet', 'chinese', '--from-dir', str(staging)],
+                env=environment, stdout=output, stderr=subprocess.PIPE)
+        self.assertEqual(result.returncode, 0, result.stderr.decode('utf-8'))
+        self.assertIn('独立可读的中文解释', saved.read_text(encoding='utf-8'))
+        self.assertEqual(json.loads(saved.read_bytes())['id'], 'chinese')
+        self.assertEqual(workflow.inspect(self.root, saved)['status'], 'ready')
+
     def test_documented_first_capture_inputs_generate_valid_candidates(self):
         workflow.initialize(self.root)
         reference = (SCRIPTS.parent / 'references/formats.md').read_text(encoding='utf-8')

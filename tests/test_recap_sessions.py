@@ -14,6 +14,7 @@ import unittest
 SCRIPTS = Path(__file__).resolve().parents[1] / "skills/knowledge/recap/scripts"
 sys.path.insert(0, str(SCRIPTS))
 import sessions
+import workflow
 
 
 class OpenCodeSnapshotTests(unittest.TestCase):
@@ -79,6 +80,51 @@ class OpenCodeSnapshotTests(unittest.TestCase):
         self.assertTrue(receipt["unknown_envelopes"])
         self.assertTrue(any("streaming" in gap for gap in receipt["missing"]))
         self.assertTrue(any("branch" in gap for gap in receipt["missing"]))
+
+    def test_exact_session_id_is_not_a_workspace_directory_name(self):
+        receipt = self.extract(session_id='session-workspace-name')
+        self.assertEqual(receipt['status'], 'error')
+        self.assertIn('Explicit session ID was not found', receipt['errors'])
+
+    def test_tools_are_opt_in_outputs_not_automatic_artifact_recovery(self):
+        self.add(12, 'assistant', {'finish': 'stop', 'content': [
+            {'type': 'text', 'text': 'A visible explanation.'},
+            {'type': 'tool', 'name': 'render', 'state': {
+                'input': {'parameters': {'html': '<html>INPUT_ONLY_SENTINEL</html>'}},
+                'content': 'Shown page title; no HTML returned.'}}]})
+        default = self.extract()
+        tools = self.extract(include_tools=True)
+        def records(directory):
+            return [json.loads(line) for line in (directory / 'records.jsonl').read_text(encoding='utf-8').splitlines()]
+        text_only = records(self.root / 'extract-0')
+        with_tools = records(self.root / 'extract-1')
+        self.assertEqual([r for r in with_tools if r['role'] != 'evidence'], text_only)
+        self.assertEqual(default['skipped_noise']['tool_output'], 1)
+        self.assertEqual(tools['status'], 'complete')
+        self.assertIn('Shown page title', next(r['text'] for r in with_tools if r['role'] == 'evidence'))
+        self.assertNotIn('INPUT_ONLY_SENTINEL', json.dumps(with_tools))
+
+    def test_old_and_published_cursors_both_verify_incremental_prefix(self):
+        prior = self.extract()
+        original = self.root / 'extract-0/receipt.json'
+        saved_bytes = original.read_bytes()
+        prior['incremental']['prior_receipt'] = '/private-user/previous.json'
+        published = self.root / 'published.json'
+        published.write_text(json.dumps(workflow.publication_cursor(prior)), encoding='utf-8')
+        self.assertEqual(original.read_bytes(), saved_bytes)
+        self.add(20, 'user', {'text': 'A correction.'})
+        for checkpoint in (original, published):
+            with self.subTest(checkpoint=checkpoint.name):
+                delta = self.extract(after=7, prior_receipt=str(checkpoint))
+                self.assertEqual(delta['status'], 'complete')
+                self.assertTrue(delta['incremental']['verified_prefix'])
+        with closing(sqlite3.connect(self.db)) as conn, conn:
+            conn.execute('UPDATE session_message SET data=? WHERE seq=4', (json.dumps({'text': 'Changed'}),))
+        for checkpoint in (original, published):
+            with self.subTest(changed_prefix_checkpoint=checkpoint.name):
+                delta = self.extract(after=7, prior_receipt=str(checkpoint))
+                self.assertEqual(delta['status'], 'error')
+                self.assertTrue(any('changed' in error for error in delta['errors']))
 
     def test_incremental_event_positions_require_unchanged_previous_prefix(self):
         prior = self.extract()

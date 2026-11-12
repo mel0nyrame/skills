@@ -213,8 +213,9 @@ def render_item(item, prior, today):
         if relative.startswith('sources/'):
             doc.validate_source(result)
         else:
-            receipt = json.loads(result)
+            receipt = json.loads(result, object_pairs_hook=unique_object)
             validate_cursor(receipt)
+            result = json_bytes(publication_cursor(receipt)).decode('utf-8')
     return result.encode()
 
 
@@ -251,6 +252,15 @@ def validate_cursor(receipt):
     exclude_raw(receipt)
 
 
+def publication_cursor(receipt):
+    """Normalize two known local-path fields without changing other metadata."""
+    result = {**receipt, 'source': {**receipt['source'], 'locator': 'redacted:local-source'}}
+    if isinstance(receipt.get('incremental'), dict):
+        result['incremental'] = {key: value for key, value in receipt['incremental'].items()
+                                 if key != 'prior_receipt'}
+    return result
+
+
 def check_cursors(tree, state, rendered=None):
     rendered = rendered or {}
     authored = set(state['authored'])
@@ -260,6 +270,8 @@ def check_cursors(tree, state, rendered=None):
         receipt = (json.loads(rendered[path], object_pairs_hook=unique_object) if path in rendered
                    else load_json(safe_path(tree, path)))
         validate_cursor(receipt)
+        if receipt != publication_cursor(receipt):
+            raise KnowledgeError('Authored cursor must use publication-safe path fields; prepare a new candidate')
         represented = receipt['represented_by']
         if not set(represented['topics'] + represented['sources']) <= authored:
             raise KnowledgeError('Capture cursor must publish its represented topics and sources in the same batch')
@@ -898,7 +910,9 @@ def build_packet(root, identifier, directory):
                 item['document'] = {**metadata, 'body': body}
             else:
                 item['content'] = content
-            render_item(item, prior, date.today().isoformat())
+            rendered = render_item(item, prior, date.today().isoformat())
+            if path.startswith('.state/cursors/'):
+                item['content'] = rendered.decode('utf-8')
             packet['changes'].append(item)
         return packet
 
@@ -982,7 +996,7 @@ def migration_plan(root, overrides_file=None):
         for path, data in existing.items():
             if not path.startswith('.state/cursors/'):
                 continue
-            receipt = json.loads(data)
+            receipt = json.loads(data, object_pairs_hook=unique_object)
             matching_sources = []
             for source_path, content in changes.items():
                 if source_path.startswith('sources/'):
@@ -993,7 +1007,7 @@ def migration_plan(root, overrides_file=None):
                                any(doc.local_target(p, link) in matching_sources for link in doc.validate_topic(content)[0]['sources'])]
             receipt['represented_by'] = {'topics': sorted(matching_topics), 'sources': sorted(matching_sources)}
             validate_cursor(receipt)
-            changes[path] = json_bytes(receipt).decode()
+            changes[path] = json_bytes(publication_cursor(receipt)).decode('utf-8')
         return {'schema': 'recap-migration/v2', 'id': 'migration',
                 'expected_files': {p: digest(b) for p, b in existing.items()}, 'changes': changes,
                 'note': 'Review source coverage overrides and topic types; prose and original dates remain unchanged.'}
@@ -1026,8 +1040,12 @@ def migrate(root, filename, approved_sha256):
                     raise KnowledgeError('Migration can only transform existing topics, sources and capture cursors')
                 original = safe_path(root, path).read_text(encoding='utf-8')
                 if path.startswith('.state/cursors/'):
-                    old_cursor, new_cursor = json.loads(original), json.loads(content)
+                    old_cursor = json.loads(original, object_pairs_hook=unique_object)
+                    new_cursor = json.loads(content, object_pairs_hook=unique_object)
                     validate_cursor(new_cursor)
+                    if new_cursor != publication_cursor(new_cursor):
+                        raise KnowledgeError('Migration cursor must use publication-safe path fields')
+                    old_cursor = publication_cursor(old_cursor)
                     old_cursor.pop('represented_by', None)
                     compared = dict(new_cursor)
                     compared.pop('represented_by', None)

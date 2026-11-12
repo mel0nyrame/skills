@@ -20,9 +20,9 @@ For a new empty library, follow [first-capture setup](references/checklist.md#fi
 
 ### 1. Establish coverage
 
-Pin the host, conversation, branch and cutoff using [source selection](references/sessions.md#choose-a-bounded-source). For local recovery, follow [helper extraction](references/sessions.md#helper-extraction); for repeated capture, check [continuity](references/sessions.md#completeness-and-incrementality). Give long sources to a worker in ordered chunks, or inspect the chunks sequentially.
+Pin the host, conversation, branch and cutoff using [source selection](references/sessions.md#choose-a-bounded-source). For local recovery, follow [helper extraction](references/sessions.md#helper-extraction); for OpenCode identity or cutoff coordinates, read [host notes](references/sessions.md#host-notes); for repeated capture, check [continuity](references/sessions.md#completeness-and-incrementality). Give long sources to a worker in ordered chunks, or inspect the chunks sequentially.
 
-Complete when every significant theme/correction and every source interval is accounted for, including gaps and unread attachments. Unaccepted partial sources support drafts, not formal updates or successful-capture cursors.
+Complete when every significant theme/correction and every source interval is accounted for, including gaps, unread attachments and evidence needed for tool-dependent claims. Unaccepted partial sources support drafts, not formal updates or successful-capture cursors.
 
 ### 2. Develop topics
 
