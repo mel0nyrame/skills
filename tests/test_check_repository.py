@@ -14,6 +14,23 @@ from scripts import check_repository
 
 
 class RepositoryCheckTests(unittest.TestCase):
+    def test_documented_and_ci_entry_points_use_shared_runner(self):
+        for name in ('README.md', 'README.zh.md', 'AGENTS.md',
+                     'docs/maintaining.md', 'docs/maintaining.zh.md'):
+            with self.subTest(path=name):
+                text = (check_repository.ROOT / name).read_text(encoding='utf-8')
+                blocks = text.split('```sh\n')[1:]
+                commands = [block.split('```', 1)[0].splitlines() for block in blocks]
+                self.assertTrue(
+                    any('python3 -B -m scripts.check_repository' in lines
+                        for lines in commands),
+                    f'{name}: shell examples must include the shared check command',
+                )
+        workflow = (check_repository.ROOT / '.github/workflows/tests.yml').read_text(
+            encoding='utf-8')
+        self.assertIn('      - run: python -B -m scripts.check_repository',
+                      workflow.splitlines())
+
     def test_checks_share_environment_interpreter_and_root(self):
         with patch.dict(os.environ, {'PYTHONUTF8': '1', 'PYTHONIOENCODING': 'ascii',
                                      'CHECK_SENTINEL': 'preserved'}):
