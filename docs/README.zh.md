@@ -11,6 +11,7 @@
 | Skill 和详细指南 | 适合交给它的任务 | 通常能得到什么 |
 | --- | --- | --- |
 | [clarify](thinking/clarify.zh.md) | 先明确真正要解决的问题 | 有缺口时只问一个问题，信息充分时直接回答，没有默认文件 |
+| [wait-what](thinking/wait-what.zh.md) | 重新理解没听懂的说明 | 补齐上下文、逻辑明确、术语一致的重新解释，没有默认文件 |
 | [karpathy-guidelines](thinking/karpathy-guidelines.zh.md) | 控制工作范围，核实假设和结果 | 原任务的代码、文档或答案，没有固定产物目录 |
 | [project-engineering](engineering/project-engineering.zh.md) | 按项目规则实现功能、修复或迁移 | 相关源文件和测试，必要时更新工程知识及决策 |
 | [project-adr](engineering/project-adr.zh.md) | 保存长期提案与选择，接续议题并维护记录 | 项目 ADR 目录中的议题记录，包含否决理由、未决问题、状态和链接 |
@@ -60,7 +61,7 @@ $skills:project-engineering
 
 Firecrawl 和 TinyFish 指南依赖相应 MCP 连接。MCP 是 Agent 调用外部工具的连接方式，安装文字指令不能替代连接。读取结果默认可以留在对话里。要求 CSV 或 JSON 时，要明确保存路径，助手也需要能写入本地文件。
 
-Context7、PR、retro 和 writing-for-agents 来自外部项目，需要单独安装，具体命令在各自指南中。本集合有 9 个内置 Skill，四个子模块只是上游引用。它们设置 `update = none`，正常情况下不检出上游完整内容。在 GitHub 上点击子模块会打开上游仓库的固定提交，指南保留直达具体 Skill 子目录的链接。
+Context7、PR、retro 和 writing-for-agents 来自外部项目，需要单独安装，具体命令在各自指南中。本集合有 10 个内置 Skill，四个子模块只是上游引用。它们设置 `update = none`，正常情况下不检出上游完整内容。在 GitHub 上点击子模块会打开上游仓库的固定提交，指南保留直达具体 Skill 子目录的链接。
 
 `recap` 操作独立知识库。它的初始化、候选检查和正式发布可能创建 Git 提交。只想先看内容时，应明确要求未提交草稿。查询正式知识也可能更新缓存或锁文件，严格只读任务需要先核对访问方式。
 

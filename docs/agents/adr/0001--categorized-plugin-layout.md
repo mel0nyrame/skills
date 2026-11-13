@@ -6,13 +6,13 @@ Partially superseded by [upstream submodule references](0002--upstream-submodule
 
 ## Problem
 
-The collection needs physical categories and one maintained source for each skill. The Skills CLI, Claude Code, and Codex use different discovery and plugin metadata conventions. External skills must remain links rather than copied installation candidates.
+The collection needs physical categories and one maintained source for each skill. The Skills CLI, Claude Code, and Codex use different discovery and plugin metadata conventions. Unmodified external recommendations must remain links rather than copied installation candidates.
 
 ## Decision
 
 Keep one copy of each skill under `skills/<category>/<name>/`. Use Claude's manifest paths to list category directories. Use Codex's supported `.codex-plugin/plugin.json` compatibility manifest with `skills: "./skills/"` to retain recursive discovery. Each marketplace exposes one complete plugin. The Skills CLI provides individual skill selection.
 
-The original external-reference choice used README-only directories without a `SKILL.md`. Its replacement is owned by the linked submodule decision. Preserve the bundled Karpathy fork's upstream identity and record licensing separately. English and Chinese READMEs describe the same catalog and installation behavior.
+The original external-reference choice used README-only directories without a `SKILL.md`. Its replacement is owned by the linked submodule decision. Bundle the maintained Karpathy fork and wait-what adaptation as local installation candidates, preserving their upstream identities and recording licensing separately. The wait-what adaptation replaces upstream-specific glossary and English-language requirements with self-contained explanation guidance, so an upstream-only reference would not deliver the maintained behavior. English and Chinese READMEs describe the same catalog and installation behavior.
 
 The discovery constraint is based on [Codex's manifest-format dispatch](https://github.com/openai/codex/blob/main/codex-rs/core-plugins/src/loader.rs): the compatibility format uses recursive discovery; the portable Agent Plugins format uses direct-child discovery. [Claude's manifest contract](https://code.claude.com/docs/en/plugins/manifest-reference) permits explicit skill directories.
 
@@ -26,6 +26,6 @@ The discovery constraint is based on [Codex's manifest-format dispatch](https://
 
 ## Consequences and risks
 
-Adding a category requires updating Claude's declared paths. Changing Codex manifest format requires rechecking discovery, not merely renaming a file. Validate that all nine bundled skills are discovered and that the external directories are excluded. Schema validity alone does not establish successful runtime discovery.
+Adding a category requires updating Claude's declared paths. Changing Codex manifest format requires rechecking discovery, not merely renaming a file. Validate that all ten bundled skills are discovered and that the external directories are excluded. Schema validity alone does not establish successful runtime discovery.
 
 MCP guidance depends on separately configured services. Plugin installation does not supply service credentials. PR operations depend on the separately installed upstream `pr` skill and retain explicit authorization boundaries.

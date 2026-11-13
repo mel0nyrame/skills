@@ -11,6 +11,7 @@ Start with the result you need. `clarify` checks whether a focused clarification
 | Skill and detailed guide | Suitable task | Typical result |
 | --- | --- | --- |
 | [clarify](thinking/clarify.md) | Establish the problem that needs solving | One question when needed, otherwise a direct answer; no default file |
+| [wait-what](thinking/wait-what.md) | Recover an explanation you did not understand | A re-explanation with context, explicit logic, and consistent terms; no default file |
 | [karpathy-guidelines](thinking/karpathy-guidelines.md) | Keep scope, assumptions, and verification under control | The original task's code, documents, or answer, with no fixed artifact directory |
 | [project-engineering](engineering/project-engineering.md) | Implement features, fixes, or migrations under project rules | Relevant source and tests, plus engineering knowledge and decision updates when needed |
 | [project-adr](engineering/project-adr.md) | Capture durable proposals and choices, resume topics, and maintain records | Topic records with rejection reasons, open questions, states, and links in the project's ADR location |
@@ -59,7 +60,7 @@ Once code and prose are ready, `project-git` can review them before you separate
 
 Firecrawl and TinyFish need their corresponding MCP connections. MCP is the tool connection used by an agent; installed instructions cannot replace it. Reading results can stay in chat. CSV or JSON delivery needs an explicit path and local writing capability.
 
-Context7, PR, retro, and writing-for-agents come from external projects and require separate installation, described in their guides. This collection contains nine bundled skills. Its four submodules are upstream references using `update = none`, normally leaving complete upstream contents unchecked out. GitHub opens a pinned repository root when a submodule is clicked; the guides retain direct skill-directory links.
+Context7, PR, retro, and writing-for-agents come from external projects and require separate installation, described in their guides. This collection contains ten bundled skills. Its four submodules are upstream references using `update = none`, normally leaving complete upstream contents unchecked out. GitHub opens a pinned repository root when a submodule is clicked; the guides retain direct skill-directory links.
 
 `recap` works with a separate knowledge library. Initialization, candidate inspection, and publication can create Git commits. Request an uncommitted draft if you want to inspect content first. Queries can update caches or lock files, so strict read-only tasks need an access-method check.
 

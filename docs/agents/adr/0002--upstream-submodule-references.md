@@ -22,11 +22,11 @@ Human usage guides live in `docs/<category>/<skill>.md` and `<skill>.zh.md`. Thi
 
 - README-only link folders can open exact URLs but do not provide the requested clickable submodule representation.
 - A submodule URL containing a GitHub `tree/` subdirectory is not a valid Git repository source. Use the repository URL and keep deep links in guides.
-- Normal recursive checkout brings in complete upstream collections and can change local skill discovery. A default no-checkout policy preserves the nine owned install candidates without changing each installer.
-- Vendoring upstream instruction bodies makes this repository maintain copies the user wants to reference externally.
+- Normal recursive checkout brings in complete upstream collections and can change local skill discovery. A default no-checkout policy preserves the ten bundled install candidates without changing each installer.
+- Vendoring unchanged upstream instruction bodies makes this repository maintain copies the user wants to reference externally. Maintained adaptations are separate bundled skills under the packaging decision.
 
 ## Consequences and risks
 
 GitHub clicks open pinned repository roots, not exact skill subdirectories. Readers use the guides' direct links for those. Normal `git submodule update --init` skips these entries. Explicit checkout overrides can populate upstream trees and affect recursive skill discovery; use a separate upstream checkout when browsing or developing those projects.
 
-When changing a pin, verify the commit exists upstream and check the Git index records mode `160000`. Confirm the Skills CLI still discovers exactly nine bundled skills. Submodule correctness does not establish that an upstream skill has been installed or its service configured.
+When changing a pin, verify the commit exists upstream and check the Git index records mode `160000`. Confirm the Skills CLI still discovers exactly ten bundled skills. Submodule correctness does not establish that an upstream skill has been installed or its service configured.
