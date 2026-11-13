@@ -8,7 +8,7 @@ The upstream directory lives under `skills/productivity/`. This collection keeps
 
 ## Install the skill
 
-This external skill is not among the nine bundled with this collection. Install it separately.
+This external skill is not bundled with this collection. Install it separately.
 
 ```sh
 npx skills@latest add mattpocock/skills --skill writing-for-agents

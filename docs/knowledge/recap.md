@@ -93,7 +93,7 @@ A capture of this collection's packaging discussion could begin with this excerp
 
 This topic explains why the collection leaves external upstream
 repositories unchecked out. It applies to the current packaging layout where
-nine bundled skills share categorized directories.
+ten bundled skills share categorized directories.
 
 ## Rule and reason
 The external references are Git submodules with update = none in .gitmodules.
@@ -102,7 +102,7 @@ discovery when checked out.
 
 ## Verification
 Confirm the external references remain gitlinks and normal initialization skips checkout.
-Then verify that installer discovery still returns nine bundled skills.
+Then verify that installer discovery still returns ten bundled skills.
 
 ## Source
 Consult the [conversation record](../sources/host-session-id.md), retaining actual

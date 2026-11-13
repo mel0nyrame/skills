@@ -19,7 +19,7 @@ The adaptation is based on the upstream skill and UI metadata at the reference r
 - Replaced the direct ASD-STE100 instruction with self-contained guidance on clarity, explicit logic, consistent terminology, structured delivery, and facts versus assumptions.
 - Used the user's current language instead of requiring English.
 - Removed the requirement to find `GLOSSARY.md` or `GLOSSARY-MAP.md`.
-- Preserved the skill name, manual-only invocation settings, and UI metadata.
+- Preserved the skill name and manual-only invocation settings. Kept upstream UI metadata unchanged, including the absence of `interface.default_prompt`.
 
 This is an independent adaptation, not an official upstream release. No endorsement by Matt Pocock is implied.
 

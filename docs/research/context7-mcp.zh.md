@@ -8,7 +8,7 @@
 
 ## 先安装并连接
 
-它属于外部 Skill，不包含在本集合安装的 9 个 Skill 中。可以单独安装。
+它属于外部 Skill，不包含在本集合的内置 Skill 中。可以单独安装。
 
 ```sh
 npx skills@latest add upstash/context7 --skill context7-mcp

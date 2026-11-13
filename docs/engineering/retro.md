@@ -8,7 +8,7 @@ The skill runs only when you explicitly invoke it. It inspects navigation, autom
 
 ## Install the skill and its writing reference
 
-This external skill is not among the nine bundled with this collection. Install it separately.
+This external skill is not bundled with this collection. Install it separately.
 
 ```sh
 npx skills@latest add mattpocock/skills --skill retro
