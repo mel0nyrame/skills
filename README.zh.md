@@ -28,6 +28,7 @@
 | --- | --- |
 | [clarify](docs/thinking/clarify.zh.md) | 检查假设；有关键缺口时只问一个问题，信息充分时直接回答。 |
 | [karpathy-guidelines](docs/thinking/karpathy-guidelines.zh.md) | 保持任务范围，验证结果，清楚表达结论。内容来自个人维护的 fork。 |
+| [wait-what](docs/thinking/wait-what.zh.md) | 补齐上下文，以明确逻辑和一致术语重新解释没听懂的回答。仅显式调用，改编自 Matt Pocock。 |
 
 ### 检索工具
 
@@ -43,7 +44,7 @@
 | --- | --- |
 | [recap](docs/knowledge/recap.zh.md) | 将会话整理为可复用、可追溯的专题知识。仅由用户显式调用。 |
 
-项目包含 **9 个可安装 Skill**。`pr`、`retro`、`writing-for-agents` 和 `context7-mcp` 使用默认不检出的 Git 子模块，不进入插件和 Skills CLI 的 Skill 清单。对应使用指南提供精确的上游链接和单独安装方法。
+项目包含 **10 个可安装 Skill**。`pr`、`retro`、`writing-for-agents` 和 `context7-mcp` 使用默认不检出的 Git 子模块，不进入插件和 Skills CLI 的 Skill 清单。对应使用指南提供精确的上游链接和单独安装方法。
 
 ## 安装
 
@@ -112,6 +113,7 @@ codex plugin add skills@mel0nyrame-skills
 ## 行为与依赖
 
 - `clarify` 在仍有关键缺口时只问一个问题并等待回复。已有上下文充分时，它在同一轮直接回答。
+- `wait-what` 仅由用户显式调用，使用用户当前的语言重新解释回答，不依赖词汇表文件或外部服务。
 - `recap` 仅由用户显式调用。保留 `disable-model-invocation: true` 和 Codex 禁止隐式调用的设置。
 - `project-git` 分别检查 commit、push 和 PR/MR 操作的授权。先检查项目规则和稳定的结构化提交历史，再决定是否使用中文默认说明。用户对本次任务的明确要求优先。
 - `project-adr` 优先遵守目标项目约定。默认检查器接受完整的英文或中文结构，并保留归档排除规则。
@@ -142,7 +144,7 @@ Skill 指令使用英文。同步维护本文件与 [README.md](README.md)。每
 
 面向使用者的指南位于 `docs/<类别>/<skill>.md`，并配套 `<skill>.zh.md`。两个语言版本与对应 `SKILL.md` 保持一致，用来解释用法，不另行定义执行流程。项目自身的 ADR 位于 `docs/agents/adr/`。
 
-替换 Codex 兼容清单前，先验证新格式能发现分类目录中的 Skill。[打包决策](docs/agents/adr/0001--categorized-plugin-layout.md) 说明发现机制和备选方案。决策或依据变化时同步更新记录。引入第三方内容时保留来源和许可通知。根 `LICENSE` 是自有内容许可的权威文本；同步维护对应 Skill 目录中的副本，使单独安装也携带许可通知。Karpathy 的许可和来源通知由其自身目录保存。
+替换 Codex 兼容清单前，先验证新格式能发现分类目录中的 Skill。[打包决策](docs/agents/adr/0001--categorized-plugin-layout.md) 说明发现机制和备选方案。决策或依据变化时同步更新记录。引入第三方内容时保留来源和许可通知。根 `LICENSE` 是自有内容许可的权威文本；同步维护对应 Skill 目录中的副本，使单独安装也携带许可通知。Karpathy 和 wait-what 改编版的上游许可及来源通知由各自目录保存。
 
 在仓库根目录运行下面的检查。
 
@@ -153,10 +155,10 @@ claude plugin validate .claude-plugin/plugin.json --strict
 claude plugin validate .claude-plugin/marketplace.json --strict
 ```
 
-修改打包方式后，还需在隔离的 Claude/Codex 安装环境中核对实际 Skill 清单。清单格式有效不能证明 9 个 Skill 都能加载。GitHub 远程安装需要发布仓库后单独验证。
+修改打包方式后，还需在隔离的 Claude/Codex 安装环境中核对实际 Skill 清单。清单格式有效不能证明 10 个 Skill 都能加载。GitHub 远程安装需要发布仓库后单独验证。
 
 安装格式依据包括 [Skills CLI](https://github.com/vercel-labs/skills)、[Claude 插件文档](https://code.claude.com/docs/en/plugins) 和 [Codex 插件打包文档](https://developers.openai.com/plugins/build/plugins)。
 
 ## 许可与来源
 
-mel0nyrame 的自有内容采用 MIT。项目中的 Karpathy fork 保留上游 MIT 声明和来源。外部推荐遵循各自的上游许可。详见 [LICENSE](LICENSE)、[第三方通知](THIRD_PARTY_NOTICES.md) 和 [Karpathy 许可条款](skills/thinking/karpathy-guidelines/LICENSE)。
+mel0nyrame 的自有内容采用 MIT。项目中的 Karpathy fork 和 wait-what 改编版保留各自的上游 MIT 声明和来源。外部推荐遵循各自的上游许可。详见 [LICENSE](LICENSE)、[第三方通知](THIRD_PARTY_NOTICES.md)、[Karpathy 许可条款](skills/thinking/karpathy-guidelines/LICENSE)和 [wait-what 许可条款](skills/thinking/wait-what/LICENSE)。

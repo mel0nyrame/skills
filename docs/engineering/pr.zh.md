@@ -12,7 +12,7 @@
 
 只有修改后的代码，没有修改前的截图或失败测试时，助手不能补造一段“修改前证据”。它应说明手头证据支持什么，缺少什么。
 
-这个 Skill 需要单独安装，不在本集合的 9 个内置 Skill 中。
+这个 Skill 需要单独安装，不在本集合的内置 Skill 中。
 
 ```sh
 npx skills@latest add mattpocock/skills --skill pr

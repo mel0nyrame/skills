@@ -6,6 +6,10 @@ The [root MIT license](LICENSE) covers mel0nyrame's contributions. Third-party m
 
 The bundled skill comes from [mel0nyrame's fork](https://github.com/mel0nyrame/andrej-karpathy-skills) of [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills). Its [self-contained notice](skills/thinking/karpathy-guidelines/NOTICE.md) owns the source revision, upstream MIT declarations, and attribution. Its [license](skills/thinking/karpathy-guidelines/LICENSE) travels with standalone installations.
 
+## Wait What: bundled adaptation
+
+The bundled [wait-what skill](skills/thinking/wait-what/SKILL.md) is a maintained adaptation of [Matt Pocock's upstream skill](https://github.com/mattpocock/skills/tree/main/skills/productivity/wait-what). Its [self-contained notice](skills/thinking/wait-what/NOTICE.md) records provenance and licensing. The [MIT license](skills/thinking/wait-what/LICENSE), including `Copyright (c) 2026 Matt Pocock`, travels with standalone installations. ASD-STE100 is a background reference, not bundled standard text or material covered by this MIT license.
+
 ## PR: upstream submodule
 
 [Matt Pocock's PR skill](https://github.com/mattpocock/skills/tree/main/skills/engineering/pr) is represented by the `skills/engineering/pr` submodule. The [usage guide](docs/engineering/pr.md) links to the exact upstream skill directory. No upstream skill instructions or local translation are copied into parent-repository files.

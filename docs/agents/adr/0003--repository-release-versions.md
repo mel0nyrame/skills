@@ -27,6 +27,6 @@ To install a historical release, use an explicit source such as `https://github.
 
 Keep unreleased work out of `main` and complete tagging promptly after merging a release. A new commit on the default branch changes what an unpinned Skills CLI installation receives, even before a tag exists. Published tags stay fixed; corrections use a new release number.
 
-Before release, verify equal manifest versions, nine discovered bundled skills, excluded external submodules, and the applicable tests. Users update their installed copies separately; repository publication does not silently refresh existing installations.
+Before release, verify equal manifest versions, ten discovered bundled skills, excluded external submodules, and the applicable tests. Users update their installed copies separately; repository publication does not silently refresh existing installations.
 
 The source rules are described in [npm package specifiers](https://docs.npmjs.com/cli/v11/using-npm/package-spec/), [Skills CLI repository cloning](https://github.com/vercel-labs/skills/blob/main/src/git.ts), and [Claude plugin version semantics](https://code.claude.com/docs/en/plugins/manifest-reference#version).

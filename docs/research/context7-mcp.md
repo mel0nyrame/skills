@@ -8,7 +8,7 @@ A library can change interfaces between versions. A memory-based example may not
 
 ## Install the skill and connect the tools
 
-This external skill is not among the nine bundled with this collection. Install it separately.
+This external skill is not bundled with this collection. Install it separately.
 
 ```sh
 npx skills@latest add upstash/context7 --skill context7-mcp

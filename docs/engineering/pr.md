@@ -12,7 +12,7 @@ Give the assistant access to the actual diff and real validation results, or per
 
 If only the changed code is available, the assistant cannot invent a before screenshot or failing test. The description should distinguish what the evidence supports from what is missing.
 
-Install this external skill separately; it is not one of this collection's nine bundled skills.
+Install this external skill separately; it is not bundled with this collection.
 
 ```sh
 npx skills@latest add mattpocock/skills --skill pr

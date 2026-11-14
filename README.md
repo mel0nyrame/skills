@@ -28,6 +28,7 @@ The four `project-*` skills form a project-engineering suite: implementation and
 | --- | --- |
 | [clarify](docs/thinking/clarify.md) | Check assumptions, ask one decisive question when needed, or answer directly when context is sufficient. |
 | [karpathy-guidelines](docs/thinking/karpathy-guidelines.md) | Keep work focused, verify results, and make outcomes understandable. Maintained fork. |
+| [wait-what](docs/thinking/wait-what.md) | Re-explain an unclear response with missing context, explicit logic, and consistent terms. Explicit invocation only; adapted from Matt Pocock. |
 
 ### Research
 
@@ -43,7 +44,7 @@ The four `project-*` skills form a project-engineering suite: implementation and
 | --- | --- |
 | [recap](docs/knowledge/recap.md) | Turn conversations into reusable, traceable topic knowledge. Explicit invocation only. |
 
-The package contains **nine installable skills**. `pr`, `retro`, `writing-for-agents`, and `context7-mcp` are upstream Git submodules left unchecked out by default. They are excluded from the plugin and Skills CLI skill inventory. Their guides provide exact upstream links and separate installation instructions.
+The package contains **ten installable skills**. `pr`, `retro`, `writing-for-agents`, and `context7-mcp` are upstream Git submodules left unchecked out by default. They are excluded from the plugin and Skills CLI skill inventory. Their guides provide exact upstream links and separate installation instructions.
 
 ## Install
 
@@ -112,6 +113,7 @@ codex plugin add skills@mel0nyrame-skills
 ## Behavior and dependencies
 
 - `clarify` asks one decisive question and waits when a key gap remains. When the supplied context is sufficient, it answers in the same reply.
+- `wait-what` is explicitly invoked to re-explain a response in the user's current language. It requires no glossary file or external service.
 - `recap` is explicitly invoked. It preserves both `disable-model-invocation: true` and the Codex implicit-invocation opt-out.
 - `project-git` keeps separate authorization for commits, pushes, and PR/MR operations. It checks project rules and consistent structured commit history before falling back to Chinese commit descriptions. Explicit task instructions take precedence.
 - `project-adr` follows project conventions first. Its default checker accepts complete English and Chinese schemas and preserves archive exclusions.
@@ -142,7 +144,7 @@ Keep instructions in English. Keep this README and [README.zh.md](README.zh.md) 
 
 Human usage guides live in `docs/<category>/<skill>.md` with a matching `<skill>.zh.md`. Keep both languages aligned with the owning `SKILL.md`; they explain use rather than define a second execution workflow. Project ADRs live in `docs/agents/adr/`.
 
-Keep Codex's compatibility manifest unless a replacement has been verified to discover categorized skills. See [the packaging decision](docs/agents/adr/0001--categorized-plugin-layout.md) for the discovery constraint and alternatives. Update that record when its decision or supporting facts change. Keep third-party provenance and notices with imported content. The root `LICENSE` owns the license text for original contributions; keep the copies in those skill directories synchronized so standalone installations carry the notice. Karpathy's own license and source notice remain with that skill.
+Keep Codex's compatibility manifest unless a replacement has been verified to discover categorized skills. See [the packaging decision](docs/agents/adr/0001--categorized-plugin-layout.md) for the discovery constraint and alternatives. Update that record when its decision or supporting facts change. Keep third-party provenance and notices with imported content. The root `LICENSE` owns the license text for original contributions; keep the copies in those skill directories synchronized so standalone installations carry the notice. The bundled Karpathy and wait-what adaptations retain their upstream licenses and source notices in their own directories.
 
 Run repository checks from the repository root:
 
@@ -153,10 +155,10 @@ claude plugin validate .claude-plugin/plugin.json --strict
 claude plugin validate .claude-plugin/marketplace.json --strict
 ```
 
-For packaging changes, also check actual skill discovery in an isolated Claude/Codex installation. A valid manifest alone does not establish that all nine skills load. Remote GitHub installation requires a published repository and separate verification.
+For packaging changes, also check actual skill discovery in an isolated Claude/Codex installation. A valid manifest alone does not establish that all ten skills load. Remote GitHub installation requires a published repository and separate verification.
 
 Installation contracts: [Skills CLI](https://github.com/vercel-labs/skills), [Claude plugins](https://code.claude.com/docs/en/plugins), [Codex plugin packaging](https://developers.openai.com/plugins/build/plugins).
 
 ## License and sources
 
-MIT for mel0nyrame's contributions. The bundled Karpathy fork retains its upstream MIT declaration and attribution. External recommendations remain under their upstream licenses. See [LICENSE](LICENSE), [third-party notices](THIRD_PARTY_NOTICES.md), and [the Karpathy license](skills/thinking/karpathy-guidelines/LICENSE).
+MIT for mel0nyrame's contributions. The bundled Karpathy fork and wait-what adaptation retain their upstream MIT declarations and attribution. External recommendations remain under their upstream licenses. See [LICENSE](LICENSE), [third-party notices](THIRD_PARTY_NOTICES.md), [the Karpathy license](skills/thinking/karpathy-guidelines/LICENSE), and [the wait-what license](skills/thinking/wait-what/LICENSE).

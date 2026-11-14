@@ -29,7 +29,7 @@ Follow existing four-space Python and two-space JSON/YAML indentation. Keep `SKI
 
 Use Python's standard-library `unittest`; name files `tests/test_*.py` and methods `test_*`. Cover executable changes with behavioral regression tests. ADR checker changes must preserve English/Chinese compatibility, invalid-input rejection, and archive exclusions. Documentation edits require link, anchor, and bilingual-pair checks.
 
-Packaging changes must still discover nine bundled skills. Verify actual Claude/Codex discovery in isolated configuration directories; schema validation alone is insufficient.
+Packaging changes must still discover ten bundled skills. Verify actual Claude/Codex discovery in isolated configuration directories; schema validation alone is insufficient.
 
 ## Decision Maintenance
 
