@@ -5,11 +5,13 @@ description: Use when the user asks to clarify intent or stress-test an open-end
 
 # Clarify
 
-Check the supplied context for a decision-changing gap before answering. Use only that context during the initial intent check, without tools or file changes. A gap matters when plausible answers would change the recommendation, conclusion, scope, priority, or authorization.
+Check the supplied context for a decision-changing gap before answering. Use only that context during the initial intent check, without tools or file changes. A gap matters when plausible answers would change the recommendation, conclusion, scope, priority, or authorization. Do not turn every missing fact into an intent question; an already clear task may need later investigation.
+
+The no-tools restriction applies to this initial check, not to later investigation or execution authorized by the original task. Keep this check focused on the requested clarification; do not start concurrent unrelated work.
 
 ## Context is sufficient
 
-Answer directly in the same reply. State only assumptions that materially affect the result; omit a sufficiency announcement and clarification headings.
+Answer directly in the same reply without forcing an extra turn. If the original task requires investigation or execution, proceed within its existing authorization after the initial check. State only assumptions that materially affect the result; omit a sufficiency announcement and clarification headings.
 
 ## A decision-changing gap remains
 
@@ -21,6 +23,6 @@ Complete this stage when one question identifies the decision the user needs to 
 
 ## After the user's reply
 
-Use the answer with the original request to give a specific, actionable response. Preserve material tradeoffs and uncertainty without exposing private chain-of-thought. Later actions follow the task's authorization; clarification alone authorizes no file changes.
+Use the answer to resume the original authorized task, whether it calls for a specific response, investigation, or execution. Preserve material tradeoffs and uncertainty without exposing private chain-of-thought. The clarification reply does not itself expand authorization or require renewed permission for actions already authorized by the original task.
 
 Ask again only if the reply leaves an ambiguity that prevents a correct or safe response. In that case, ask exactly one decisive question and pause.
