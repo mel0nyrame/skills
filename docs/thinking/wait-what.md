@@ -20,16 +20,18 @@ Use `$wait-what` for a standalone installation or `/skills:wait-what` in Claude 
 
 ## What to expect
 
-- A reset from the confusing explanation, with missing prerequisites, the current problem state, and assumptions made explicit.
-- A response in the language you are currently using.
-- Direct wording, explicit conditions and outcomes, consistent terms, and brief definitions of technical terms.
-- The core answer first, followed by the background and examples needed to understand it, without dropping necessary details or risks.
-- A distinction between verified facts, inferences, assumptions, and recommendations.
+- The core answer first, then the minimum context and intermediate steps needed to explain the missing causal or logical connection.
+- A response in your current language and requested format, without a required acknowledgment before the explanation.
+- Direct wording and consistent terms. Definitions, examples, and limits appear as needed, not as a fixed four-part lecture.
+- Necessary facts, conditions, exceptions, risks, evidence strength, uncertainty, and exact technical identifiers preserved.
+- A distinction between verified facts, inferences, assumptions, and recommendations. If the previous claim is wrong, the assistant corrects it explicitly rather than just restyling it.
 
-The explanation stays in the conversation; the skill has no default file output. It requires no `GLOSSARY.md`, project-specific documentation, or external service.
+If there is no previous content, the assistant asks what to re-explain instead of inventing an explanation.
+
+The explanation stays in the conversation by default. Invoking the skill grants no new authorization to write files, run commands, or use external services. It requires no other skill, `GLOSSARY.md`, project-specific documentation, or external service.
 
 ## Check the result
 
-Check whether the new response explains the missing connection instead of repeating the same wording. Necessary prerequisites, terms, assumptions, and limits should be visible. Clearer wording does not verify the underlying technical claims; check those against the relevant evidence.
+Check whether the new response makes the missing connection explicit, not merely shorter or differently worded. Necessary prerequisites, terms, assumptions, and limits should remain visible. Clearer wording does not verify the underlying technical claims; check those against the relevant evidence.
 
 The [skill instructions](../../skills/thinking/wait-what/SKILL.md) own the behavior. Use [clarify](clarify.md) when the task itself needs clarification before an answer.

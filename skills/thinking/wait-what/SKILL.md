@@ -4,21 +4,22 @@ description: "Stop. That last message did not land: re-pitch it."
 disable-model-invocation: true
 ---
 
-Wait, I don't understand where you've got to here. Re-pitch that: give me a little bit of context, then explain it again using the rules below:
+# Wait What
 
-### 1. Core Recovery Actions
+Repair the previous explanation so the user can follow the missing causal or logical connection.
 
-- **Acknowledge & Reset:** Briefly acknowledge the misalignment without being defensive. Do not stack more complex logic on top of the previous confusion.
-- **Restore Context:** Explicitly state the missing prerequisites, where we currently are in the problem, and what assumptions are being made.
-- **Match User Language:** Respond in the same language the user is currently using (e.g., Simplified Chinese, English, etc.).
+## Re-explain
 
-### 2. Communication Principles
+- Use the user's current language and requested format. If there is no previous content to re-explain, ask what the user wants explained; do not invent it.
+- Identify the gap from the user's question and available conversation. If the previous claim is wrong, correct it explicitly rather than just restyling it.
+- Give the core answer first. Then add only the context needed to connect the relevant premise or cause to the conclusion or outcome. Make that connection explicit, including conditions and intermediate steps that the previous explanation skipped.
+- Add definitions, a concrete example, or limits when they help repair the gap. Choose what is needed rather than giving a fixed four-part lecture. Start with the explanation; no acknowledgment ceremony is required.
 
-- **Accuracy & Clarity:** Use direct, precise, and unambiguous language. Aim for one main fact, action, or judgment per sentence. Eliminate vague filler words (e.g., "to some extent," "handle accordingly," "related stuff").
-- **Explicit Logic:** Prefer clear Subject-Verb-Object structures. Explicitly state conditions, actions, and outcomes using structures like "If \[condition], then \[action/result]." Avoid ambiguous pronouns like "this" or "it"—repeat the specific noun when necessary.
-- **Consistent Terminology:** Always use the exact same term for the same concept; never swap in synonyms just for stylistic variety. Provide a brief definition the first time a technical term is introduced. Preserve exact code identifiers, commands, and API names.
-- **Structured Delivery:**
-  - Answer the core question first before providing background details.
-  - When explaining complex concepts, follow the sequence: **Definition → Mechanism/Principle → Concrete Example → Limitations/Edge Cases**.
-  - Do not sacrifice necessary technical details, prerequisites, or risks just to make the response shorter. Clarity and completeness take priority over brevity.
-- **Fact vs. Assumption:** Clearly distinguish between verified facts, logical inferences, assumptions, and recommendations.
+## Preserve meaning
+
+- Use direct sentences, one main idea at a time, and consistent terms. Define unfamiliar technical terms when needed. Preserve exact code identifiers, commands, and API names.
+- Keep necessary facts, conditions, exceptions, risks, evidence strength, and uncertainty. Distinguish verified facts, inferences, assumptions, and recommendations. Clearer wording must not make an unsupported claim sound verified.
+
+Respond in the conversation by default. Invocation grants no new authorization to write files, run commands, or use external services. This skill is self-contained; it requires no other skill or `GLOSSARY.md`.
+
+Finish when the missing connection is explicit and the necessary conditions remain visible, not merely when the answer is shorter or reworded.
