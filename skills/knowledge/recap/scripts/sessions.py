@@ -462,6 +462,7 @@ def extract_opencode(args, receipt: dict[str, Any], writer: ChunkWriter):
         first = None
         last = None
         sequence_gaps = {"count": 0, "examples": []}
+        row_counts = {"emitted": 0, "skipped": 0, "unaccounted": 0}
         cursor = connection.execute("SELECT id,type,seq,data FROM session_message WHERE session_id = ? AND seq <= ? ORDER BY seq", (args.session_id, cutoff))
         while True:
             batch = cursor.fetchmany(256)
@@ -488,8 +489,16 @@ def extract_opencode(args, receipt: dict[str, Any], writer: ChunkWriter):
                         raise ValueError("not an object")
                 except (ValueError, TypeError):
                     receipt["errors"].append("Unreadable data at seq:%d" % ordinal)
+                    row_counts["unaccounted"] += 1
                     continue
-                for record in normalize_opencode(row["type"], data, ordinal, row["id"], receipt, args.include_tools):
+                gap_fields = ("missing", "unread_attachments", "unknown_envelopes")
+                before = tuple(len(receipt[key]) for key in gap_fields)
+                records = normalize_opencode(row["type"], data, ordinal, row["id"], receipt, args.include_tools)
+                if before != tuple(len(receipt[key]) for key in gap_fields):
+                    row_counts["unaccounted"] += 1
+                else:
+                    row_counts["emitted" if any(record["text"] for record in records) else "skipped"] += 1
+                for record in records:
                     writer.add(record)
         prefix_hash = digest.hexdigest()
         # OpenCode projects message creation from a shared durable-event sequence.
@@ -499,6 +508,8 @@ def extract_opencode(args, receipt: dict[str, Any], writer: ChunkWriter):
             receipt["missing"].append("Requested cutoff is not an available sequence")
         receipt["source"] = {"kind": "opencode_v2_read_snapshot", "locator": str(path.resolve()),
                              "prefix_sha256": prefix_hash, "persisted_rows": bounds[2],
+                             "session_rows": bounds[2], "range_rows": sum(row_counts.values()),
+                             "excluded_rows": bounds[2] - sum(row_counts.values()), "row_counts": row_counts,
                              "first_persisted_seq": first, "sequence_gaps": sequence_gaps}
         receipt["range"] = {"unit": "session_message.seq", "after": args.after if args.after is not None else (first - 1 if first is not None else -1),
                             "through": cutoff, "available_through": available,

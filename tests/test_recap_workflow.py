@@ -1,5 +1,6 @@
 """Run candidate maintenance through disposable Git libraries."""
 
+from unittest.mock import patch
 from contextlib import redirect_stderr, redirect_stdout
 import io
 import json
@@ -220,6 +221,165 @@ class MaintenanceTests(unittest.TestCase):
         self.assertFalse((self.root / '.worktree/capture').exists())
         self.assertEqual(marker.read_bytes(), b'Private fixture transcript')
         self.assertIn('remove only the exact extraction', result['note'])
+
+    def test_cleanup_temp_is_explicit_scoped_and_retryable_after_default_cleanup(self):
+        self.publish_topic('capture')
+        raw = self.root / '.state/tmp/capture'
+        raw.mkdir(parents=True)
+        (raw / 'raw.txt').write_bytes(b'Private fixture transcript')
+        other = self.root / '.state/tmp/other'
+        other.mkdir()
+        (other / 'raw.txt').write_bytes(b'Unrelated transcript')
+        workflow.cleanup(self.root, 'capture')
+        self.assertTrue((raw / 'raw.txt').exists())
+        output = io.StringIO()
+        with redirect_stdout(output):
+            self.assertEqual(knowledge.main(['--root', str(self.root), 'cleanup', '--temp', 'capture']), 0)
+        result = json.loads(output.getvalue())
+        self.assertEqual(result['temporary_cleanup'], 'removed')
+        self.assertFalse(raw.exists())
+        self.assertTrue((other / 'raw.txt').exists())
+        self.assertEqual(workflow.cleanup(self.root, 'capture', temp=True)['temporary_cleanup'], 'absent')
+
+    def test_cleanup_temp_rejects_preserved_files_and_non_directories_before_worktree_removal(self):
+        self.publish_topic('capture')
+        raw = self.root / '.state/tmp/capture'
+        raw.mkdir(parents=True)
+        (raw / 'preserved').mkdir()
+        with self.assertRaisesRegex(KnowledgeError, 'preserved'):
+            workflow.cleanup(self.root, 'capture', temp=True)
+        self.assertTrue((self.root / '.worktree/capture').exists())
+        (raw / 'preserved').rmdir()
+        raw.rmdir()
+        raw.write_bytes(b'Not a directory')
+        with self.assertRaisesRegex(KnowledgeError, 'directory'):
+            workflow.cleanup(self.root, 'capture', temp=True)
+        self.assertEqual(raw.read_bytes(), b'Not a directory')
+
+    def test_cleanup_temp_rejects_wrong_operations_and_unpublished_work(self):
+        self.publish_topic('capture')
+        raw = self.root / '.state/tmp/capture'
+        raw.mkdir(parents=True)
+        (raw / 'raw.txt').write_bytes(b'Retain')
+        for identifier in ('../capture', '/capture', 'unknown'):
+            with self.subTest(identifier=identifier), self.assertRaises((KnowledgeError, OSError)):
+                workflow.cleanup(self.root, identifier, temp=True)
+        workflow.begin(self.root, 'pending', 'writer')
+        with self.assertRaisesRegex(KnowledgeError, 'successfully published'):
+            workflow.cleanup(self.root, 'pending', temp=True)
+        state = workflow.get_state(self.root, 'capture')
+        state['id'] = 'other'
+        # Corrupt the selected operation's identity without changing its target.
+        (self.root / '.state/operations/capture.json').write_bytes(json_bytes(state))
+        with self.assertRaises(KnowledgeError):
+            workflow.cleanup(self.root, 'capture', temp=True)
+        self.assertEqual((raw / 'raw.txt').read_bytes(), b'Retain')
+
+    def test_cleanup_temp_rejects_symlinks_in_target_and_tree(self):
+        self.publish_topic('capture')
+        outside = Path(self.temp.name) / 'outside'
+        outside.mkdir()
+        marker = outside / 'keep.txt'
+        marker.write_bytes(b'Retain')
+        raw = self.root / '.state/tmp/capture'
+        raw.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            raw.symlink_to(outside, target_is_directory=True)
+        except OSError:
+            self.skipTest('Symlinks unavailable')
+        with self.assertRaisesRegex(KnowledgeError, 'Symlink'):
+            workflow.cleanup(self.root, 'capture', temp=True)
+        raw.unlink()
+        raw.mkdir()
+        (raw / 'link').symlink_to(marker)
+        with self.assertRaisesRegex(KnowledgeError, 'Symlink'):
+            workflow.cleanup(self.root, 'capture', temp=True)
+        self.assertEqual(marker.read_bytes(), b'Retain')
+
+    def test_cleanup_temp_rejects_symlinked_parent_and_unmatched_provenance(self):
+        self.publish_topic('capture')
+        outside = Path(self.temp.name) / 'outside'
+        outside.mkdir()
+        (outside / 'capture').mkdir()
+        marker = outside / 'capture/raw.txt'
+        marker.write_bytes(b'Retain')
+        parent = self.root / '.state/tmp'
+        try:
+            parent.symlink_to(outside, target_is_directory=True)
+        except OSError:
+            self.skipTest('Symlinks unavailable')
+        with self.assertRaisesRegex(KnowledgeError, 'Symlink'):
+            workflow.cleanup(self.root, 'capture', temp=True)
+        parent.unlink()
+        parent.mkdir()
+        raw = parent / 'capture'
+        raw.mkdir()
+        state = workflow.get_state(self.root, 'capture')
+        state['fingerprint'] = '0' * 64
+        workflow.save_state(self.root, state)
+        with self.assertRaisesRegex(KnowledgeError, 'provenance'):
+            workflow.cleanup(self.root, 'capture', temp=True)
+        self.assertTrue(raw.exists())
+        self.assertEqual(marker.read_bytes(), b'Retain')
+
+    @unittest.skipIf(sys.platform == 'win32', 'POSIX directory permissions required')
+    def test_cleanup_temp_cannot_report_inaccessible_material_as_absent(self):
+        self.publish_topic('capture')
+        parent = self.root / '.state/tmp'
+        raw = parent / 'capture'
+        raw.mkdir(parents=True)
+        marker = raw / 'raw.txt'
+        marker.write_bytes(b'Retain')
+        parent.chmod(0)
+        try:
+            try:
+                raw.lstat()
+            except PermissionError:
+                pass
+            else:
+                self.skipTest('Current identity bypasses directory permissions')
+            with self.assertRaises((KnowledgeError, PermissionError)) as error:
+                workflow.cleanup(self.root, 'capture', temp=True)
+            self.assertIn(str(parent), str(error.exception))
+        finally:
+            parent.chmod(0o700)
+        self.assertEqual(marker.read_bytes(), b'Retain')
+        self.assertEqual(workflow.get_state(self.root, 'capture')['status'], 'published')
+        self.assertTrue((self.root / '.worktree/capture').exists())
+
+    def test_cleanup_temp_failure_reports_exact_path_and_can_be_retried(self):
+        self.publish_topic('capture')
+        raw = self.root / '.state/tmp/capture'
+        raw.mkdir(parents=True)
+        (raw / 'raw.txt').write_bytes(b'Retain')
+        with patch.object(workflow.shutil, 'rmtree', side_effect=PermissionError('blocked')):
+            with self.assertRaises(KnowledgeError) as error:
+                workflow.cleanup(self.root, 'capture', temp=True)
+        self.assertIn(str(raw), str(error.exception))
+        self.assertTrue(raw.exists())
+        self.assertEqual(workflow.cleanup(self.root, 'capture', temp=True)['temporary_cleanup'], 'removed')
+
+    def test_cursor_optional_row_counts_reconcile_and_preserve_old_receipts(self):
+        packet = self.cursor_packet('capture')
+        receipt = json.loads(json.loads(packet.read_bytes())['changes'][3]['content'])
+        workflow.validate_cursor(receipt)
+        counts = {'persisted_rows': 5, 'session_rows': 5, 'range_rows': 3, 'excluded_rows': 2,
+                  'row_counts': {'emitted': 2, 'skipped': 1, 'unaccounted': 0}}
+        receipt['source'].update(counts)
+        workflow.validate_cursor(receipt)
+        self.assertEqual(workflow.publication_cursor(receipt)['source']['row_counts'], counts['row_counts'])
+        incomplete = json.loads(json.dumps(receipt))
+        del incomplete['source']['range_rows']
+        with self.assertRaises(KnowledgeError):
+            workflow.validate_cursor(incomplete)
+        for key, wrong in (('range_rows', 4), ('excluded_rows', -1), ('session_rows', True),
+                           ('persisted_rows', 6), ('row_counts', {'emitted': 3}),
+                           ('row_counts', {'emitted': 1, 'skipped': 1, 'unaccounted': 1})):
+            with self.subTest(key=key, wrong=wrong):
+                receipt['source'].update(counts)
+                receipt['source'][key] = wrong
+                with self.assertRaises(KnowledgeError):
+                    workflow.validate_cursor(receipt)
 
     def test_migration_normalizes_only_known_paths_and_preserves_capture_coverage(self):
         packet, _, receipt = self.private_cursor_packet('capture')

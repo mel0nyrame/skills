@@ -54,6 +54,38 @@ class OpenCodeSnapshotTests(unittest.TestCase):
         records = [json.loads(line) for line in (self.root / "extract-0/records.jsonl").read_text(encoding='utf-8').splitlines()]
         self.assertEqual([r["locator"] for r in records], ["seq:4", "seq:7"])
 
+    def test_range_counts_exclude_prefix_and_suffix_without_counting_tool_parts_as_rows(self):
+        prior = self.extract(through=4)
+        self.add(12, 'assistant', {'finish': 'stop', 'content': [
+            {'type': 'text', 'text': 'An explanation.'},
+            {'type': 'tool'}, {'type': 'tool'}]})
+        self.add(20, 'idle', {})
+        self.add(29, 'user', {'text': 'Outside the cutoff.'})
+        receipt = self.extract(after=4, through=20, prior_receipt=str(self.root / 'extract-0/receipt.json'))
+        source = receipt['source']
+        self.assertEqual(receipt['status'], 'complete', receipt)
+        self.assertEqual(source['range_rows'], 3)
+        self.assertEqual(source['session_rows'], 5)
+        self.assertEqual(source['persisted_rows'], source['session_rows'])
+        self.assertEqual(source['excluded_rows'], 2)
+        self.assertEqual(source['row_counts'], {'emitted': 2, 'skipped': 1, 'unaccounted': 0})
+        self.assertEqual(receipt['skipped_noise']['tool_output'], 2)
+        # Old checkpoints lack range counts but retain prefix verification.
+        for key in ('range_rows', 'session_rows', 'excluded_rows', 'row_counts'):
+            prior['source'].pop(key, None)
+        checkpoint = self.root / 'old.json'
+        checkpoint.write_text(json.dumps(prior), encoding='utf-8')
+        self.assertEqual(self.extract(after=4, through=20, prior_receipt=str(checkpoint))['status'], 'complete')
+
+    def test_range_counts_include_unreadable_and_unsupported_rows(self):
+        self.add(12, 'unsupported-host-record', {})
+        with closing(sqlite3.connect(self.db)) as conn, conn:
+            conn.execute("INSERT INTO session_message VALUES ('broken', 'selected', 'user', 20, '{')")
+        receipt = self.extract()
+        self.assertEqual(receipt['status'], 'partial')
+        self.assertEqual(receipt['source']['range_rows'], 4)
+        self.assertEqual(receipt['source']['row_counts'], {'emitted': 2, 'skipped': 0, 'unaccounted': 2})
+
     def test_missing_or_future_cutoff_remains_partial(self):
         for cutoff in (0, 5, 8):
             with self.subTest(cutoff=cutoff):
@@ -80,6 +112,7 @@ class OpenCodeSnapshotTests(unittest.TestCase):
         self.assertTrue(receipt["unknown_envelopes"])
         self.assertTrue(any("streaming" in gap for gap in receipt["missing"]))
         self.assertTrue(any("branch" in gap for gap in receipt["missing"]))
+        self.assertEqual(receipt['source']['row_counts'], {'emitted': 2, 'skipped': 0, 'unaccounted': 3})
 
     def test_exact_session_id_is_not_a_workspace_directory_name(self):
         receipt = self.extract(session_id='session-workspace-name')
@@ -92,6 +125,8 @@ class OpenCodeSnapshotTests(unittest.TestCase):
             {'type': 'tool', 'name': 'render', 'state': {
                 'input': {'parameters': {'html': '<html>INPUT_ONLY_SENTINEL</html>'}},
                 'content': 'Shown page title; no HTML returned.'}}]})
+        self.add(15, 'assistant', {'finish': 'stop', 'content': [
+            {'type': 'tool', 'state': {'content': 'Returned evidence only.'}}]})
         default = self.extract()
         tools = self.extract(include_tools=True)
         def records(directory):
@@ -99,7 +134,9 @@ class OpenCodeSnapshotTests(unittest.TestCase):
         text_only = records(self.root / 'extract-0')
         with_tools = records(self.root / 'extract-1')
         self.assertEqual([r for r in with_tools if r['role'] != 'evidence'], text_only)
-        self.assertEqual(default['skipped_noise']['tool_output'], 1)
+        self.assertEqual(default['skipped_noise']['tool_output'], 2)
+        self.assertEqual(default['source']['row_counts'], {'emitted': 3, 'skipped': 1, 'unaccounted': 0})
+        self.assertEqual(tools['source']['row_counts'], {'emitted': 4, 'skipped': 0, 'unaccounted': 0})
         self.assertEqual(tools['status'], 'complete')
         self.assertIn('Shown page title', next(r['text'] for r in with_tools if r['role'] == 'evidence'))
         self.assertNotIn('INPUT_ONLY_SENTINEL', json.dumps(with_tools))

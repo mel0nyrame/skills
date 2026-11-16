@@ -38,7 +38,7 @@ Complete when every listed fragment has been inspected, every receipt gap or unr
 
 ## Completeness and incrementality
 
-A coverage record identifies target and branch, source, cutoff, ranges/pages/rows, counts, missing intervals, compaction placeholders, attachment omissions, and checked previous-prefix continuity.
+A coverage record identifies target and branch, source, cutoff, ranges/pages/rows, counts, missing intervals, compaction placeholders, attachment omissions, and checked previous-prefix continuity. OpenCode receipts separate `range_rows` (`after < seq <= cutoff`) from `session_rows`; `excluded_rows` is their difference. Legacy `persisted_rows` still means the session total. Each range row is classified once as emitted, skipped or unaccounted in `row_counts`; these sum to `range_rows`. Message and tool-part counts use different units and must not be added to reconcile rows. Preserve these counts in source provenance without changing source-header fields. Old receipts without them remain readable.
 
 Inspect every included chunk, merging later corrections with earlier findings. A parser receipt proves only its supported extraction conditions; it proves neither external truth nor model inspection of its outputs. Preserve warnings in provenance.
 

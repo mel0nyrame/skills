@@ -293,10 +293,40 @@ class SearchTests(unittest.TestCase):
         path.write_text(path.read_text(encoding='utf-8').replace("sends input", "sends another input"), encoding='utf-8')
         knowledge.git(self.root, "add", "--", "topics/scope.md")
         knowledge.git(self.root, "commit", "-m", "Update search fixture")
-        with self.assertRaisesRegex(knowledge.KnowledgeError, "revision changed"):
+        with self.assertRaisesRegex(knowledge.KnowledgeError, "revision mismatch"):
             knowledge.search(self.root, "session.prompt", expected_revision=revision)
-        with self.assertRaisesRegex(knowledge.KnowledgeError, "revision changed"):
+        with self.assertRaisesRegex(knowledge.KnowledgeError, "revision mismatch"):
             knowledge.read_document(self.root, "topics/scope.md", "topic", expected_revision=revision)
+
+    def test_source_owner_error_names_the_exact_link_without_discovering_topics(self):
+        sources = self.root / 'sources'
+        sources.mkdir()
+        (sources / 'selected.md').write_text('Source evidence', encoding='utf-8')
+        self.topic('owner.md', 'Owner', '[Source](../sources/selected.md)')
+        with self.assertRaisesRegex(knowledge.KnowledgeError, 'exact link'):
+            knowledge.read_document(self.root, 'sources/selected.md', 'source')
+        self.assertEqual(knowledge.read_document(self.root, 'sources/selected.md', 'source',
+                                               owner='topics/owner.md')['content'], 'Source evidence')
+        self.topic('other.md', 'Other', 'No selected source link.')
+        with self.assertRaisesRegex(knowledge.KnowledgeError, 'does not reference'):
+            knowledge.read_document(self.root, 'sources/selected.md', 'source', owner='topics/other.md')
+
+    def test_revision_errors_preserve_legacy_tokens_and_explain_hash_confusion(self):
+        self.topic('scope.md', 'Scope', 'A visible explanation.')
+        token = knowledge.read_document(self.root, 'topics/scope.md', 'topic')['revision']
+        self.assertTrue(token.startswith('legacy-'))
+        knowledge.search(self.root, 'explanation', expected_revision=token)
+        for wrong in ('a' * 64, 'b' * 40, 'not-a-revision'):
+            for call in (lambda: knowledge.search(self.root, 'explanation', expected_revision=wrong),
+                         lambda: knowledge.read_document(self.root, 'topics/scope.md', 'topic',
+                                                         expected_revision=wrong)):
+                with self.subTest(token=wrong), self.assertRaises(knowledge.KnowledgeError) as error:
+                    call()
+                message = str(error.exception)
+                self.assertIn('revision mismatch', message)
+                self.assertIn('read/search', message)
+                self.assertIn('--at', message)
+                self.assertNotIn('revision changed', message)
 
     def test_pending_recovery_blocks_both_public_search_engines(self):
         transactions = self.root / ".state/transactions"

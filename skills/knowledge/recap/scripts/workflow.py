@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import stat
 import tempfile
 
@@ -233,6 +234,21 @@ def validate_cursor(receipt):
     after, through = interval.get('after'), interval.get('through')
     if type(after) is not int or type(through) is not int or after < -1 or through < 0 or through < after:
         raise KnowledgeError('Cursor range requires ordered integer after/through bounds')
+    count_fields = {'session_rows', 'range_rows', 'excluded_rows', 'row_counts'}
+    if source.keys() & count_fields:
+        if not count_fields <= source.keys():
+            raise KnowledgeError('Cursor row counts require session, range, excluded and classified rows')
+        for key in ('session_rows', 'range_rows', 'excluded_rows', 'persisted_rows'):
+            if type(source.get(key)) is not int or source[key] < 0:
+                raise KnowledgeError('Cursor row counts must be nonnegative integers')
+        counts = source['row_counts']
+        if (not isinstance(counts, dict) or set(counts) != {'emitted', 'skipped', 'unaccounted'}
+                or any(type(value) is not int or value < 0 for value in counts.values())):
+            raise KnowledgeError('Cursor row counts need emitted, skipped and unaccounted integers')
+        if (source['range_rows'] + source['excluded_rows'] != source['session_rows']
+                or source['persisted_rows'] != source['session_rows']
+                or sum(counts.values()) != source['range_rows'] or counts['unaccounted']):
+            raise KnowledgeError('Complete cursor row counts do not reconcile or contain unaccounted rows')
     for key in ('missing', 'unread_attachments', 'errors', 'unknown_envelopes'):
         if receipt.get(key, []) != []:
             raise KnowledgeError('Complete cursor contains unresolved coverage gaps')
@@ -820,29 +836,64 @@ def publish(root, identifier, approved_sha256, migration=False):
             raise KnowledgeError(f'Publication interrupted; run recover {identifier}: {exc}') from exc
 
 
-def cleanup(root, identifier):
+def cleanup(root, identifier, *, temp=False):
     with locked(root):
         assert_no_pending(root)
         state = get_state(root, identifier)
-        if state['status'] == 'cleaned':
+        changed = state['status'] != 'cleaned'
+        if not changed and not temp:
             return {'id': identifier, 'status': 'cleaned', 'changed': False}
-        if state['status'] != 'published':
+        if state['status'] not in ('published', 'cleaned'):
             raise KnowledgeError('Only a successfully published candidate can be cleaned automatically')
         record = git_content(root, state['published_commit'], f'.state/published/{identifier}.json')
         if not record or json.loads(record)['candidate_sha256'] != state['fingerprint']:
             raise KnowledgeError('Published provenance does not match this candidate')
-        destination = safe_path(root, '.worktree/' + identifier)
-        if destination.exists():
-            tree = ensure_candidate(root, state)
-            git(root, 'worktree', 'remove', str(tree))
-        branch = git(root, 'rev-parse', '--verify', state['branch'], check=False)
-        if branch.returncode == 0:
-            git(root, 'update-ref', '-d', state['branch'], state['candidate'])
-        state['status'] = 'cleaned'
-        save_state(root, state)
-        return {'id': identifier, 'status': 'cleaned', 'changed': True,
-                'raw_temporary_area': '.state/tmp/' + identifier,
-                'note': 'Temporary raw extraction is not staged; remove only the exact extraction you created.'}
+        def temporary_stat(path):
+            try:
+                return path.lstat()
+            except FileNotFoundError:
+                return None
+            except OSError as exc:
+                raise KnowledgeError(f'Cannot inspect temporary cleanup target {path}: {exc}') from exc
+
+        raw = safe_path(root, '.state/tmp/' + identifier) if temp else None
+        raw_stat = temporary_stat(raw) if raw is not None else None
+        if raw_stat is not None:
+            if not stat.S_ISDIR(raw_stat.st_mode):
+                raise KnowledgeError(f'Temporary cleanup requires a directory: {raw}')
+            if temporary_stat(raw / 'preserved') is not None:
+                raise KnowledgeError(f'Temporary cleanup refuses preserved material: {raw / "preserved"}')
+            def walk_error(error):
+                raise KnowledgeError(f"Cannot inspect temporary cleanup target {raw}: {error}") from error
+
+            for directory, directories, files in os.walk(raw, onerror=walk_error):
+                for name in directories + files:
+                    entry = temporary_stat(Path(directory) / name)
+                    if entry is not None and stat.S_ISLNK(entry.st_mode):
+                        raise KnowledgeError(f'Symlinks are excluded from temporary cleanup: {Path(directory) / name}')
+        if changed:
+            destination = safe_path(root, '.worktree/' + identifier)
+            if destination.exists():
+                tree = ensure_candidate(root, state)
+                git(root, 'worktree', 'remove', str(tree))
+            branch = git(root, 'rev-parse', '--verify', state['branch'], check=False)
+            if branch.returncode == 0:
+                git(root, 'update-ref', '-d', state['branch'], state['candidate'])
+            state['status'] = 'cleaned'
+            save_state(root, state)
+        result = {'id': identifier, 'status': 'cleaned', 'changed': changed,
+                  'raw_temporary_area': '.state/tmp/' + identifier}
+        if raw is None:
+            result['note'] = 'Temporary raw extraction is not staged; remove only the exact extraction you created.'
+        else:
+            result['temporary_cleanup'] = 'absent'
+            if raw_stat is not None:
+                try:
+                    shutil.rmtree(raw)
+                except OSError as exc:
+                    raise KnowledgeError(f'Temporary cleanup incomplete at {raw}: {exc}; stop if host policy blocks deletion') from exc
+                result.update(temporary_cleanup='removed', changed=True)
+        return result
 
 
 def status(root, identifier=None):

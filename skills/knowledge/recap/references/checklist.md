@@ -44,7 +44,7 @@ Group independent reads of these selected sections, the extraction receipt and c
 If `inspect` fails after writing candidate material, retain that operation and inspect its status/diff before retrying. The candidate may be dirty even though nothing was published. Do not reset or clean the formal root to repair a candidate.
 
 - Read a topic with `--purpose topic`, including before editing it.
-- Check `complete` and per-entry errors in `status --all`; directory presence does not prove candidate validity.
+- Start retained-work inventory with `status --all --summary`; check `complete` and per-entry errors, then use `status OP` and `diff OP`. Directory presence does not prove candidate validity.
 - Updates use hashes from the operation base, not whichever revision is currently published. `packet` computes them.
 - Topics use `document`; sources and capture cursors use `content`.
 - Guide input is only the introduction before the managed topic catalog. It requires user approval.
