@@ -477,7 +477,7 @@ def main(argv=None):
         if name == 'cleanup':
             p.add_argument('--temp', action='store_true',
                            help='Also remove this operation temporary area; refuse preserved files and symlinks')
-    for name in ['resolve', 'review', 'approve']:
+    for name in ['revise', 'resolve', 'review', 'approve']:
         p = sub.add_parser(name)
         p.add_argument('operation')
         p.add_argument('file')
@@ -518,7 +518,7 @@ def main(argv=None):
                           'publication_record_exists', 'review_required', 'conflicts', 'error'}
                 result['operations'] = [{k: v for k, v in entry.items() if k in fields}
                                         for entry in result['operations']]
-        elif args.command in ('resolve', 'approve'): result = getattr(workflow, args.command)(root, args.operation, Path(args.file))
+        elif args.command in ('revise', 'resolve', 'approve'): result = getattr(workflow, args.command)(root, args.operation, Path(args.file))
         elif args.command == 'review': result = workflow.record_review(root, args.operation, Path(args.file))
         elif args.command == 'publish': result = workflow.publish(root, args.operation, args.approved_sha256)
         elif args.command == 'migration-plan': result = workflow.migration_plan(root, Path(args.overrides) if args.overrides else None)

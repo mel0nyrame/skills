@@ -101,6 +101,146 @@ class MaintenanceTests(unittest.TestCase):
         expected.get('incremental', {}).pop('prior_receipt', None)
         return expected
 
+    def ready_revision(self):
+        packet = self.cursor_packet('capture')
+        result = workflow.inspect(self.root, packet)
+        item = json.loads(packet.read_bytes())['changes'][2]
+        item['document']['body'] = item['document']['body'].replace(
+            'An independent explanation.', 'A corrected explanation.')
+        item['reason'] = 'Correct the evidence attribution'
+        replacement = Path(self.temp.name) / 'revision.json'
+        replacement.write_bytes(json_bytes({'changes': [item]}))
+        return packet, result, replacement
+
+    def test_ready_candidate_can_be_revised_and_published_in_same_operation(self):
+        packet, original, replacement = self.ready_revision()
+        initial_state = workflow.get_state(self.root, 'capture')
+        base = initial_state['base']
+        formal_head = head(self.root)
+        result = subprocess.run([sys.executable, '-B', str(SCRIPTS / 'knowledge.py'),
+            '--root', str(self.root), 'revise', 'capture', str(replacement)],
+            capture_output=True, encoding='utf-8')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        revised = json.loads(result.stdout)
+        self.assertEqual(revised['status'], 'ready')
+        self.assertFalse(revised['review_required'])
+        self.assertEqual(revised['review_rounds'], 0)
+        self.assertNotEqual(revised['approval_sha256'], original['approval_sha256'])
+        self.assertNotEqual(revised['packet_sha256'], original['packet_sha256'])
+        state = workflow.get_state(self.root, 'capture')
+        self.assertEqual(state['base'], base)
+        self.assertEqual(state['authored'], initial_state['authored'])
+        self.assertEqual(head(self.root), formal_head)
+        self.assertEqual(git(Path(revised['worktree']), 'log', '-1', '--format=%s').stdout.strip(),
+                         b'Revise candidate capture')
+        with self.assertRaises(KnowledgeError):
+            workflow.publish(self.root, 'capture', original['approval_sha256'])
+        with self.assertRaisesRegex(KnowledgeError, 'Packet differs'):
+            knowledge.apply_bundle(self.root, packet, revised['approval_sha256'])
+        with self.assertRaises(KnowledgeError):
+            workflow.inspect(self.root, packet)
+        workflow.publish(self.root, 'capture', revised['approval_sha256'])
+        self.assertIn('A corrected explanation.', (self.root / 'topics/Example.md').read_text(encoding='utf-8'))
+        record = json.loads((self.root / '.state/published/capture.json').read_bytes())
+        self.assertEqual(record['packet_sha256'], revised['packet_sha256'])
+        self.assertIn('Correct the evidence attribution', (self.root / 'CHANGELOG.md').read_text(encoding='utf-8'))
+
+    def test_revise_rejects_recorded_approval_without_changing_candidate(self):
+        _, original, replacement = self.ready_revision()
+        self.approve('capture', original['approval_sha256'])
+        before = workflow.get_state(self.root, 'capture')
+        with self.assertRaisesRegex(KnowledgeError, 'approval'):
+            workflow.revise(self.root, 'capture', replacement)
+        self.assertEqual(workflow.get_state(self.root, 'capture'), before)
+        self.assertEqual(head(Path(original['worktree'])), original['candidate_commit'])
+
+    def test_revise_rejects_reviewed_or_nonready_candidates(self):
+        _, original, replacement = self.ready_revision()
+        state = workflow.get_state(self.root, 'capture')
+        for status in ('editing', 'needs-review', 'needs-revision', 'conflict', 'review-blocked', 'published', 'cleaned'):
+            with self.subTest(status=status):
+                state['status'] = status
+                workflow.save_state(self.root, state)
+                with self.assertRaisesRegex(KnowledgeError, 'ready'):
+                    workflow.revise(self.root, 'capture', replacement)
+        state.update(status='ready', review_required=True)
+        workflow.save_state(self.root, state)
+        with self.assertRaisesRegex(KnowledgeError, 'review'):
+            workflow.revise(self.root, 'capture', replacement)
+        state.update(review_required=False, reviews=[{'verdict': 'approve', 'candidate_sha256': original['approval_sha256']}])
+        workflow.save_state(self.root, state)
+        with self.assertRaisesRegex(KnowledgeError, 'review'):
+            workflow.revise(self.root, 'capture', replacement)
+        self.assertEqual(workflow.get_state(self.root, 'capture'), state)
+
+    def test_revise_keeps_authored_scope_and_rejects_dirty_candidate(self):
+        _, original, replacement = self.ready_revision()
+        before = workflow.get_state(self.root, 'capture')
+        payload = json.loads(replacement.read_bytes())
+        payload['changes'][0]['path'] = 'topics/other.md'
+        replacement.write_bytes(json_bytes(payload))
+        with self.assertRaisesRegex(KnowledgeError, 'authored path'):
+            workflow.revise(self.root, 'capture', replacement)
+        self.assertEqual(workflow.get_state(self.root, 'capture'), before)
+        target = Path(original['worktree']) / 'topics/Example.md'
+        target.write_text('External edit', encoding='utf-8')
+        with self.assertRaisesRegex(KnowledgeError, 'External/uncommitted'):
+            workflow.revise(self.root, 'capture', replacement)
+        self.assertEqual(target.read_text(encoding='utf-8'), 'External edit')
+
+    def test_revise_reserved_candidate_needs_user_approval_not_independent_review(self):
+        packet = self.guide('route', '# Route\n\nRead current topics.\n')
+        original = workflow.inspect(self.root, packet)
+        item = json.loads(packet.read_bytes())['changes'][0]
+        item['document']['body'] = '# Route\n\nRead the relevant topic first.\n'
+        replacement = Path(self.temp.name) / 'revision.json'
+        replacement.write_bytes(json_bytes({'changes': [item]}))
+        revised = workflow.revise(self.root, 'route', replacement)
+        self.assertTrue(revised['reserved_reasons'])
+        self.assertFalse(revised['review_required'])
+        self.assertNotEqual(original['approval_sha256'], revised['approval_sha256'])
+        with self.assertRaisesRegex(KnowledgeError, 'explicit user approval'):
+            workflow.publish(self.root, 'route', revised['approval_sha256'])
+        self.approve('route', revised['approval_sha256'])
+        workflow.publish(self.root, 'route', revised['approval_sha256'])
+
+    def test_resolve_preserves_review_rounds_and_revise_cannot_bypass_them(self):
+        first = workflow.inspect(self.root, self.guide('one', '# Route\n\nFirst route.\n'))
+        workflow.inspect(self.root, self.guide('two', '# Route\n\nSecond route.\n'))
+        self.approve('one', first['approval_sha256'])
+        workflow.publish(self.root, 'one', first['approval_sha256'])
+        self.assertEqual(workflow.integrate(self.root, 'two')['status'], 'conflict')
+        replacement = Path(self.temp.name) / 'resolution.json'
+        item = {'path': 'index.md', 'kind': 'update',
+                'expected_sha256': digest((self.root / 'index.md').read_bytes()),
+                'reason': 'Reconcile routes', 'evidence': ['both routes'],
+                'document': {'body': '# Route\n\nCombined route.\n'}}
+        replacement.write_bytes(json_bytes({'changes': [item]}))
+        resolved = workflow.resolve(self.root, 'two', replacement)
+        review_file = Path(self.temp.name) / 'review.json'
+        review = {'operation': 'two', 'candidate_sha256': resolved['approval_sha256'],
+                  'reviewer_id': 'reviewer', 'evidence_locator': 'fixture review',
+                  'verdict': 'revise', 'findings': ['Clarify the order']}
+        review_file.write_bytes(json_bytes(review))
+        workflow.record_review(self.root, 'two', review_file)
+        item['document']['body'] = '# Route\n\nRead the first route, then the second.\n'
+        replacement.write_bytes(json_bytes({'changes': [item]}))
+        revised = workflow.resolve(self.root, 'two', replacement)
+        self.assertEqual(revised['status'], 'needs-review')
+        self.assertEqual(workflow.get_state(self.root, 'two')['reviews'], [review])
+        self.assertEqual(revised['review_rounds'], 1)
+        with self.assertRaises(KnowledgeError):
+            workflow.publish(self.root, 'two', revised['approval_sha256'])
+        review.update(candidate_sha256=revised['approval_sha256'], verdict='approve', findings=[])
+        review_file.write_bytes(json_bytes(review))
+        workflow.record_review(self.root, 'two', review_file)
+        before = workflow.get_state(self.root, 'two')
+        with self.assertRaisesRegex(KnowledgeError, 'review'):
+            workflow.revise(self.root, 'two', replacement)
+        self.assertEqual(workflow.get_state(self.root, 'two'), before)
+        self.approve('two', revised['approval_sha256'])
+        workflow.publish(self.root, 'two', revised['approval_sha256'])
+
     def test_non_utf8_packet_error_names_regeneration_remedy(self):
         packet = self.guide('route', '# Route\n\n中文导读。\n')
         packet.write_bytes(packet.read_text(encoding='utf-8').encode('gbk'))

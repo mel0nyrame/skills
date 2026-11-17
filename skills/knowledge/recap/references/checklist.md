@@ -47,6 +47,7 @@ If `inspect` fails after writing candidate material, retain that operation and i
 
 - Read a topic with `--purpose topic`, including before editing it.
 - Start retained-work inventory with `status --all --summary`; check `complete` and per-entry errors, then use `status OP` and `diff OP`. Directory presence does not prove candidate validity.
+- If the author check finds a defect in an ordinary `ready` candidate without approval or reviews, use [candidate revision](operations.md#revise-an-unapproved-candidate), then inspect the revised diff and latest hash. Keep defective candidates unpublished. Conflicts and reviewer rejections still use `resolve`.
 - Updates use hashes from the operation base, not whichever revision is currently published. `packet` computes them.
 - Topics use `document`; sources and capture cursors use `content`.
 - Guide input is only the introduction before the managed topic catalog. It requires user approval.
