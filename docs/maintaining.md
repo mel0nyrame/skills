@@ -13,6 +13,15 @@ python3 -B -m scripts.check_pr_body --body-file /tmp/pr-body.md
 
 The [shared runner](../scripts/check_repository.py) runs regression tests, ADR validation, and documentation checks in order, stopping at the first nonzero exit code. It uses the invoking Python interpreter and the repository root as each child process's working directory. Each child receives `PYTHONUTF8=0` and `PYTHONIOENCODING=utf-8`: locale-dependent defaults remain covered while Python standard streams use UTF-8. The parent environment is unchanged. Direct checker commands remain available for focused work but do not set this shared environment automatically.
 
+For a focused iteration, use the same runner to retain the shared encoding environment:
+
+```sh
+python3 -B -m scripts.check_repository --test-pattern 'test_check_repository.py'
+python3 -B -m scripts.check_repository --test-pattern 'test_recap_workflow.py' --test-name revise --test-name resolve
+```
+
+`--test-pattern` passes a test-filename glob to unittest discovery (`-p`). Each `--test-name` passes a case-sensitive name substring or glob (`-k`); repeated names match with OR, within the selected files. ADR and documentation checks still run after the selected tests pass, and any failure still stops later checks. Confirm the reported test count; a mistyped selector may select no tests. A filtered run is not full-suite evidence. Without selectors, the runner and CI retain the full existing sequence. Run the unfiltered command before delivery; allow several minutes rather than terminating a healthy run at a short tool timeout.
+
 The [CI workflow](../.github/workflows/tests.yml) uses the same runner on Ubuntu and Windows. PR events also validate the body. Editing the PR title or body reruns its structure check without repeating the full matrix.
 
 The documentation checker reads tracked and unignored Markdown, excluding intentional inputs under `tests/fixtures/`. It checks relative inline and reference-definition targets, local Markdown fragments, duplicate heading slugs, and explicit HTML anchors.

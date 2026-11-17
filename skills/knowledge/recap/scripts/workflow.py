@@ -123,7 +123,13 @@ def begin(root, identifier, writer_id, migration=False):
 
 
 def raw_packet(filename):
-    packet = load_json(filename)
+    try:
+        packet = load_json(filename)
+    except KnowledgeError as exc:
+        if isinstance(exc.__cause__, UnicodeDecodeError):
+            raise KnowledgeError(f'{exc}. The packet is not UTF-8; regenerate stdout with '
+                                 'PYTHONIOENCODING=utf-8 and avoid shell transcoding') from exc
+        raise
     doc.object_keys(packet, ('id', 'writer_id', 'changes'), ('risk',))
     operation_id(packet['id'])
     doc.text(packet['writer_id'], 'writer_id')
@@ -428,7 +434,19 @@ def inspect(root, filename):
         if state['status'] != 'editing':
             if state.get('packet_sha256') == packet_sha:
                 return inspected_result(root, state)
-            raise KnowledgeError('Use resolve for an existing candidate; preserve its review rounds and base')
+            status = state['status']
+            if status == 'needs-review':
+                raise KnowledgeError('Candidate needs independent review; run review OP FILE for the current hash')
+            if status == 'review-blocked':
+                raise KnowledgeError('Independent review is blocked; retain the candidate and ask the user')
+            if status in ('conflict', 'needs-revision'):
+                if len(state['reviews']) >= 2:
+                    raise KnowledgeError('Two review rounds exhausted; retain worktree and ask the user')
+                raise KnowledgeError('Use resolve OP FILE for conflict or reviewer rejection; preserve review rounds and base')
+            if (status == 'ready' and not state['review_required'] and not state['reviews']
+                    and state.get('user_approval') is None):
+                raise KnowledgeError('Use revise OP FILE for this unapproved ready candidate')
+            raise KnowledgeError('Candidate cannot be replaced by inspect; retain its approval/review history and ask the user')
         tree = worktree(root, state)
         assert_clean(tree)
         seen, rendered = set(), {}
@@ -556,27 +574,44 @@ def integrate(root, identifier):
         return inspected_result(root, state)
 
 
+def revise(root, identifier, filename):
+    return replace_candidate(root, identifier, filename, revision=True)
+
+
 def resolve(root, identifier, filename):
+    return replace_candidate(root, identifier, filename, revision=False)
+
+
+def replace_candidate(root, identifier, filename, *, revision):
     replacements = load_json(filename)
     doc.object_keys(replacements, ('changes',))
     if not isinstance(replacements['changes'], list) or not replacements['changes']:
-        raise KnowledgeError('Resolution needs a nonempty changes array')
+        raise KnowledgeError('Replacement needs a nonempty changes array')
     with locked(root):
         managed(root)
         assert_no_pending(root)
         state = get_state(root, identifier)
-        if state['status'] not in ('conflict', 'needs-revision'):
-            raise KnowledgeError('Only a conflicted or reviewer-rejected candidate can be resolved')
-        if len(state['reviews']) >= 2:
-            raise KnowledgeError('Two review rounds exhausted; retain worktree and ask the user')
+        if revision:
+            assert_clean(root)
+            if state['status'] != 'ready':
+                raise KnowledgeError('Only an ordinary ready candidate can be revised')
+            if state.get('user_approval') is not None:
+                raise KnowledgeError('Candidate has recorded user approval; author-only revision is unavailable')
+            if state['review_required'] or state['reviews']:
+                raise KnowledgeError('Candidate requires or has recorded independent review; use its review workflow')
+        else:
+            if state['status'] not in ('conflict', 'needs-revision'):
+                raise KnowledgeError('Only a conflicted or reviewer-rejected candidate can be resolved')
+            if len(state['reviews']) >= 2:
+                raise KnowledgeError('Two review rounds exhausted; retain worktree and ask the user')
         tree = ensure_candidate(root, state, dirty=state['status'] == 'conflict')
         changes, seen = {}, set()
         for item in replacements['changes']:
             if not isinstance(item, dict):
-                raise KnowledgeError('Resolution change must be an object')
+                raise KnowledgeError('Replacement change must be an object')
             path = item.get('path')
             if path not in state['authored'] or path in seen:
-                raise KnowledgeError('Resolution can change each authored path once')
+                raise KnowledgeError('Replacement can change each authored path once')
             seen.add(path)
             changes[path] = render_item(item, git_content(root, state['base'], path), date.today().isoformat())
         if not set(state.get('conflicts', [])) <= seen:
@@ -584,6 +619,7 @@ def resolve(root, identifier, filename):
         files = content_files(tree)
         files.update({p: b.decode() for p, b in changes.items() if p.endswith('.md')})
         doc.validate_library(files)
+        check_cursors(tree, state, changes)
         for path, data in changes.items():
             atomic_write(safe_path(tree, path), data)
         # Keep audit reasons/evidence synchronized with the resolved input.
@@ -594,11 +630,20 @@ def resolve(root, identifier, filename):
         check_cursors(tree, state)
         check_candidate_scope(tree, state)
         state['reserved_reasons'] = reserved_reasons(root, tree, state)
-        state['candidate'] = commit_candidate(tree, 'Resolve candidate ' + identifier)
-        state.update(status='needs-review', conflicts=[], review_required=True)
+        if revision:
+            state['packet_sha256'] = digest(json_bytes(state['packet']))
+            state.pop('user_approval', None)
+            state['candidate'] = commit_candidate(tree, 'Revise candidate ' + identifier)
+            state.update(status='ready', conflicts=[])
+        else:
+            state['candidate'] = commit_candidate(tree, 'Resolve candidate ' + identifier)
+            state.update(status='needs-review', conflicts=[], review_required=True)
         state['fingerprint'] = fingerprint(tree, state)
         save_state(root, state)
-        return inspected_result(root, state)
+        result = inspected_result(root, state)
+        if revision:
+            result['packet_json'] = json_bytes(state['packet']).decode('utf-8')
+        return result
 
 
 def record_review(root, identifier, filename):
@@ -775,7 +820,8 @@ def publish(root, identifier, approved_sha256, migration=False):
         if state['status'] != 'ready' or approved_sha256 != state['fingerprint']:
             raise KnowledgeError('Candidate is not ready or exact inspection hash differs')
         if head(root) != state['base']:
-            raise KnowledgeError('Published version advanced; run integrate, inspect and review again')
+            raise KnowledgeError('Published version advanced; run integrate, inspect the candidate diff with diff OP, '
+                                 'then satisfy any required review/approval and use the latest candidate hash')
         if state['review_required'] and not any(r['candidate_sha256'] == state['fingerprint'] and r['verdict'] == 'approve' for r in state['reviews']):
             raise KnowledgeError('Independent review unavailable or not approved; candidate retained')
         risk = state['packet'].get('risk', 'routine')
@@ -929,7 +975,8 @@ def build_packet(root, identifier, directory):
         assert_clean(root)
         state = get_state(root, identifier)
         if state['status'] != 'editing':
-            raise KnowledgeError('Packet generation requires an editing operation; use resolve for a prepared candidate')
+            raise KnowledgeError('Packet generation requires an editing operation; use revise for an unapproved '
+                                 'ordinary ready candidate or resolve for conflict/reviewer rejection')
         assert_clean(worktree(root, state))
         manifest = load_json(safe_path(directory, 'changes.json'))
         doc.object_keys(manifest, ('changes',), ('risk',))

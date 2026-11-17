@@ -13,6 +13,15 @@ python3 -B -m scripts.check_pr_body --body-file /tmp/pr-body.md
 
 [共享检查入口](../scripts/check_repository.py)依次运行回归测试、ADR 校验和文档检查，遇到首个非零退出码即停止。各子进程使用调用者的 Python 解释器，以仓库根目录为工作目录，并接收 `PYTHONUTF8=0` 和 `PYTHONIOENCODING=utf-8`：依赖系统区域设置的默认编码路径仍会被测试覆盖，同时 Python 标准流使用 UTF-8。不修改父进程环境。仍可直接调用单项检查进行定向验证，但不会自动设置共享编码环境。
 
+定向迭代时，使用同一入口保留共享编码环境：
+
+```sh
+python3 -B -m scripts.check_repository --test-pattern 'test_check_repository.py'
+python3 -B -m scripts.check_repository --test-pattern 'test_recap_workflow.py' --test-name revise --test-name resolve
+```
+
+`--test-pattern` 将测试文件名 glob 传给 unittest discovery（`-p`）。每个 `--test-name` 传入区分大小写的测试名称子串或 glob（`-k`）；重复名称按“或”匹配，范围仍限于选中的文件。选中测试通过后仍运行 ADR 和文档检查，任何失败仍会停止后续检查。核对报告的测试数量；选择条件拼错可能选不中测试。筛选运行不等于全量验证。不传选择条件时，入口和 CI 保持原有完整检查顺序。交付前运行不带筛选的命令；应预留数分钟，避免过短的工具超时中断正常检查。
+
 [CI 工作流](../.github/workflows/tests.yml)在 Ubuntu 和 Windows 上使用同一检查入口。PR 事件还会检查正文。编辑 PR 标题或正文后，只重新检查正文结构，不重复运行完整矩阵。
 
 文档检查器读取 Git 已跟踪和未被忽略的 Markdown，排除 `tests/fixtures/` 下的刻意构造输入。检查范围包括相对路径的行内链接、引用定义、Markdown 锚点、重复标题锚点和显式 HTML 锚点。

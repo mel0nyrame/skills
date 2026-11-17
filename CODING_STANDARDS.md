@@ -4,9 +4,11 @@ Read for repository reviews, alongside the diff and applicable project rules.
 
 ## Skill and documentation semantics
 
-For each claimed regression, identify the changed trigger, condition, action, obligation, or authorization boundary. Compare both versions and follow relevant references before treating deleted wording as deleted behavior. Distinguish a reproduced failure, a static semantic gap, and an untested risk. Equivalent wording can preserve a rule without repeating it at every step.
+For each claimed regression, identify the changed trigger, condition, action, obligation, or authorization boundary. Compare both versions and follow relevant references before treating deleted wording as deleted behavior. Distinguish a reproduced failure, a static semantic gap, and an untested risk. Before claiming that an artifact is irreproducible or an operation cannot continue, exercise the relevant supported serialization or recovery path, or label the claim as an unexecuted inference. Keep conclusions within the tested scope. Equivalent wording can preserve a rule without repeating it at every step.
 
 For executable claims, trace argument handling, discovery/filtering, validation, and reporting. Inspect existing focused tests and CI evidence. A function excerpt or state constant alone does not establish CLI behavior.
+
+For stateful commands, review rejection and retry paths alongside success: identify which files, operation state, hashes and approval/review evidence can change before failure, and how supported recovery or corrected input can continue. Require behavioral evidence matching the promised failure contract: unchanged files/state for a preflight rejection, or retained material and a usable recovery path for partial progress. A passing happy-path test does not establish either contract.
 
 Review descriptions for distinct invocation branches and the body for execution steps. Skill enumeration does not demonstrate correct automatic invocation. Compare translations for the same actor, action, applicability conditions, guarantees, and requirement strength. Bilingual-pair checks establish file pairing and links, not semantic equivalence.
 

@@ -6,7 +6,7 @@ Use `scripts/knowledge.py --root ROOT COMMAND`; global options precede the comma
 
 1. Run `doctor`; read the root's reader rules. Initialize only a new empty root. Prepare a reviewed migration for an existing root.
 2. Choose a unique safe operation ID and the writer's actual host agent ID. Run `begin OP --writer-id ID`. Its worktree is `ROOT/.worktree/OP`, with a temporary branch. Keep original extraction separately in `ROOT/.state/tmp/OP/<new-extraction>`.
-3. Read relevant formal files with returned hashes/revisions. Prepare the [declared inputs](formats.md#packet-input-directory) and run `packet OP --from-dir DIR`, saving stdout outside formal paths; direct structured packets remain supported. Generation computes base hashes without inspecting, committing or publishing. `inspect PACKET` validates it, writes and commits only candidate material, and returns `approval_sha256`. The old v1 arbitrary-write bundle is intentionally rejected.
+3. Read relevant formal files with returned hashes/revisions. Prepare the [declared inputs](formats.md#packet-input-directory) and run `packet OP --from-dir DIR`, saving stdout outside formal paths; direct structured packets remain supported. Generation computes base hashes without inspecting, committing or publishing. `inspect PACKET` validates it, writes and commits only candidate material, and returns `approval_sha256`. If the author check finds a defect in an ordinary ready candidate, follow [candidate revision](#revise-an-unapproved-candidate) before publication. The old v1 arbitrary-write bundle is intentionally rejected.
 4. Run `integrate OP` before publication if the formal revision advanced. Disjoint authored files integrate automatically; both writers changing the same file requires independent review even when Git finds no textual conflict. `status OP` reports state; `diff OP` exposes the candidate diff. If `conflict`, read the exact candidate files and author all reported replacements in a resolution file; run `resolve OP FILE`.
 5. Complete the [standalone reading check](knowledge.md#built-in-writing-contract) for every new or substantively changed topic, then satisfy any independent review below. For a reserved change, show the exact candidate diff to the user, then record its approval with `approve OP FILE`. Program flags include guide-introduction updates, archive, source-contribution removal and removal/rewriting of over 30% of a body of at least 200 characters. This is a conservative mechanical trigger, not a semantic proof. Agent judgment must also flag broad restructuring or changes to the user's non-factual judgment. Approval receipt fields are `candidate_sha256` and a nonempty `evidence_locator` for the user's approval.
 6. Publish with `publish OP --approved-sha256 HASH`, or `apply PACKET --approved-sha256 HASH`. Use the latest candidate hash, not the packet's file hash. A changed main revision requires integration and renewed inspection/review; bypassing the old-version check is not a retry.
@@ -15,6 +15,32 @@ Use `scripts/knowledge.py --root ROOT COMMAND`; global options precede the comma
 The helper waits at most 30 seconds for the main library lock. Authoring, research and agent review happen outside it. Timeout retains candidates; there is no background queue or infinite retry. Existing uncommitted/staged changes in the formal root pause publication without being staged, committed, stashed or overwritten. Report them to the user. A selected explicit maintenance task can reconcile them separately; capture never silently adopts them.
 
 Guide text is preserved unless an explicitly approved candidate updates its [introduction](formats.md#guide-introduction). The helper regenerates the topic catalog and appends the current operation to the latest changelog. Packets cannot replace the catalog, trailing guide prose, `CHANGELOG.md`, `AGENTS.md`, Git metadata or publication rules. Integration merges only authored introduction text, retains the latest catalog/trailing prose, then regenerates entries. Concurrent introduction changes require independent review; generated entries alone do not. Integration changes the candidate hash, so approval of an earlier candidate is insufficient.
+
+## Revise an unapproved candidate
+
+For an ordinary `ready` candidate with no recorded user approval, review history or independent-review requirement, use `revise OP FILE`. Keep a failed author check unpublished; retain the candidate and pause if no permitted correction path is available.
+
+The UTF-8 replacement file has the same `{"changes": [...]}` shape as `resolve`. Each item uses the [change-packet fields](formats.md#change-packet), including its hash from the operation's current base, reason and evidence. Replace each selected authored path at most once; unlisted authored paths stay unchanged, and new paths are excluded. Use `status OP` and `diff OP` to inspect the retained candidate and base. Packet generation remains limited to `editing` operations.
+
+Revision validates the proposed topic/source/cursor relationships before writing, commits the candidate, rebuilds catalogs, recomputes reserved reasons and returns a new `approval_sha256`. A rejected cursor relationship leaves the candidate and saved operation unchanged, so corrected input can be retried. It preserves the base, authored set and review history; it does not force independent review. Reserved changes still require the user's exact approval. Re-read the revised prose and diff, integrate any newer formal changes and publish with the latest candidate hash. Old packet bytes no longer match; use `publish OP`, not `apply` with the original packet.
+
+The revision result also includes `packet_json`: the exact canonical packet string whose UTF-8 bytes match the returned `packet_sha256`. Save these bytes without reformatting or newline conversion to retain a verifiable packet. `inspect` can replay this revised packet, and `apply` can publish it with the latest candidate hash. This does not reopen candidate replacement through `inspect`. For example, substitute the selected paths and operation:
+
+```python
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+result = subprocess.run([sys.executable, "-B", "/path/to/knowledge.py", "--root", "/path/to/library",
+                         "revise", "capture-example", "/path/to/replacements.json"],
+                        env={**os.environ, "PYTHONIOENCODING": "utf-8"}, capture_output=True, check=True)
+revision = json.loads(result.stdout)
+Path("revised-packet.json").write_bytes(revision["packet_json"].encode("utf-8"))
+```
+
+Recorded user approval or any review history blocks this author-only path. `conflict` and `needs-revision` still use `resolve`, with independent review and its existing round bound. Revision is not approval withdrawal or a way to bypass a completed review.
 
 ## UTF-8 redirected output
 
@@ -37,7 +63,7 @@ with open("packet.json", "wb") as output:
                    env={**os.environ, "PYTHONIOENCODING": "utf-8"}, stdout=output, check=True)
 ```
 
-Check command success and parse the saved file as UTF-8 before inspection. Changing the reader's encoding after saving does not repair incorrectly encoded bytes. This setting controls CLI output, not source coverage or host deletion permissions.
+Check command success and parse the saved file as UTF-8 before inspection. Changing the reader's encoding after saving does not repair incorrectly encoded bytes. This setting controls CLI output, not source coverage or host deletion permissions. It also applies to piped or redirected `status` and `diff` output: mojibake there does not establish damaged library files. On packet decode failure, regenerate the file with UTF-8 output rather than changing the JSON reader's encoding.
 
 ## Locate retained operations
 
@@ -72,7 +98,7 @@ The reviewer writes a JSON receipt:
 }
 ```
 
-Run `review OP FILE`. `approve` requires no unresolved findings. `revise` returns findings to the writer; `blocked` retains work for user attention. Use `resolve` to revise authored paths and invalidate prior approval. At most two review rounds are allowed per operation. After two unsuccessful rounds, ask the user with differences and reasons; preserve the worktree rather than restarting under a new ID to evade the bound. Without a separate agent, leave the required merge pending. A review receipt is auditable caller-supplied evidence, not cryptographic proof that another agent actually ran.
+Run `review OP FILE`. The `approve` verdict requires no unresolved findings. The `revise` verdict returns findings to the writer; the `blocked` verdict retains work for user attention. After a `revise` verdict, use `resolve OP FILE` to replace authored paths and invalidate prior approval, not the author-only `revise OP FILE` command. At most two review rounds are allowed per operation. After two unsuccessful rounds, ask the user with differences and reasons; preserve the worktree rather than restarting under a new ID to evade the bound. Without a separate agent, leave the required merge pending. A review receipt is auditable caller-supplied evidence, not cryptographic proof that another agent actually ran.
 
 ## Publication and interrupted recovery
 
