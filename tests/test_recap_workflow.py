@@ -101,6 +101,18 @@ class MaintenanceTests(unittest.TestCase):
         expected.get('incremental', {}).pop('prior_receipt', None)
         return expected
 
+    def test_non_utf8_packet_error_names_regeneration_remedy(self):
+        packet = self.guide('route', '# Route\n\n中文导读。\n')
+        packet.write_bytes(packet.read_text(encoding='utf-8').encode('gbk'))
+        errors = io.StringIO()
+        with redirect_stderr(errors):
+            result = knowledge.main(['--root', str(self.root), 'inspect', str(packet)])
+        self.assertEqual(result, 2)
+        error = json.loads(errors.getvalue())['error']
+        self.assertIn('not UTF-8', error)
+        self.assertIn('PYTHONIOENCODING=utf-8', error)
+        self.assertFalse((self.root / '.state/operations/route.json').exists())
+
     def test_direct_packet_normalizes_cursor_before_review_and_publication(self):
         packet, payload, receipt = self.private_cursor_packet('capture')
         original = packet.read_bytes()

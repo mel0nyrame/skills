@@ -17,11 +17,13 @@ A new operation starts with `begin`; query `status OP` when its state is needed.
 | Order | Command | Completion criterion |
 | --- | --- | --- |
 | 1 | `begin OP --writer-id ID` | One operation-owned candidate and frozen base exist. |
-| 2 | `packet OP --from-dir INPUT` | Formal root and matching editing candidate are clean. JSON contains base hashes and the author's explicit reasons/evidence. Save stdout outside formal paths. |
+| 2 | `PYTHONIOENCODING=utf-8 python3 "$SKILL_DIR/scripts/knowledge.py" --root "$ROOT" packet "$OP" --from-dir "$INPUT" > "$PACKET"` | POSIX shell: formal root and matching editing candidate are clean; command succeeds and the saved packet parses as UTF-8 JSON. It contains base hashes and the author's explicit reasons/evidence, outside formal paths. |
 | 3 | `inspect PACKET` | Candidate validates; inspect its diff, source coverage and returned `approval_sha256`. |
 | 4 | `integrate OP` | Candidate includes newer formal changes. If conflicts or review are required, follow [operations](operations.md#independent-review). |
 | 5 | `publish OP --approved-sha256 HASH` | Use the latest candidate hash. Reserved changes also need the user's exact approval through `approve OP FILE`. |
 | 6 | `cleanup OP` | Re-read saved knowledge and test retrieval first. Clean only this successfully published operation. |
+
+The packet command above is for POSIX shells, including Git Bash on Windows. For Windows PowerShell or any shell that transcodes redirection, use the [binary-output method](operations.md#utf-8-redirected-output); the environment setting alone cannot prevent shell transcoding.
 
 Inspect substantive prose with the [standalone reading check](knowledge.md#built-in-writing-contract). Use the contract for the current step:
 

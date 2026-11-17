@@ -37,7 +37,7 @@ with open("packet.json", "wb") as output:
                    env={**os.environ, "PYTHONIOENCODING": "utf-8"}, stdout=output, check=True)
 ```
 
-Check command success and parse the saved file as UTF-8 before inspection. Changing the reader's encoding after saving does not repair incorrectly encoded bytes. This setting controls CLI output, not source coverage or host deletion permissions.
+Check command success and parse the saved file as UTF-8 before inspection. Changing the reader's encoding after saving does not repair incorrectly encoded bytes. This setting controls CLI output, not source coverage or host deletion permissions. It also applies to piped or redirected `status` and `diff` output: mojibake there does not establish damaged library files. On packet decode failure, regenerate the file with UTF-8 output rather than changing the JSON reader's encoding.
 
 ## Locate retained operations
 

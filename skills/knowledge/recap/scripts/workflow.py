@@ -123,7 +123,13 @@ def begin(root, identifier, writer_id, migration=False):
 
 
 def raw_packet(filename):
-    packet = load_json(filename)
+    try:
+        packet = load_json(filename)
+    except KnowledgeError as exc:
+        if isinstance(exc.__cause__, UnicodeDecodeError):
+            raise KnowledgeError(f'{exc}. The packet is not UTF-8; regenerate stdout with '
+                                 'PYTHONIOENCODING=utf-8 and avoid shell transcoding') from exc
+        raise
     doc.object_keys(packet, ('id', 'writer_id', 'changes'), ('risk',))
     operation_id(packet['id'])
     doc.text(packet['writer_id'], 'writer_id')
