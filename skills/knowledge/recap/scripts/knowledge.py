@@ -339,7 +339,7 @@ def _read_document(root, relative, purpose, owner=None):
         raise KnowledgeError("Hidden topic files are excluded")
     if purpose == "source":
         if not owner or not owner.startswith("topics/"):
-            raise KnowledgeError("Source reads require --owner topics/FILE.md")
+            raise KnowledgeError("Source reads require --owner topics/FILE.md naming the topic whose exact link you followed")
         owner_path = safe_path(root, owner)
         text = owner_path.read_text(encoding="utf-8")
         links = re.findall(r"\]\(<?([^\s)>]+)>?(?:\s+[^)]*)?\)", text)
@@ -371,7 +371,9 @@ def check_read(root, expected_revision=None):
         assert_clean(root)
     current = revision(root)
     if expected_revision and expected_revision != current:
-        raise KnowledgeError('Library revision changed; refresh related reads before answering')
+        raise KnowledgeError('Library revision mismatch; reuse the revision returned by read/search, '
+                             'refreshing related reads if stale. Candidate/approval hashes are not current-library '
+                             'revision tokens. For selected history use --at <commit> --purpose history.')
     return current
 
 
@@ -472,6 +474,9 @@ def main(argv=None):
     for name in ['integrate', 'diff', 'recover', 'cleanup']:
         p = sub.add_parser(name)
         p.add_argument('operation')
+        if name == 'cleanup':
+            p.add_argument('--temp', action='store_true',
+                           help='Also remove this operation temporary area; refuse preserved files and symlinks')
     for name in ['resolve', 'review', 'approve']:
         p = sub.add_parser(name)
         p.add_argument('operation')
@@ -505,7 +510,8 @@ def main(argv=None):
         elif args.command == 'packet': result = workflow.build_packet(root, args.operation, Path(args.from_dir))
         elif args.command == 'inspect': result = inspect_bundle(root, Path(args.packet))
         elif args.command == 'apply': result = apply_bundle(root, Path(args.packet), args.approved_sha256)
-        elif args.command in ('integrate', 'status', 'diff', 'recover', 'cleanup'):
+        elif args.command == 'cleanup': result = workflow.cleanup(root, args.operation, temp=args.temp)
+        elif args.command in ('integrate', 'status', 'diff', 'recover'):
             result = getattr(workflow, args.command)(root, args.operation)
             if args.command == 'status' and args.summary:
                 fields = {'id', 'status', 'worktree_exists', 'branch_exists',

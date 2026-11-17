@@ -34,6 +34,8 @@ This uses the collection's Codex plugin. Use `$recap` standalone or `/skills:rec
 
 ## Follow capture into publication
 
+OpenCode receipts report `range_rows` for `after < seq <= cutoff`, `session_rows` for the whole session, and `excluded_rows` for the difference. Mutually exclusive `row_counts` reconcile the range; legacy `persisted_rows` remains the session total.
+
 The assistant establishes the selected conversation, branch, and inspected coverage, then searches related topics. Existing explanations should absorb appropriate findings instead of producing similar copies for every chat. Guesses, executed checks, and user corrections need distinct treatment.
 
 It prepares topic bodies and necessary source records. Coverage gaps and unread attachments remain visible. Locators support traceability, but deleting the original chat leaves only retained excerpts independently inspectable; full replay is not guaranteed.
@@ -44,7 +46,7 @@ References are selected by the current step: source recovery, continuity, topic 
 
 For local extraction, `sessions.py show CHUNK` displays one chunk as text with original locators and fragment offsets. It wraps long lines for display and leaves the JSONL files unchanged. The assistant reads the receipt and one text view per chunk; targeted rereads remain available for truncation or corrections. Whole-output limits still require bounded reading. See [chunk reading](../../skills/knowledge/recap/references/sessions.md#read-extracted-chunks).
 
-Formal updates use a candidate worktree and checks. Concurrent changes to the same content require independent review. Publication uses the same candidate hash that was inspected and approved. Current task authorization and existing approval rules determine when explicit user approval is required. Saved prose and important retrieval must pass verification before cleanup. Claimed incremental progress must have its cursor published with the represented knowledge. `cleanup` removes only the matching published worktree and branch; raw extraction needs separate removal of the exact directory created for this operation. If host policy blocks deletion, report the retained location rather than bypassing the block. Moving or renaming data does not prove deletion. Failed or pending work remains available.
+Formal updates use a candidate worktree and checks. Concurrent changes to the same content require independent review. Publication uses the same candidate hash that was inspected and approved. Current task authorization and existing approval rules determine when explicit user approval is required. Saved prose and important retrieval must pass verification before cleanup. Claimed incremental progress must have its cursor published with the represented knowledge. `cleanup` removes only the matching published worktree and branch. Explicit `cleanup OP --temp` also removes `.state/tmp/OP/`, but refuses symlinks, non-directory targets and retained `preserved/` material. It can be retried after ordinary cleanup. If host policy blocks deletion, report the retained location rather than bypassing the block. Moving or renaming data does not prove deletion. Failed or pending work remains available.
 
 ## Know the resulting files
 
