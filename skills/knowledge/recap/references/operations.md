@@ -22,7 +22,23 @@ For an ordinary `ready` candidate with no recorded user approval, review history
 
 The UTF-8 replacement file has the same `{"changes": [...]}` shape as `resolve`. Each item uses the [change-packet fields](formats.md#change-packet), including its hash from the operation's current base, reason and evidence. Replace each selected authored path at most once; unlisted authored paths stay unchanged, and new paths are excluded. Use `status OP` and `diff OP` to inspect the retained candidate and base. Packet generation remains limited to `editing` operations.
 
-Revision validates and commits the candidate, rebuilds catalogs, recomputes reserved reasons and returns a new `approval_sha256`. It preserves the base, authored set and review history; it does not force independent review. Reserved changes still require the user's exact approval. Re-read the revised prose and diff, integrate any newer formal changes and publish with the latest candidate hash. Old packet bytes no longer match; use `publish OP`, not `apply` with the original packet.
+Revision validates the proposed topic/source/cursor relationships before writing, commits the candidate, rebuilds catalogs, recomputes reserved reasons and returns a new `approval_sha256`. A rejected cursor relationship leaves the candidate and saved operation unchanged, so corrected input can be retried. It preserves the base, authored set and review history; it does not force independent review. Reserved changes still require the user's exact approval. Re-read the revised prose and diff, integrate any newer formal changes and publish with the latest candidate hash. Old packet bytes no longer match; use `publish OP`, not `apply` with the original packet.
+
+The revision result also includes `packet_json`: the exact canonical packet string whose UTF-8 bytes match the returned `packet_sha256`. Save these bytes without reformatting or newline conversion to retain a verifiable packet. `inspect` can replay this revised packet, and `apply` can publish it with the latest candidate hash. This does not reopen candidate replacement through `inspect`. For example, substitute the selected paths and operation:
+
+```python
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+result = subprocess.run([sys.executable, "-B", "/path/to/knowledge.py", "--root", "/path/to/library",
+                         "revise", "capture-example", "/path/to/replacements.json"],
+                        env={**os.environ, "PYTHONIOENCODING": "utf-8"}, capture_output=True, check=True)
+revision = json.loads(result.stdout)
+Path("revised-packet.json").write_bytes(revision["packet_json"].encode("utf-8"))
+```
 
 Recorded user approval or any review history blocks this author-only path. `conflict` and `needs-revision` still use `resolve`, with independent review and its existing round bound. Revision is not approval withdrawal or a way to bypass a completed review.
 
@@ -82,7 +98,7 @@ The reviewer writes a JSON receipt:
 }
 ```
 
-Run `review OP FILE`. `approve` requires no unresolved findings. `revise` returns findings to the writer; `blocked` retains work for user attention. Use `resolve` to revise authored paths and invalidate prior approval. At most two review rounds are allowed per operation. After two unsuccessful rounds, ask the user with differences and reasons; preserve the worktree rather than restarting under a new ID to evade the bound. Without a separate agent, leave the required merge pending. A review receipt is auditable caller-supplied evidence, not cryptographic proof that another agent actually ran.
+Run `review OP FILE`. The `approve` verdict requires no unresolved findings. The `revise` verdict returns findings to the writer; the `blocked` verdict retains work for user attention. After a `revise` verdict, use `resolve OP FILE` to replace authored paths and invalidate prior approval, not the author-only `revise OP FILE` command. At most two review rounds are allowed per operation. After two unsuccessful rounds, ask the user with differences and reasons; preserve the worktree rather than restarting under a new ID to evade the bound. Without a separate agent, leave the required merge pending. A review receipt is auditable caller-supplied evidence, not cryptographic proof that another agent actually ran.
 
 ## Publication and interrupted recovery
 

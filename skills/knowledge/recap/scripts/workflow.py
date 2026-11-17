@@ -434,8 +434,19 @@ def inspect(root, filename):
         if state['status'] != 'editing':
             if state.get('packet_sha256') == packet_sha:
                 return inspected_result(root, state)
-            raise KnowledgeError('Use revise for an unapproved ordinary ready candidate, or resolve for '
-                                 'conflict/reviewer rejection; preserve review rounds and base')
+            status = state['status']
+            if status == 'needs-review':
+                raise KnowledgeError('Candidate needs independent review; run review OP FILE for the current hash')
+            if status == 'review-blocked':
+                raise KnowledgeError('Independent review is blocked; retain the candidate and ask the user')
+            if status in ('conflict', 'needs-revision'):
+                if len(state['reviews']) >= 2:
+                    raise KnowledgeError('Two review rounds exhausted; retain worktree and ask the user')
+                raise KnowledgeError('Use resolve OP FILE for conflict or reviewer rejection; preserve review rounds and base')
+            if (status == 'ready' and not state['review_required'] and not state['reviews']
+                    and state.get('user_approval') is None):
+                raise KnowledgeError('Use revise OP FILE for this unapproved ready candidate')
+            raise KnowledgeError('Candidate cannot be replaced by inspect; retain its approval/review history and ask the user')
         tree = worktree(root, state)
         assert_clean(tree)
         seen, rendered = set(), {}
@@ -608,6 +619,7 @@ def replace_candidate(root, identifier, filename, *, revision):
         files = content_files(tree)
         files.update({p: b.decode() for p, b in changes.items() if p.endswith('.md')})
         doc.validate_library(files)
+        check_cursors(tree, state, changes)
         for path, data in changes.items():
             atomic_write(safe_path(tree, path), data)
         # Keep audit reasons/evidence synchronized with the resolved input.
@@ -628,7 +640,10 @@ def replace_candidate(root, identifier, filename, *, revision):
             state.update(status='needs-review', conflicts=[], review_required=True)
         state['fingerprint'] = fingerprint(tree, state)
         save_state(root, state)
-        return inspected_result(root, state)
+        result = inspected_result(root, state)
+        if revision:
+            result['packet_json'] = json_bytes(state['packet']).decode('utf-8')
+        return result
 
 
 def record_review(root, identifier, filename):
@@ -805,7 +820,8 @@ def publish(root, identifier, approved_sha256, migration=False):
         if state['status'] != 'ready' or approved_sha256 != state['fingerprint']:
             raise KnowledgeError('Candidate is not ready or exact inspection hash differs')
         if head(root) != state['base']:
-            raise KnowledgeError('Published version advanced; run integrate, inspect and review again')
+            raise KnowledgeError('Published version advanced; run integrate, inspect the candidate diff with diff OP, '
+                                 'then satisfy any required review/approval and use the latest candidate hash')
         if state['review_required'] and not any(r['candidate_sha256'] == state['fingerprint'] and r['verdict'] == 'approve' for r in state['reviews']):
             raise KnowledgeError('Independent review unavailable or not approved; candidate retained')
         risk = state['packet'].get('risk', 'routine')

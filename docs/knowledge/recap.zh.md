@@ -158,7 +158,7 @@ $skills:recap
 
 普通发布可先读[命令清单](../../skills/knowledge/recap/references/checklist.md)。`knowledge.py packet OP --from-dir DIR` 从操作基准版本计算哈希，把明确列出的专题、来源和回执转换为变更包。作者仍需填写修改理由、证据和真实覆盖范围。`reason` 必须是非空单行字符串。`evidence` 必须是非空数组，其中每项都是互不重复的非空单行字符串；只有一个定位时也必须使用数组。重定向保存的 JSON 必须采用 UTF-8，具体方法见[输出说明](../../skills/knowledge/recap/references/operations.md#utf-8-redirected-output)。生成命令不会执行 `inspect` 或发布候选。输入结构见[输入目录格式](../../skills/knowledge/recap/references/formats.md#packet-input-directory)。
 
-如果作者在 `inspect` 后发现缺陷，可以对没有批准记录或审查历史的普通 `ready` 候选使用 `revise OP FILE`。它在同一操作内替换选中的已声明路径，并返回最新候选哈希；旧哈希和原始变更包不能发布该候选。保留变更仍要求用户批准精确候选，并不自动要求独立审查。冲突和审查退回仍使用 `resolve`，原有审查规则保持不变。具体见[候选修订](../../skills/knowledge/recap/references/operations.md#revise-an-unapproved-candidate)。如果没有允许的修正路径，应保留候选而不发布已知缺陷。
+如果作者在 `inspect` 后发现缺陷，可以对没有批准记录或审查历史的普通 `ready` 候选使用 `revise OP FILE`。它在同一操作内替换选中的已声明路径，并返回最新候选哈希；旧哈希和原始变更包不能发布该候选。返回结果中的 `packet_json` 可以按精确的 UTF-8 字节保存，用于核验 `packet_sha256`，或通过 `inspect`/`apply` 重放修订后的变更包。游标关系无效时会在写盘前拒绝，修正输入后仍可重试。保留变更仍要求用户批准精确候选，并不自动要求独立审查。冲突和审查退回仍使用 `resolve`，原有审查规则保持不变。具体见[候选修订](../../skills/knowledge/recap/references/operations.md#revise-an-unapproved-candidate)。如果没有允许的修正路径，应保留候选而不发布已知缺陷。
 
 生成变更包要求正式库和候选没有未提交修改。候选必须存在、处于编辑状态，并具有匹配的仓库和分支身份。命令在读取声明的文档前报告这些问题，保留外部文件。正式库可以推进到更新的干净版本，哈希仍取自操作基准。单项输入检查不能替代 `inspect` 对整个候选的链接和来源关系验证。
 

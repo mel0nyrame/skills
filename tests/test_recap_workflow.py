@@ -241,6 +241,75 @@ class MaintenanceTests(unittest.TestCase):
         self.approve('two', revised['approval_sha256'])
         workflow.publish(self.root, 'two', revised['approval_sha256'])
 
+    def test_replacement_cursor_failure_is_clean_and_retryable(self):
+        packet, original, replacement = self.ready_revision()
+        original_input = replacement.read_bytes()
+        payload = json.loads(original_input)
+        payload['changes'][0]['document']['sources'] = ['../sources/old.md']
+        payload['changes'][0]['document']['body'] = payload['changes'][0]['document']['body'].replace(
+            '../sources/new.md', '../sources/old.md')
+        invalid_input = json_bytes(payload)
+        for command in ('revise', 'resolve'):
+            with self.subTest(command=command):
+                state = workflow.get_state(self.root, 'capture')
+                state.update(status='ready' if command == 'revise' else 'needs-revision',
+                             review_required=command == 'resolve')
+                workflow.save_state(self.root, state)
+                tree = Path(original['worktree'])
+                before = {path: (tree / path).read_bytes() for path in
+                          ('topics/Example.md', 'index.md', 'CHANGELOG.md', '.state/cursors/new.json')}
+                replacement.write_bytes(invalid_input)
+                with self.assertRaisesRegex(KnowledgeError, 'Represented topic must cite a represented source'):
+                    getattr(workflow, command)(self.root, 'capture', replacement)
+                self.assertEqual(workflow.get_state(self.root, 'capture'), state)
+                self.assertEqual(git(tree, 'status', '--porcelain').stdout, b'')
+                self.assertEqual({path: (tree / path).read_bytes() for path in before}, before)
+                replacement.write_bytes(original_input)
+                retried = getattr(workflow, command)(self.root, 'capture', replacement)
+                self.assertEqual(retried['status'], 'ready' if command == 'revise' else 'needs-review')
+                self.assertEqual(git(tree, 'status', '--porcelain').stdout, b'')
+
+    def test_revise_returns_exact_packet_bytes_for_inspect_and_apply(self):
+        _, original, replacement = self.ready_revision()
+        output = io.StringIO()
+        with redirect_stdout(output):
+            code = knowledge.main(['--root', str(self.root), 'revise', 'capture', str(replacement)])
+        self.assertEqual(code, 0)
+        revised = json.loads(output.getvalue())
+        saved = Path(self.temp.name) / 'revised-packet.json'
+        saved.write_bytes(revised['packet_json'].encode('utf-8'))
+        self.assertEqual(digest(saved.read_bytes()), revised['packet_sha256'])
+        self.assertEqual(workflow.inspect(self.root, saved)['approval_sha256'], revised['approval_sha256'])
+        self.assertEqual(knowledge.apply_bundle(self.root, saved, revised['approval_sha256'])['status'], 'published')
+
+    def test_inspect_changed_packet_gives_state_specific_next_action(self):
+        packet, original, _ = self.ready_revision()
+        packet.write_bytes(packet.read_bytes() + b'\n')
+        state = workflow.get_state(self.root, 'capture')
+        for status, message in (('needs-review', 'independent review'), ('review-blocked', 'ask the user'),
+                                ('conflict', 'resolve'), ('needs-revision', 'resolve'),
+                                ('ready', 'revise'), ('published', 'Published operation'),
+                                ('cleaned', 'Published operation')):
+            with self.subTest(status=status):
+                state['status'] = status
+                workflow.save_state(self.root, state)
+                with self.assertRaisesRegex(KnowledgeError, message):
+                    workflow.inspect(self.root, packet)
+        state.update(status='ready', reviews=[{'verdict': 'approve'}], review_required=True)
+        workflow.save_state(self.root, state)
+        with self.assertRaisesRegex(KnowledgeError, 'ask the user'):
+            workflow.inspect(self.root, packet)
+        state.update(status='needs-revision', reviews=[{}, {}])
+        workflow.save_state(self.root, state)
+        with self.assertRaisesRegex(KnowledgeError, 'Two review rounds exhausted'):
+            workflow.inspect(self.root, packet)
+
+    def test_publish_advanced_base_points_to_candidate_inspection_not_packet_replacement(self):
+        _, original, _ = self.ready_revision()
+        self.publish_topic('newer')
+        with self.assertRaisesRegex(KnowledgeError, 'inspect the candidate diff'):
+            workflow.publish(self.root, 'capture', original['approval_sha256'])
+
     def test_non_utf8_packet_error_names_regeneration_remedy(self):
         packet = self.guide('route', '# Route\n\n中文导读。\n')
         packet.write_bytes(packet.read_text(encoding='utf-8').encode('gbk'))
