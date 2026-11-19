@@ -28,9 +28,9 @@ This uses the collection's Codex plugin. Use `$karpathy-guidelines` standalone o
 
 ## What should change in the process
 
-The assistant first inspects implementation and constraints to locate the duplicate behavior, which could involve the page, retries, or server handling. Insufficient evidence remains uncertainty, not a prematurely declared root cause.
+If you or an active workflow request an initial intent check or a no-tools stage, the assistant first uses only the supplied context. It honors any required pause, including `clarify`'s question-and-wait rule, before environmental investigation or independent work. Otherwise, it inspects discoverable facts instead of asking you for them. For this fix, it inspects implementation and constraints to locate the duplicate behavior, which could involve the page, retries, or server handling. Insufficient evidence remains uncertainty, not a prematurely declared root cause. It states material assumptions and tradeoffs and presents a supported default for remaining choices.
 
-Each edit should trace to the task. Reuse existing capabilities where adequate. A helper script or visualization can be useful when it serves current understanding or verification, but its purpose should be explicit.
+Each edit should trace to the task and provide only the minimum sufficient behavior. Reuse existing capabilities where adequate. Avoid speculative features, unrequested configuration, and error handling for impossible cases. A disposable helper script or visualization can serve current understanding or verification without needing a reusable abstraction. Remove residue introduced or made unused by the change; preserve unrelated pre-existing work and dead code unless removal is requested.
 
 The report accounts for each requirement and separates executed tests from behavior inferred by reading code. Compatibility work distinguishes required behavior, accepted limitations, and user-approved deferrals. One passing failure scenario does not establish that every concurrent case is solved.
 
@@ -47,7 +47,11 @@ There is no fixed output directory or new policy file created by invoking this s
 | Documentation edit | Updated target documents and necessary references |
 | A useful chart or interactive explanation | A task-specific artifact or display, at a location determined by the task |
 
-A conversational explanation normally produces no file. This skill does not automatically create `AGENTS.md`, `CLAUDE.md`, or another personal skill.
+Conversation defaults to text and normally produces no file. Follow the requested format; a useful inline visual is allowed when it fits that format. Creating files, calling services, or using tools requires task authorization, not merely a preference for a format. Advice or planning does not authorize implementation, and HTML must not replace a requested format. This skill does not automatically create `AGENTS.md`, `CLAUDE.md`, or another personal skill.
+
+Within those boundaries, diagrams or images can explain relationships; editable diagrams help with precise technical structure. Interactive HTML can help users change parameters or compare scenarios. An authorized HTML artifact should use only necessary interactions and dependencies, follow workspace placement conventions, and have its key behavior checked. If a format is unavailable, explain the limitation and offer a useful supported alternative. Video production is outside this skill.
+
+Writing uses clarity principles inspired by ASD-STE100 and adapted to the user's language. Preserve necessary facts, conditions, exceptions, and uncertainty. This is not a claim of full compliance; strict vocabulary, tense, and word-count rules apply only when requested and checked against the specification.
 
 ## Review the outcome
 
