@@ -4,13 +4,15 @@ English | [简体中文](clarify.zh.md) · [All guides](../README.md)
 
 `clarify` is useful when you have an idea but have not established the problem you most need to solve. Select it when you want to clarify intent or stress-test the question before receiving a substantive answer. It identifies assumptions and missing information that could affect the answer. If a key gap remains, it asks one decisive question and delivers the solution after your reply.
 
-The initial intent check uses the supplied context without tools or file changes. When a decision-changing gap remains, the first output asks one question and waits. When the context is sufficient, the assistant answers directly in the same reply, without a sufficiency announcement or clarification headings.
+The initial intent check uses only the supplied context, without tools or file changes. The assistant keeps this check focused on your requested clarification and does not start concurrent unrelated work. When a decision-changing gap remains, it asks once about one decisive dimension and pauses. When the context is sufficient, it answers directly in the same reply, without a sufficiency announcement or clarification headings.
+
+After this initial check, investigation and execution follow the original task's authorization. Missing facts do not all require intent questions; an already clear task may need authorized investigation. Your clarification reply lets the assistant resume the original task. It does not itself expand authorization or require renewed permission for actions already authorized.
 
 ## Decide whether clarification is useful
 
 “I want a personal knowledge base; recommend tools” leaves several important conditions open. Individual versus shared use, collecting material versus retrieving it, and preserving context can lead to different recommendations. A product list alone may not solve the immediate problem.
 
-An explicit request such as “rename this file to usage.md” usually needs direct action. This skill adds a conversational round, so use it when one answer can materially narrow the task.
+An explicit request such as “rename this file to usage.md” usually needs direct action. This skill adds a conversational round only when a decision-changing gap remains. Sufficient context leads to a same-reply answer or continuation of the authorized task.
 
 ## Follow one complete round
 
@@ -39,10 +41,10 @@ Use `$clarify` standalone or `/skills:clarify` in Claude Code. `$skills:clarify`
 | --- | --- | --- |
 | A key gap remains | A short explanation and one decisive question; relevant assumptions or risks only as needed | No tools or file changes |
 | Context is sufficient | The answer directly, without clarification framing | No default output file; later actions follow the task's authorization |
-| After your reply | Explanation, recommendation, or plan addressing the original goal | No default output file |
-| A separate request to save the answer | A document at your requested path | Written later within your authorization |
+| After your reply | Response or resumed authorized work addressing the original goal | No default output file; existing task authorization still applies |
+| Authorized investigation or execution after the initial check | Results required by the original task | Tools and file changes only within that authorization |
 
-Installing or invoking the skill does not automatically create `requirements.md` or a requirements database. If you want a file after clarification, request a path such as `docs/requirements.md` and specify whether the assistant should only document requirements or proceed to implementation.
+Installing or invoking the skill does not automatically create `requirements.md` or a requirements database. If you want a file after clarification, include a path such as `docs/requirements.md` in your task and specify whether the assistant should only document requirements or proceed to implementation. An existing instruction to save or implement does not need to be repeated after clarification.
 
 ## Check whether the question helped
 

@@ -4,13 +4,13 @@
 
 这个集合里的 Skill 会指导 AI 助手怎样处理任务。你提出同一个请求，助手应当按相应规则调查、执行和检查结果。安装 Skill 只是让这些指令可被调用，外部服务连接和文件操作权限仍由你的 Agent 环境提供。
 
-先想清楚你要得到什么。需要检查是否还有关键缺口时，可以用 `clarify`。要修改项目并留下后续能用的工程知识，可以从 `project-engineering` 开始。要把会话整理成独立专题，再用 `recap`。它们的文件产物和操作范围差别很大。
+先想清楚你要得到什么。需要检查是否还有关键缺口时，可以用 `clarify`，之后直接回答或在原有授权范围内继续原始任务。要修改项目并留下后续能用的工程知识，可以从 `project-engineering` 开始。要把会话整理成独立专题，再用 `recap`。文件产物和操作范围取决于所选 Skill 与任务授权。
 
 ## 每个 Skill 具体做什么，会留下什么
 
 | Skill 和详细指南 | 适合交给它的任务 | 通常能得到什么 |
 | --- | --- | --- |
-| [clarify](thinking/clarify.zh.md) | 先明确真正要解决的问题 | 有缺口时只问一个问题，信息充分时直接回答，没有默认文件 |
+| [clarify](thinking/clarify.zh.md) | 先明确真正要解决的问题 | 有缺口时只问一个问题，否则直接回答或继续已授权的任务，没有默认文件 |
 | [wait-what](thinking/wait-what.zh.md) | 重新理解没听懂的说明 | 补齐上下文、逻辑明确、术语一致的重新解释，没有默认文件 |
 | [karpathy-guidelines](thinking/karpathy-guidelines.zh.md) | 控制工作范围，核实假设和结果 | 原任务的代码、文档或答案，没有固定产物目录 |
 | [project-engineering](engineering/project-engineering.zh.md) | 按项目规则实现功能、修复或迁移 | 相关源文件和测试，必要时更新工程知识及决策 |

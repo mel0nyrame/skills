@@ -1,4 +1,4 @@
 interface:
   display_name: "Clarify"
-  short_description: "Clarify key gaps or answer when context is sufficient"
-  default_prompt: "Use $clarify to check for decision-changing gaps, ask one decisive question when needed, or answer directly when the supplied context is sufficient."
+  short_description: "Ask once, answer, or continue the authorized task"
+  default_prompt: "Use $clarify to clarify my intent from the supplied context, ask one decisive question when a decision-changing gap remains, or, when the context is sufficient, answer directly or continue the original task within its existing authorization."

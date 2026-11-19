@@ -4,13 +4,13 @@ English | [简体中文](README.zh.md) · [Installation](../README.md#install)
 
 These skills guide how an AI assistant investigates, performs, and checks a task. Installation makes instructions callable; external connections and file permissions still come from your agent environment.
 
-Start with the result you need. `clarify` checks whether a focused clarification round is needed. `project-engineering` implements a project change and preserves useful engineering knowledge. `recap` turns conversations into independent topics. Their file outputs and operational effects differ substantially.
+Start with the result you need. `clarify` checks whether a focused clarification round is needed, then answers or continues the original task within its existing authorization. `project-engineering` implements a project change and preserves useful engineering knowledge. `recap` turns conversations into independent topics. File outputs and operational effects depend on the selected skill and the task's authorization.
 
 ## Tasks and actual deliverables
 
 | Skill and detailed guide | Suitable task | Typical result |
 | --- | --- | --- |
-| [clarify](thinking/clarify.md) | Establish the problem that needs solving | One question when needed, otherwise a direct answer; no default file |
+| [clarify](thinking/clarify.md) | Establish the problem that needs solving | One question when needed, otherwise an answer or continuation of the authorized task; no default file |
 | [wait-what](thinking/wait-what.md) | Recover an explanation you did not understand | A re-explanation with context, explicit logic, and consistent terms; no default file |
 | [karpathy-guidelines](thinking/karpathy-guidelines.md) | Keep scope, assumptions, and verification under control | The original task's code, documents, or answer, with no fixed artifact directory |
 | [project-engineering](engineering/project-engineering.md) | Implement features, fixes, or migrations under project rules | Relevant source and tests, plus engineering knowledge and decision updates when needed |

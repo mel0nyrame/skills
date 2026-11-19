@@ -26,7 +26,7 @@
 
 | Skill | 用途 |
 | --- | --- |
-| [clarify](docs/thinking/clarify.zh.md) | 检查假设；有关键缺口时只问一个问题，信息充分时直接回答。 |
+| [clarify](docs/thinking/clarify.zh.md) | 检查假设；有关键缺口时只问一个问题，否则直接回答或继续已授权的任务。 |
 | [karpathy-guidelines](docs/thinking/karpathy-guidelines.zh.md) | 保持任务范围，验证结果，清楚表达结论。内容来自个人维护的 fork。 |
 | [wait-what](docs/thinking/wait-what.zh.md) | 补齐上下文，以明确逻辑和一致术语重新解释没听懂的回答。仅显式调用，改编自 Matt Pocock。 |
 
@@ -112,7 +112,7 @@ codex plugin add skills@mel0nyrame-skills
 
 ## 行为与依赖
 
-- `clarify` 在仍有关键缺口时只问一个问题并等待回复。已有上下文充分时，它在同一轮直接回答。
+- `clarify` 在仍有关键缺口时只问一个问题并等待回复。已有上下文充分时，它在同一轮直接回答，或在原有授权范围内继续原始任务。
 - `wait-what` 仅由用户显式调用，使用用户当前的语言重新解释回答，不依赖词汇表文件或外部服务。
 - `recap` 仅由用户显式调用。保留 `disable-model-invocation: true` 和 Codex 禁止隐式调用的设置。
 - `project-git` 分别检查 commit、push 和 PR/MR 操作的授权。先检查项目规则和稳定的结构化提交历史，再决定是否使用中文默认说明。用户对本次任务的明确要求优先。
