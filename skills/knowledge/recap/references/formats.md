@@ -21,7 +21,7 @@ Stored headers additionally contain `schema: recap-topic/v2`, `created` and `upd
 
 ## Body links
 
-Local body links must be relative to their owning document, use forward slashes and remain inside the knowledge root. Absolute local paths (including Windows drive paths and `file:` URLs), backslashes and root-escaping `..` are rejected. Link fragments are allowed; the helper checks the target file, not its heading anchor. Topic links may target only topics, sources or `index.md`, not management material. External link schemes are limited to `http`, `https` and `mailto`. A path needed as an operational example can appear as code rather than as a clickable local link.
+Local body links must be relative to their owning document, use forward slashes and remain inside the knowledge root. Absolute local paths (including Windows drive paths and `file:` URLs), backslashes and root-escaping `..` are rejected. Wrap destinations containing spaces in angle brackets, for example `[Source](<../sources/Case notes.md>)`. In destinations, percent-encode literal angle brackets. Link fragments are allowed; the helper checks the target file, not its heading anchor. Topic links may target only topics, sources or `index.md`, not management material. External link schemes are limited to `http`, `https` and `mailto`. A path needed as an operational example can appear as code rather than as a clickable local link.
 
 ## Body templates
 

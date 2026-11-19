@@ -82,6 +82,73 @@ class MaintenanceTests(unittest.TestCase):
             "content": json.dumps(receipt)})
         return self.packet(identifier, changes)
 
+    def test_spaced_links_publish_and_read_exact_source(self):
+        packet = self.cursor_packet('capture')
+        data = json.loads(packet.read_bytes())
+        _, source, topic, cursor = data['changes']
+        source['path'] = 'sources/Source 记录.md'
+        topic['path'] = 'topics/Topic 记忆.md'
+        topic['document']['sources'] = ['../sources/Source 记录.md']
+        topic['document']['body'] = '# Example\n\n[Source](<../sources/Source 记录.md>)\n'
+        receipt = json.loads(cursor['content'])
+        receipt['represented_by'] = {'topics': [topic['path']], 'sources': [source['path']]}
+        cursor['content'] = json.dumps(receipt)
+        packet.write_bytes(json_bytes(data))
+
+        before = head(self.root)
+        candidate = workflow.inspect(self.root, packet)
+        self.assertEqual(candidate['status'], 'ready')
+        self.assertEqual(head(self.root), before)
+        workflow.publish(self.root, 'capture', candidate['approval_sha256'])
+        revision = head(self.root)
+        index = (self.root / 'index.md').read_text(encoding='utf-8')
+        self.assertIn('](<topics/Topic 记忆.md>)', index)
+        current = knowledge.read_document(self.root, source['path'], 'source', owner=topic['path'])
+        historical = knowledge.read_version(self.root, source['path'], revision, owner=topic['path'])
+        self.assertEqual(current['content'], source['content'])
+        self.assertEqual(historical['content'], source['content'])
+
+    def test_generated_link_rejection_leaves_editing_candidate_retryable(self):
+        packet = self.cursor_packet('capture')
+        data = json.loads(packet.read_bytes())
+        topic, cursor = data['changes'][2:]
+        receipt = json.loads(cursor['content'])
+
+        def packet_for_topic(path):
+            topic['path'] = path
+            receipt['represented_by']['topics'] = [path]
+            cursor['content'] = json.dumps(receipt)
+            packet.write_bytes(json_bytes(data))
+
+        # A literal '#' in the generated destination is interpreted as a fragment.
+        packet_for_topic('topics/Example#fragment.md')
+        workflow.begin(self.root, 'capture', 'writer')
+        state = workflow.get_state(self.root, 'capture')
+        tree = workflow.worktree(self.root, state)
+        formal_head, candidate_head = head(self.root), head(tree)
+        for _ in range(2):
+            with self.assertRaisesRegex(doc.DocumentError, 'Broken local link in index.md'):
+                workflow.inspect(self.root, packet)
+            self.assertEqual(head(self.root), formal_head)
+            self.assertEqual(head(tree), candidate_head)
+            self.assertEqual(workflow.get_state(self.root, 'capture'), state)
+            self.assertEqual(git(tree, 'status', '--porcelain').stdout, b'')
+
+        packet_for_topic('topics/Example with spaces.md')
+        result = workflow.inspect(self.root, packet)
+        self.assertEqual(result['status'], 'ready')
+        self.assertEqual(result['base_revision'], formal_head)
+
+    def test_inline_destination_forms_preserve_local_path_checks(self):
+        self.assertEqual(doc.markdown_links('[x](<a b.md> "title") [y](a.md \'title\')'), ['a b.md', 'a.md'])
+        self.assertEqual(doc.markdown_links('[x](a b.md) [x](<a>b.md>) [x](<a<b.md>)'), [])
+        self.assertEqual(doc.markdown_links('[x](<a%3Eb.md>)'), ['a%3Eb.md'])
+        self.assertEqual(doc.local_target('topics/topic.md', 'a b.md'), 'topics/a b.md')
+        for link in ('/a b.md', '../../a b.md', '%2e%2e/%2e%2e/a b.md', 'C:/a b.md',
+                     'a\\b.md', 'a\tb.md', 'a%00b.md'):
+            with self.subTest(link=link), self.assertRaises(doc.DocumentError):
+                doc.local_target('topics/topic.md', link)
+
     def private_cursor_packet(self, identifier):
         packet = self.cursor_packet(identifier)
         payload = json.loads(packet.read_text(encoding='utf-8'))

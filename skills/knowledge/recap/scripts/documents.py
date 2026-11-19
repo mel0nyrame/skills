@@ -200,11 +200,23 @@ def validate_source(content):
     return meta, body
 
 
+# Match the suffix so search can mask it without changing the label or its offsets.
+INLINE_LINK_TAIL = re.compile(r"""
+    \]\(
+    (?:<(?P<angle>[^<>\r\n]+)>|(?P<bare>[^\s<>)]+))
+    (?:[ \t]+(?:"(?:\\.|[^"\\\r\n])*"|'(?:\\.|[^'\\\r\n])*'|\([^()\r\n]*\)))?
+    [ \t]*\)
+""", re.VERBOSE)
+
+
 def markdown_links(body):
-    return re.findall(r"\]\(<?([^\s)>]+)>?(?:\s+[^)]*)?\)", body)
+    return [match['angle'] or match['bare'] for match in INLINE_LINK_TAIL.finditer(body)]
 
 
 def local_target(owner, link):
+    # urlsplit strips some raw controls; reject them before parsing.
+    if any(ord(c) < 32 for c in link):
+        raise DocumentError('Control character in link')
     parsed = urlsplit(link)
     if parsed.scheme:
         if parsed.scheme not in ('http', 'https', 'mailto'):
