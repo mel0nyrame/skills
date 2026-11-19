@@ -23,5 +23,5 @@ license: MIT
 
 When a task hits the triggers below, **read the corresponding file first** before executing:
 
-- **Modifying existing code, files, or structured artifacts:** Read [Coding Guide](/references/coding-and-edits.md) for surgical change boundaries and anti-overengineering rules.
-- **Nontrivial research, bug fixes, compatibility work, or multi-step plans:** Read [Verification Guide](/references/verification-guide.md) for task-specific completion and verification criteria.
+- **Modifying existing code, files, or structured artifacts:** Read [Coding Guide](references/coding-and-edits.md) for surgical change boundaries and anti-overengineering rules.
+- **Nontrivial research, bug fixes, compatibility work, or multi-step plans:** Read [Verification Guide](references/verification-guide.md) for task-specific completion and verification criteria.
