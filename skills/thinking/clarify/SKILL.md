@@ -1,6 +1,6 @@
 ---
 name: clarify
-description: Use when the user asks to clarify intent or stress-test an open-ended question before receiving an answer. Ask one decisive question when a decision-changing gap remains; otherwise answer directly.
+description: Use when the user asks to clarify intent or stress-test an open-ended question before receiving an answer. Ask one decisive question when a decision-changing gap remains; otherwise answer directly or continue the original task within its existing authorization.
 ---
 
 # Clarify

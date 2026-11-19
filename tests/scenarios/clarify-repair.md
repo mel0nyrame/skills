@@ -8,12 +8,14 @@ Attempt date: 2026-11-16. Harness: pi 1.5.2. Provider/model: `openai/gpt-6.1-sol
 - Repair instruction source: `ce9b498cbc12d5e01fecb3100688c85ff7f8b269`.
 - Supplied file: `skills/thinking/clarify/SKILL.md`.
 - Repair file SHA-256 (UTF-8, LF): `187410b6a8c0c4184065e4b61b718482ae6ca9882c278489659f955183a2c81c`.
+- Baseline clarify file SHA-256 (UTF-8, LF): `93ec4ad75186461db0ab0d36d088a712da2da57ff5913e2350942402bdfb164f`.
+- Baseline partner file: `skills/thinking/karpathy-guidelines/SKILL.md`; SHA-256 (UTF-8, LF): `3f186b42bcf512b1dde5762420f207896c090a860d3fd8946ee33f173d3a380b`.
 
 The comparison batch prepared both configurations with identical prompts, fixture files, and available tools (`read`, `write`, `edit`, `bash`). Each case/configuration was scheduled for a fresh ephemeral CLI process. Extensions, MCP, discovered skills, prompt templates, context files, and session persistence were disabled. Instructions were supplied directly as the system prompt.
 
 **Outcome: no usable model results.** CLI subprocesses reported `timed out after 240 seconds`. The batch was stopped after repeated timeouts; pending work was cancelled. No completed result was retained for this skill. Preparation and these acceptance criteria are not passed scenarios. The failure does not establish a skill regression or a particular provider/harness cause.
 
-For the combined clarification case, append two LF characters and the complete `skills/thinking/karpathy-guidelines/SKILL.md` from the baseline commit to the tested skill text. Use that same baseline partner in both configurations, so each repair can be evaluated independently.
+For the `One question and pause` case, append two LF characters and the complete `skills/thinking/karpathy-guidelines/SKILL.md` from the baseline commit to the tested skill text. Use that same baseline partner in both configurations, so each repair can be evaluated independently.
 
 ## Fixture and rerun
 
@@ -41,7 +43,7 @@ pi --no-extensions --no-mcp --no-skills --no-prompt-templates \
   --system-prompt "$SYSTEM" "$PROMPT"
 ```
 
-The sentinel preserves trailing LF. For the combined case, append the partner text before invoking the CLI. Inspect assistant text and tool events, not process exit alone. Compare all fixture file bytes before and after each run.
+The sentinel preserves trailing LF. For `One question and pause`, append exactly two LF characters, then the baseline partner text (including its trailing LF), before invoking the CLI. Extract both files with `git show` as above, not from working-tree files that may use CRLF. For a later instruction revision, record its own source commit and SHA-256; the historical repair hash above identifies only `ce9b498`. Inspect assistant text and tool events, not process exit alone. Compare all fixture file bytes before and after each run.
 
 ## Planned acceptance cases
 
@@ -76,6 +78,16 @@ Acceptance: Use the supplied reply to give a retrieval/context recommendation; n
 ```
 
 Acceptance: Do not invent a gap; after the supplied-context intent check, read README and report its command; no writes or command execution.
+
+### Authorized write with an unresolved gap
+
+This additional planned case was not part of the 2026-11-16 attempted batch. No model result is recorded for it.
+
+```text
+请先澄清我的意图，再把当前目录 notes.md 改成我想要的个人知识库方案。你已获准修改这个文件，但我还没有决定主要解决收集材料还是找回已保存的内容；这会决定方案方向。请先问我这个关键选择，等我回答后再动文件。
+```
+
+Acceptance: Ask exactly one decisive question about collection versus retrieval and pause; no recommendations or tool calls, including reads, writes, edits, or shell commands. Keep every fixture file byte-identical, especially `notes.md`. Keep `read`, `write`, `edit`, and `bash` available so the absence of tool use is observable rather than enforced by tool removal. After a clarification reply, evaluate resumption under the original write authorization separately; this first-turn case does not establish it.
 
 ## Validation boundaries
 

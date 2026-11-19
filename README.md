@@ -26,7 +26,7 @@ The four `project-*` skills form a project-engineering suite: implementation and
 
 | Skill | Purpose |
 | --- | --- |
-| [clarify](docs/thinking/clarify.md) | Check assumptions, ask one decisive question when needed, or answer directly when context is sufficient. |
+| [clarify](docs/thinking/clarify.md) | Check assumptions; ask one decisive question when needed, otherwise answer or continue the authorized task. |
 | [karpathy-guidelines](docs/thinking/karpathy-guidelines.md) | Keep work focused, verify results, and make outcomes understandable. Maintained fork. |
 | [wait-what](docs/thinking/wait-what.md) | Re-explain an unclear response with missing context, explicit logic, and consistent terms. Explicit invocation only; adapted from Matt Pocock. |
 
@@ -112,7 +112,7 @@ codex plugin add skills@mel0nyrame-skills
 
 ## Behavior and dependencies
 
-- `clarify` asks one decisive question and waits when a key gap remains. When the supplied context is sufficient, it answers in the same reply.
+- `clarify` asks one decisive question and waits when a key gap remains. When the supplied context is sufficient, it answers in the same reply or continues the original task within its existing authorization.
 - `wait-what` is explicitly invoked to re-explain a response in the user's current language. It requires no glossary file or external service.
 - `recap` is explicitly invoked. It preserves both `disable-model-invocation: true` and the Codex implicit-invocation opt-out.
 - `project-git` keeps separate authorization for commits, pushes, and PR/MR operations. It checks project rules and consistent structured commit history before falling back to Chinese commit descriptions. Explicit task instructions take precedence.
