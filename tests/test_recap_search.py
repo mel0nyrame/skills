@@ -206,6 +206,25 @@ class SearchTests(unittest.TestCase):
                 self.assertEqual(self.paths(query, fallback), ["topics/plain.md"])
             self.assertEqual(self.paths("destinationmarker", fallback), [])
 
+    def test_spaced_link_destination_is_masked_in_both_search_paths(self):
+        self.topic("inline.md", "Inline", '[Visible label](<../sources/record (old) hiddenmarker.md> "link title")')
+        for fallback in (False, True):
+            with self.subTest(fallback=fallback):
+                self.assertEqual(self.paths("hiddenmarker", fallback), [])
+                self.assertEqual(self.paths("Visible", fallback), ["topics/inline.md"])
+
+    def test_schema3_cache_rebuilds_changed_inline_link_projection(self):
+        if not knowledge.fts_available():
+            self.skipTest("SQLite FTS5 unavailable")
+        path = self.topic("inline.md", "Inline", "[Visible](<../sources/record (old) hiddenmarker.md>)")
+        original = path.read_bytes()
+        with patch.object(knowledge, "INDEX_SCHEMA", "3"), patch.object(knowledge, "visible_text", side_effect=lambda text: text):
+            self.assertEqual(self.paths("hiddenmarker"), ["topics/inline.md"])
+
+        self.assertEqual(self.paths("hiddenmarker"), [])
+        self.assertEqual(self.paths("Visible"), ["topics/inline.md"])
+        self.assertEqual(path.read_bytes(), original)
+
     def test_reference_keys_are_excluded_but_labels_remain_searchable(self):
         self.topic("references.md", "References",
                    "[Visible label][ HiddenRefKey ] and [Collapsed label][]\n\n"

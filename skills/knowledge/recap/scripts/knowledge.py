@@ -69,7 +69,7 @@ CJK = r"\u3400-\u9fff\uf900-\ufaff\U00020000-\U0002ffff"
 IDENTIFIER = r"[A-Za-z0-9_]+(?:(?:\.|::)[A-Za-z0-9_]+)*"
 TOKEN = re.compile(rf"[{CJK}]|{IDENTIFIER}|[^\W_]+", re.UNICODE)
 QUERY_GROUP = re.compile(rf"[{CJK}]+|{IDENTIFIER}|[^\W_]+", re.UNICODE)
-INDEX_SCHEMA = "3"
+INDEX_SCHEMA = "4"
 
 
 def normalized_tokens(text):
@@ -151,8 +151,7 @@ def visible_text(text):
     text = re.sub(r"\[([^]\n]+)\]\[([^]\n]*)\]",
                   lambda match: keep_group(match, 1)
                   if reference_id(match[2] or match[1]) in references else match[0], text)
-    text = re.sub(r"\]\(<?[^\s)>]+>?(?:\s+[^)]*)?\)",
-                  lambda match: "]" + blank(match[0][1:]), text)
+    text = documents.INLINE_LINK_TAIL.sub(lambda match: "]" + blank(match[0][1:]), text)
     return re.sub(r"\[\[([^\]|\n]+)(?:\|([^]\n]+))?\]\]",
                   lambda match: keep_group(match, 2 if match[2] is not None else 1), text)
 
@@ -342,7 +341,7 @@ def _read_document(root, relative, purpose, owner=None):
             raise KnowledgeError("Source reads require --owner topics/FILE.md naming the topic whose exact link you followed")
         owner_path = safe_path(root, owner)
         text = owner_path.read_text(encoding="utf-8")
-        links = re.findall(r"\]\(<?([^\s)>]+)>?(?:\s+[^)]*)?\)", text)
+        links = documents.markdown_links(text)
         links += re.findall(r"\[\[([^\]|]+)(?:\|[^\]]*)?\]\]", text)
         found = False
         for link in links:

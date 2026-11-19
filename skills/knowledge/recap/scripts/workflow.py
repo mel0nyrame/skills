@@ -321,8 +321,7 @@ def escape_label(value):
     return value.replace('\\', '\\\\').replace('[', '\\[').replace(']', '\\]')
 
 
-def catalogs(tree, state):
-    files = content_files(tree)
+def render_index(files):
     topics = {p: doc.validate_topic(c)[0] for p, c in files.items() if p.startswith('topics/')}
     start, end = TOPICS_START, TOPICS_END
     current = files.get('index.md', '# Knowledge\n')
@@ -335,10 +334,15 @@ def catalogs(tree, state):
     lines += ['', end]
     section = '\n'.join(lines)
     if start in current:
-        current = prefix + section + suffix
-    else:
-        current = current.rstrip() + '\n\n' + section + '\n'
-    atomic_write(safe_path(tree, 'index.md'), current.encode())
+        return prefix + section + suffix, chinese
+    return current.rstrip() + '\n\n' + section + '\n', chinese
+
+
+def catalogs(tree, state, rendered_index=None):
+    if rendered_index is None:
+        rendered_index = render_index(content_files(tree))
+    index, chinese = rendered_index
+    atomic_write(safe_path(tree, 'index.md'), index.encode())
     changes = safe_path(tree, 'CHANGELOG.md')
     # Rebuild this operation's append from its integration base, never append it twice.
     base_log = git_content(tree, state['base'], 'CHANGELOG.md') or b'# Knowledge changes\n'
@@ -461,13 +465,15 @@ def inspect(root, filename):
             rendered[relative] = render_item(item, git_content(root, state['base'], relative), date.today().isoformat())
         files = content_files(tree)
         files.update({p: b.decode() for p, b in rendered.items() if p.endswith('.md')})
+        rendered_index = render_index(files)
+        files['index.md'], _ = rendered_index
         doc.validate_library(files)
         state.update(packet=packet, packet_sha256=packet_sha, authored=sorted(seen))
         check_cursors(tree, state, rendered)
         for relative, data in rendered.items():
-            atomic_write(safe_path(tree, relative), data)
-        catalogs(tree, state)
-        doc.validate_library(content_files(tree))
+            if relative != 'index.md':
+                atomic_write(safe_path(tree, relative), data)
+        catalogs(tree, state, rendered_index=rendered_index)
         check_cursors(tree, state)
         check_candidate_scope(tree, state)
         state['reserved_reasons'] = reserved_reasons(root, tree, state)
